@@ -1,0 +1,73 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia cms_base %}
+
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="/media/cms/admin.css" media="screen" />
+<script src="/media/cms/mootools.js" type="text/javascript"></script>
+<script src="/media/cms/dynamicforms.js" type="text/javascript"></script>
+<script src="/media/cms/page_add.js" type="text/javascript"></script>
+<script type="text/javascript">
+Window.onDomReady(function(){
+    PageContent.template = {{ pagecontent_template }};
+
+{% if not add %}
+    {% if pagecontent_data %}
+    {% for pagecontent in pagecontent_data %}
+    new PageContent({{ pagecontent }});
+    {% endfor %}
+    {% else %}
+    new PageContent();
+    {% endif %}
+{% endif %}
+})
+</script>
+{% endblock %}
+
+{% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
+
+{% block userlinks %}<a href="../../../doc/">{% trans 'Documentation' %}</a> / <a href="../../../password_change/">{% trans 'Change password' %}</a> / <a href="../../../logout/">{% trans 'Log out' %}</a>{% endblock %}
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../">{% trans 'Pages' %}</a> &rsaquo;
+     {% if add %}{% trans "Add" %} {% trans 'page' %}{% else %}{{ page|truncatewords:"18"|escape }}{% endif %}
+</div>
+{% endif %}{% endblock %}
+
+{% block content %}
+<ul class="object-tools"><li><a href="../add/" class="addlink">{% trans 'Add page' %}</a></li></ul>
+
+<div id="content-main">
+  <form id="page-form" action="" method="post">
+    <fieldset class="module aligned">
+        <div class="form-row">{{ form.title.errors }}<label for="id_title" class="required">{{ form.title.label }}</label>{{ form.title }}<p class="help">{{ form.fields.title.help_text }}</p></div>
+        <div class="form-row">{{ form.slug.errors }}<label for="id_slug" class="required">{{ form.slug.label }}</label>{{ form.slug }}<p class="help">{{ form.fields.slug.help_text }}</p></div>
+        <div class="form-row checkbox-row">{{ form.is_published.errors }}{{ form.is_published }}<label for="id_is_published" class="vCheckboxLabel">{{ form.is_published.label }}</label><p class="help">{{ form.fields.is_published.help_text }}</p></div>
+        <div class="form-row">{{ form.template.errors }}<label for="id_template" class="required">{{ form.template.label }}</label>{{ form.template }}<p class="help">{{ form.fields.template.help_text }}</p></div>
+        <div class="form-row">{{ form.parent.errors }}<label for="id_navigation">{{ form.parent.label }}</label>
+        <div class="inline">{{ form.parent }}</div> <div class="inline">{{ form.in_navigation }} <label for="{{ form.in_navigation.auto_id }}">{{ form.in_navigation.label }}</label></div><p class="help">{{ form.fields.parent.help_text }}</p></div>
+        {% if navigations %}
+        <div><p class="info">{% trans 'This page is already in the navigation (<a href="../../navigation/">edit navigation</a>):' %}</p>
+        <ul>
+        {% for navigation in navigations %}
+            <li>{{ navigation }} {% if not navigation.in_navigation %}<span class="small">(not displayed in navigation)</span>{% endif %} <a class="deletelink navigation-delete" href="../../navigation/{{ navigation.id }}/delete/">Delete</a></li>
+        {% endfor %}
+        </ul></div>
+        {% endif %}
+    </fieldset>
+
+{% include 'cms/page_submit_row.html' %}
+
+{% if not add %}
+<h2>{% trans 'Edit page content' %}</h2>
+<noscript><p class="errornote">{% trans 'Note' %}:</b> {% trans "You will have to activate JavaScript in your browser's settings to be able to edit page content." %}</p></noscript>
+<div id="page-contents"></div>
+<p><a href="#" class="addlink page-content-add">{% trans 'Add page content' %}</a></p>
+{% include 'cms/page_submit_row.html' %}
+{% endif %}
+
+  </form>
+
+</div>
+
+{% endblock %}

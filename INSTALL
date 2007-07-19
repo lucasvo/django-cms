@@ -1,0 +1,22 @@
+urls.py
+=======
+
+urlpatterns = patterns('',
+    (r'^admin/', include('cms.admin_urls')),
+    (r'^admin/', include('django.contrib.admin.urls')),
+    (r'^', include('cms.urls')),
+)
+
+settings.py
+===========
+
+MIDDLEWARE_CLASSES = (
+    #'cms.middleware.BenchmarkMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.doc.XViewMiddleware',
+    'cms.middleware.XHTMLToHTMLMiddleware',
+)
+

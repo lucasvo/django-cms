@@ -1,0 +1,316 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-02-22 12:34+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin_views.py:23
+msgid "The title of the page."
+msgstr ""
+
+#: admin_views.py:24
+msgid ""
+"The name of the page that will appear in the URL. A slug can contain "
+"letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: admin_views.py:25
+msgid "Whether or not the page will be accessible from the web."
+msgstr ""
+
+#: admin_views.py:26
+msgid ""
+"The template that will be used to render the page. Only change this value if "
+"you need a custom template."
+msgstr ""
+
+#: admin_views.py:27
+msgid "The page will be appended inside the chosen category."
+msgstr ""
+
+#: admin_views.py:27
+msgid "Navigation"
+msgstr ""
+
+#: admin_views.py:45
+msgid "Please reorder the root object on the hierarchy page."
+msgstr ""
+
+#: admin_views.py:47
+msgid "Please choose in which category the page should belong."
+msgstr ""
+
+#: admin_views.py:57
+msgid "Leave this empty to use the title of the page."
+msgstr ""
+
+#: admin_views.py:60 models.py:147
+msgid "HTML"
+msgstr ""
+
+#: admin_views.py:60 models.py:147
+msgid "Markdown"
+msgstr ""
+
+#: admin_views.py:60 models.py:147
+msgid "Plain text"
+msgstr ""
+
+#: admin_views.py:63
+msgid "Template (optional)"
+msgstr ""
+
+#: admin_views.py:66
+msgid "New page content"
+msgstr ""
+
+#: admin_views.py:130
+msgid "The page was added successfully. Now you can create your content."
+msgstr ""
+
+#: admin_views.py:132
+msgid "The page was updated successfully. You may edit it again below."
+msgstr ""
+
+#: admin_views.py:145 templates/page_add.html:33
+msgid "Add"
+msgstr ""
+
+#: admin_views.py:145
+msgid "Edit"
+msgstr ""
+
+#: admin_views.py:145 templates/page_add.html:33
+msgid "page"
+msgstr ""
+
+#: admin_views.py:169
+msgid "<h2>Your form is not valid.</h2>"
+msgstr ""
+
+#: admin_views.py:217
+msgid "The navigation was updated successfully. You may edit it again below."
+msgstr ""
+
+#: admin_views.py:220
+msgid ""
+"Your changes were discarded, because there must not be more than one root "
+"element. Make sure that there is only one root element."
+msgstr ""
+
+#: admin_views.py:227
+msgid "<li>Please <a href=\"../page/add/\">create a page</a> first.</li>"
+msgstr ""
+
+#: admin_views.py:230
+msgid "Edit pages"
+msgstr ""
+
+#: admin_views.py:242
+msgid ""
+"This page content has been already removed. Please reload the page and try "
+"again."
+msgstr ""
+
+#: json.py:15
+msgid "Received invalid data."
+msgstr ""
+
+#: models.py:44
+msgid "Please create at least one page."
+msgstr ""
+
+#: models.py:48
+msgid "Insert title here"
+msgstr ""
+
+#: models.py:49
+msgid ""
+"The name of the page that will appear in the URL. Do not leave this empty "
+"unless it is the main page."
+msgstr ""
+
+#: models.py:154
+msgid "Only specify this if you want to override the page template."
+msgstr ""
+
+#: models.py:156
+msgid "Leave this empty to use the default title."
+msgstr ""
+
+#: models.py:180
+msgid "published"
+msgstr ""
+
+#: models.py:180
+msgid "unpublished"
+msgstr ""
+
+#: templatetags/cms_base.py:127
+msgid "Unknown"
+msgstr ""
+
+#: templatetags/cms_base.py:129
+msgid "Yes"
+msgstr ""
+
+#: templatetags/cms_base.py:131
+msgid "No"
+msgstr ""
+
+#: templates/navigation_item.html:3
+msgid "In navigation"
+msgstr ""
+
+#: templates/navigation_item.html:3
+msgid "Is published"
+msgstr ""
+
+#: templates/navigation_item.html:3
+msgid "Edit page"
+msgstr ""
+
+#: templates/navigation_item.html:3 templates/page_submit_row.html:3
+msgid "Delete"
+msgstr ""
+
+#: templates/navigation_item.html:4
+msgid "Link ID"
+msgstr ""
+
+#: templates/navigation.html:13 templates/page_add.html:28
+msgid "Documentation"
+msgstr ""
+
+#: templates/navigation.html:13 templates/page_add.html:28
+msgid "Change password"
+msgstr ""
+
+#: templates/navigation.html:13 templates/page_add.html:28
+msgid "Log out"
+msgstr ""
+
+#: templates/navigation.html:16 templates/page_add.html:31
+msgid "Home"
+msgstr ""
+
+#: templates/navigation.html:17 templates/page_add.html:32
+msgid "Pages"
+msgstr ""
+
+#: templates/navigation.html:22 templates/page_add.html:38
+msgid "Add page"
+msgstr ""
+
+#: templates/navigation.html:28
+msgid ""
+"Here you can edit the pages of your site. Drag and drop the pages to change "
+"their order or hierarchy. Note that changing the hierarchy will affect the "
+"URL of the pages. Click on a page to edit it. If you uncheck the \"in "
+"navigation\" field, the page will not be displayed in the automatically "
+"generated navigation. Note that deleting a page will delete its subpages, if "
+"you don't reorder them."
+msgstr ""
+
+#: templates/navigation.html:29 templates/navigation.html.py:30
+#: templates/page_add.html:63
+msgid "Note"
+msgstr ""
+
+#: templates/navigation.html:29
+msgid ""
+"You are using Internet Explorer. There may be problems while reordering the "
+"pages. Please use Firefox or Safari."
+msgstr ""
+
+#: templates/navigation.html:30
+msgid ""
+"You will have to activate JavaScript in your browser's settings to be able "
+"to reorder the pages."
+msgstr ""
+
+#: templates/navigation.html:40
+msgid "Add a new page"
+msgstr ""
+
+#: templates/navigation.html:43 templates/page_submit_row.html:4
+msgid "Add this page"
+msgstr ""
+
+#: templates/navigation.html:43 templates/page_submit_row.html:4
+msgid "Save all changes"
+msgstr ""
+
+#: templates/page_add.html:50
+msgid ""
+"This page is already in the navigation (<a href=\"../../navigation/\">edit "
+"navigation</a>):"
+msgstr ""
+
+#: templates/page_add.html:62
+msgid "Edit page content"
+msgstr ""
+
+#: templates/page_add.html:63
+msgid ""
+"You will have to activate JavaScript in your browser's settings to be able "
+"to edit page content."
+msgstr ""
+
+#: templates/page_add.html:65
+msgid "Add page content"
+msgstr ""
+
+#: templates/pagecontent_form.html:5
+msgid "Properties"
+msgstr ""
+
+#: templates/pagecontent_form.html:8
+msgid "Show advanced options"
+msgstr ""
+
+#: templates/pagecontent_form.html:8
+msgid "Hide advanced options"
+msgstr ""
+
+#: templates/pagecontent_form.html:11
+msgid "Advanced"
+msgstr ""
+
+#: templates/pagecontent_form.html:24
+msgid "Actions"
+msgstr ""
+
+#: templates/pagecontent_form.html:25
+msgid "Preview this page"
+msgstr ""
+
+#: templates/pagecontent_form.html:25
+msgid ""
+"Previews the last saved version of this page in a new window without saving "
+"it."
+msgstr ""
+
+#: templates/pagecontent_form.html:26
+msgid "Preview"
+msgstr ""
+
+#: templates/pagecontent_form.html:27
+msgid "(in a new window without saving it)"
+msgstr ""
+
+#: templates/pagecontent_form.html:30
+msgid "Delete this content"
+msgstr ""

@@ -1,0 +1,34 @@
+{% load i18n %}
+<h2>{{ form }}</h2>
+<div class="pagecontent-content">
+
+<div class="form-row">{{ form.language.errors }}{{ form.is_published.errors }}<label class="required">{% trans 'Properties' %}</label>
+  <div class="inline"><label for="{{ form.language.auto_id }}" class="required">{{ form.language.label }}:</label> {{ form.language }}</div>
+  <div class="inline">{{ form.is_published }} <label for="{{ form.is_published.auto_id }}">{{ form.is_published.label }}</label></div>
+  <div class="inline"><a href="#" class="toggle-advanced">{% trans 'Show advanced options' %}</a><a href="#" class="toggle-advanced hidden">{% trans 'Hide advanced options' %}</a></div>
+</div>
+
+<div class="form-row advanced hidden">{{ form.content_type.errors }}{{ form.allow_template_tags.errors }}{{ form.template.errors }}<label>{% trans 'Advanced' %}</label>
+  <div class="inline"><label for="{{ form.content_type.auto_id }}">{{ form.content_type.label }}:</label> {{ form.content_type }}</div>
+  <div class="inline">{{ form.allow_template_tags }} <label for="{{ form.allow_template_tags.auto_id }}">{{ form.allow_template_tags.label }}</label></div>
+  <div class="inline"><label for="{{ form.template.auto_id }}">{{ form.template.label }}:</label> {{ form.template }}</div>
+</div>
+
+<div class="form-row">{{ form.title.errors }}<label for="{{ form.title.auto_id }}">{{ form.title.label }}</label>{{ form.title }}<p class="help">{{ form.title.help_text }}</p></div>
+
+{% if use_description %}
+<div class="form-row">{{ form.description.errors }}<label for="{{ form.description.auto_id }}">{{ form.description.label }}</label>{{ form.description }}</div>
+{% endif %}
+
+<div class="form-row">{{ form.content.errors }}<label for="{{ form.content.auto_id }}" class="required">{{ form.content.label }}</label>{{ form.content }}</div>
+  <div class="form-row"><label>{% trans 'Actions' %}</label>
+  <!--<div><a class="preview" href="#" id="id_{{ form.prefix }}-preview.#">{% trans 'Preview this page' %}</a> <p class="help">{% trans 'Previews the last saved version of this page in a new window without saving it.' %}</div>-->
+<div><ul class="object-tools"><li><a href="#" target="_blank" class="pagecontent-preview viewsitelink">{% trans 'Preview' %}</a></li></ul></div>
+<p class="help">{% trans '(in a new window without saving it)' %}</p>
+
+  {% if form.id %}
+<div class="delete"><a href="../../pagecontent/{{ form.id }}/delete/" class="deletelink pagecontent-delete">{% trans 'Delete this content' %}</a></div>
+{% endif %}
+
+</div>
+</div>
