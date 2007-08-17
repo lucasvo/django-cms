@@ -114,7 +114,7 @@ class Page(models.Model):
 
     def get_path(self):
         class PathList(list):
-            def __str__(self):
+            def __unicode__(self):
                 return u' > '.join([smart_unicode(page) for page in self])
 
         path = [self]
