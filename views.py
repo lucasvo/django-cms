@@ -132,6 +132,16 @@ def handler(request, url=''):
     if do_redirect:
         return HttpResponseRedirect('/%s/'%url)
 
+    language = request.LANGUAGE_CODE
+
+    # This shouldn't happen
+    if not language in languages:
+        language = settings.LANGUAGE_CODE
+    if not language in languages:
+        language = LANGUAGE_DEFAULT
+    if not language in languages:
+        raise Exception, _("Please define LANGUAGES in your project's settings.")
+
     # Determine the language and redirect the user, if required
     if LANGUAGE_REDIRECT:
         if url:
@@ -140,16 +150,6 @@ def handler(request, url=''):
                     return handle_page(request, l, '')
                 if url.startswith('%s/'%l):
                     return handle_page(request, l, url[len(l)+1:])
-
-        language = request.LANGUAGE_CODE
-
-        # This shouldn't happen
-        if not language in languages:
-            language = settings.LANGUAGE_CODE
-        if not language in languages:
-            language = LANGUAGE_DEFAULT
-        if not language in languages:
-            raise Exception, _("Please define LANGUAGES in your project's settings.")
 
         # Make sure the language code is prepended to the URL
         # See also: http://www.mail-archive.com/django-users@googlegroups.com/msg11604.html
