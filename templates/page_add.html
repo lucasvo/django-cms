@@ -43,7 +43,7 @@ Window.onDomReady(function(){
         <div class="form-row">{{ form.title.errors }}<label for="id_title" class="required">{{ form.title.label }}</label>{{ form.title }}<p class="help">{{ form.fields.title.help_text }}</p></div>
         <div class="form-row">{{ form.slug.errors }}<label for="id_slug" class="required">{{ form.slug.label }}</label>{{ form.slug }}<p class="help">{{ form.fields.slug.help_text }}</p></div>
         <div class="form-row checkbox-row">{{ form.is_published.errors }}{{ form.is_published }}<label for="id_is_published" class="vCheckboxLabel">{{ form.is_published.label }}</label><p class="help">{{ form.fields.is_published.help_text }}</p></div>
-        <div class="form-row">{{ form.template.errors }}<label for="id_template" class="required">{{ form.template.label }}</label>{{ form.template }}<p class="help">{{ form.fields.template.help_text }}</p></div>
+        <div class="form-row">{{ form.template.errors }}<label for="id_template">{{ form.template.label }}</label>{{ form.template }}<p class="help">{{ form.fields.template.help_text }}</p></div>
         <div class="form-row">{{ form.parent.errors }}<label for="id_navigation">{{ form.parent.label }}</label>
         <div class="inline">{{ form.parent }}</div> <div class="inline">{{ form.in_navigation }} <label for="{{ form.in_navigation.auto_id }}">{{ form.in_navigation.label }}</label></div><p class="help">{{ form.fields.parent.help_text }}</p></div>
         {% if navigations %}

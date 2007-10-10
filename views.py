@@ -9,10 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import translation
 
 from cms import models
-try:
-    from cms.settings import *
-except ImportError:
-    raise StandardError, "Could not import CMS settings. Please configure the CMS application."
+from cms.cms_global_settings import *
 from cms.util import language_list
 
 import markdown
@@ -60,7 +57,7 @@ def render_pagecontent(request, language, page, page_content):
     # Third processing stage: Use the specified template
     context.update({ 'content': content })
 
-    template = loader.get_template(page_content.template)
+    template = loader.get_template(page_content.template or DEFAULT_TEMPLATE)
 
     return HttpResponse(template.render(context))
 
@@ -132,7 +129,10 @@ def handler(request, url=''):
     if do_redirect:
         return HttpResponseRedirect('/%s/'%url)
 
-    language = request.LANGUAGE_CODE
+    try:
+        language = request.LANGUAGE_CODE
+    except AttributeError:
+        raise StandardError, "Please add django.middleware.locale.LocaleMiddleware to your MIDDLEWARE_CLASSES."
 
     # This shouldn't happen
     if not language in languages:

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
 from cms.util import language_list
-from cms.settings import LANGUAGE_REDIRECT
+from cms.cms_global_settings import LANGUAGE_REDIRECT
 
 """
 class Template(models.Model):
@@ -44,7 +44,7 @@ class PageManager(models.Manager):
         try:
             return self.filter(parent__isnull=True)[0]
         except IndexError:
-            raise RootPageDoesNotExist, _('Please create at least one page.')
+            raise RootPageDoesNotExist, 'Please create at least one page.'
 
 
 class Page(models.Model):
@@ -54,7 +54,7 @@ class Page(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
 
-    template = models.CharField(maxlength=200, default='cms/base.html')
+    template = models.CharField(maxlength=200, null=True, blank=True)
 
     is_published = models.BooleanField(default=True)
 

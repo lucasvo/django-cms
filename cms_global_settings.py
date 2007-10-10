@@ -1,3 +1,7 @@
+###########################################################################
+# Default CMS settings. Do not change them. Edit cms_settings.py instead. #
+###########################################################################
+
 # The template that will be used for the website
 DEFAULT_TEMPLATE = 'yoursite/base.html'
 
@@ -14,7 +18,7 @@ DISPLAY_ROOT = True
 LANGUAGE_REDIRECT = True
 
 # Default language (e.g. de)
-LANGUAGE_DEFAULT = ''
+LANGUAGE_DEFAULT = 'en'
 
 # Whether there should be a description field for each page content (experimental)
 PAGECONTENT_DESCRIPTION = False
@@ -25,3 +29,10 @@ REQUIRE_LOGIN = False
 # Additional templatetags for the page content, e.g. ['yourapp.extras']
 # will load yourapp/templatetags/extras.py (yourapp must be in INSTALLED_APPS)
 TEMPLATETAGS = []
+
+
+# Override the global settings with site-specific settings.
+try:
+    from cms_settings import *
+except ImportError:
+    raise StandardError, "Could not import CMS settings. Please configure the CMS application."

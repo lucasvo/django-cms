@@ -1,3 +1,30 @@
+CMS settings
+=============
+
+1. cd cms && cp cms_settings.py.dist cms_settings.py
+2. Edit cms_settings.py
+
+
+Setup media files and templates
+===============================
+
+In settings.py:
+
+TEMPLATE_DIRS = (
+    '/path-to-your-project/templates',
+)
+
+In your project directory:
+
+mkdir templates
+cd templates
+ln -s ../cms/templates cms
+
+mkdir media  # (or cp -r /path-to-django/django/contrib/admin/media .)
+cd media
+ln -s ../cms/media media
+
+
 urls.py
 =======
 
@@ -7,8 +34,11 @@ urlpatterns = patterns('',
     (r'^', include('cms.urls')),
 )
 
+
 settings.py
 ===========
+
+Make sure LocaleMiddleware is in your MIDDLEWARE_CLASSES:
 
 MIDDLEWARE_CLASSES = (
     #'cms.middleware.BenchmarkMiddleware',
@@ -20,3 +50,8 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.XHTMLToHTMLMiddleware',
 )
 
+INSTALLED_APPS = (
+    ...
+    'django.contrib.admin',
+    'cms',
+)

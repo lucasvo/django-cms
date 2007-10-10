@@ -13,7 +13,7 @@ from cms import util
 from cms import json
 from cms import dynamicforms
 from cms import views
-from cms.settings import *
+from cms.cms_global_settings import *
 
 slug_re = re.compile(r'^[-\w]+$')
 
@@ -24,7 +24,7 @@ class PageForm(forms.Form):
     title = forms.CharField(max_length=200, help_text=_('The title of the page.'))
     slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
     is_published = forms.BooleanField(required=False, initial=True, help_text=_('Whether or not the page will be accessible from the web.'))
-    template = forms.CharField(max_length=200, initial=DEFAULT_TEMPLATE, help_text=_('The template that will be used to render the page. Only change this value if you need a custom template.'))
+    template = forms.CharField(max_length=200, help_text=_('The template that will be used to render the page. Leave it empty if you don\'t need a custom template.'), required=False)
     parent = forms.ChoiceField(required=False, help_text=_('The page will be appended inside the chosen category.'), label=_('Navigation'))
     in_navigation = forms.BooleanField(required=False, label='Display in navigation', initial=True)
 

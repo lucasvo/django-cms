@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.html import escape
 
 from cms import models
-from cms.settings import *
+from cms.cms_global_settings import *
 from cms import languages
 
 
