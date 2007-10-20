@@ -48,7 +48,10 @@ class CmsNavigationNode(template.Node):
         self.varname = varname
 
     def render(self, context):
-        path = context['path']
+        try:
+            path = template.resolve_variable('path', context)
+        except template.VariableDoesNotExist:
+            return ''
         if self.level >= 0 and self.level <= len(path):
             pages = models.Page.objects.filter(in_navigation=True)
             if self.level == 0:

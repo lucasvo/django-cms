@@ -11,7 +11,7 @@ from cms.cms_global_settings import LANGUAGE_REDIRECT
 
 """
 class Template(models.Model):
-    name = models.CharField(maxlength=100)
+    name = models.CharField(max_length=100)
     content = models.TextField()
 
     created = models.DateTimeField(auto_now_add=True)
@@ -48,13 +48,14 @@ class PageManager(models.Manager):
 
 
 class Page(models.Model):
-    title = models.CharField(maxlength=200, default=_('Insert title here'), core=True)
-    slug = models.SlugField(null=True, blank=True, help_text=_('The name of the page that will appear in the URL. Do not leave this empty unless it is the main page.'))
+    title = models.CharField(max_length=200, core=True)
+    slug = models.CharField(max_length=50, null=True, blank=True)
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
 
-    template = models.CharField(maxlength=200, null=True, blank=True)
+    template = models.CharField(max_length=200, null=True, blank=True)
+    context = models.CharField(max_length=200, null=True, blank=True)
 
     is_published = models.BooleanField(default=True)
 
@@ -65,7 +66,7 @@ class Page(models.Model):
 
     # TODO
     override_url = models.BooleanField(default=False)
-    overriden_url = models.CharField(maxlength=200, null=True, blank=True)
+    overriden_url = models.CharField(max_length=200, null=True, blank=True)
 
     objects = PageManager()
 
@@ -148,18 +149,18 @@ class Page(models.Model):
 
 class PageContent(models.Model):
     page = models.ForeignKey(Page, edit_inline=models.STACKED)
-    language = models.CharField(maxlength=2, choices=settings.LANGUAGES, default='', core=True)
+    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default='', core=True)
     is_published = models.BooleanField(default=True)
     CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
-    content_type = models.CharField(maxlength=10, choices=CONTENT_TYPES, default='markdown')
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default='markdown')
     allow_template_tags = models.BooleanField(default=True)
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
 
-    template = models.CharField(maxlength=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
+    template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
 
-    title = models.CharField(maxlength=200, null=True, blank=True, help_text=_('Leave this empty to use the default title.'))
+    title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Leave this empty to use the default title.'))
     description = models.TextField(null=True, blank=True)
     content = models.TextField(core=True)
 

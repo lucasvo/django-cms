@@ -46,3 +46,10 @@ def word_slice(value, arg):
     else:
         out = words[int(args[0])]
     return ' '.join(out)
+
+@register.filter(name='cms_at')
+def at(value, arg):
+    try:
+        return value and value[arg] or ''
+    except IndexError:
+        return ''

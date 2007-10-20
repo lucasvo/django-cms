@@ -15,16 +15,17 @@ from cms import dynamicforms
 from cms import views
 from cms.cms_global_settings import *
 
-slug_re = re.compile(r'^[-\w]+$')
+slug_re = re.compile(r'^([-\w]+|\*)$')
 
-PAGE_FIELDS = ('title', 'slug', 'template', 'is_published', 'in_navigation')
+PAGE_FIELDS = ('title', 'slug', 'template', 'context', 'is_published', 'in_navigation')
 PAGECONTENT_FIELDS = ('language', 'is_published', 'content_type', 'allow_template_tags', 'template', 'title', 'content', 'description')
 
 class PageForm(forms.Form):
     title = forms.CharField(max_length=200, help_text=_('The title of the page.'))
-    slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
+    slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens. Enter an asterix (*) to catch all addresses.'))
     is_published = forms.BooleanField(required=False, initial=True, help_text=_('Whether or not the page will be accessible from the web.'))
     template = forms.CharField(max_length=200, help_text=_('The template that will be used to render the page. Leave it empty if you don\'t need a custom template.'), required=False)
+    context  = forms.CharField(max_length=200, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'), required=False)
     parent = forms.ChoiceField(required=False, help_text=_('The page will be appended inside the chosen category.'), label=_('Navigation'))
     in_navigation = forms.BooleanField(required=False, label='Display in navigation', initial=True)
 

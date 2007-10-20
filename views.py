@@ -15,7 +15,7 @@ from cms.util import language_list
 import markdown
 
 
-def render_pagecontent(request, language, page, page_content):
+def render_pagecontent(request, language, page, page_content, args=None):
     path = list(page.get_path())
 
     try:
@@ -34,6 +34,20 @@ def render_pagecontent(request, language, page, page_content):
             'site_title':SITE_TITLE,
             'title':page_content.title,
         })
+
+    if page.context:
+        try:
+            dot = page.context.rindex('.')
+            mod_name, func_name = page.context[:dot], page.context[dot+1:]
+            func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        except (ImportError, AttributeError, ValueError), e:
+            raise StandardError, 'The context function for this page does not exist. %s: %s' % (e.__class__.__name__, e)
+        if args:
+            response = func(request, context, args)
+        else:
+            response = func(request, context)
+        if response:
+            return response
 
     # First processing stage: Parse template tags
     if page_content.allow_template_tags:
@@ -62,7 +76,7 @@ def render_pagecontent(request, language, page, page_content):
     return HttpResponse(template.render(context))
 
 
-def render_page(request, language, page):
+def render_page(request, language, page, args=None):
     if not page.is_published:
         raise Http404
 
@@ -72,7 +86,7 @@ def render_page(request, language, page):
 
     page_content = page.get_content(language)
 
-    return render_pagecontent(request, language, page, page_content)
+    return render_pagecontent(request, language, page, page_content, args)
 
 
 def handle_page(request, language, url):
@@ -97,18 +111,22 @@ def handle_page(request, language, url):
 
     pages = None
 
+    args = []
+
     for part in parts:
-        pages = models.Page.objects.filter(parent=parent, slug=part)
+        pages = parent.page_set.filter(slug=part) or parent.page_set.filter(slug='*')
         if not pages:
             raise Http404
         parent = pages[0]
+        if parent.slug == '*':
+            args.append(part)
 
     if pages:
         page = pages[0]
     else:
         page = models.Page.objects.root()
 
-    return render_page(request, language, page)
+    return render_page(request, language, page, args)
 
 
 def handler(request, url=''):
