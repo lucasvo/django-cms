@@ -4,6 +4,7 @@ from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils.encoding import smart_unicode
+from django.utils.translation import gettext as _
 
 from util import to_utf8, from_utf8
 

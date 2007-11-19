@@ -4,9 +4,10 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Template, loader
-from django.utils import html
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils import translation
+from django.utils import html, translation
+from django.utils.translation import gettext as _
+from django.utils.safestring import mark_safe
 
 from cms import models
 from cms.cms_global_settings import *
@@ -69,7 +70,7 @@ def render_pagecontent(request, language, page, page_content, args=None):
         content = html.linebreaks(html.escape(content))
 
     # Third processing stage: Use the specified template
-    context.update({ 'content': content })
+    context.update({ 'content': mark_safe(content) })
 
     template = loader.get_template(page_content.template or DEFAULT_TEMPLATE)
 

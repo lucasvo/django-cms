@@ -3,6 +3,7 @@ import re
 from django.template import Context, loader
 from django import newforms as forms
 from django.newforms.forms import DeclarativeFieldsMetaclass
+from django.utils.safestring import mark_safe
 
 replace_res = [re.compile('(<[^>]+) (%s=\\\\"[a-zA-Z0-9-_]+\.)#(\\\\")([^<]*>)' % s) for s in ('id', 'for', 'name')]
 
@@ -38,7 +39,7 @@ class BaseForm(forms.BaseForm):
         data = addslashes(self.render(how))
         for replace_re in replace_res:
             data = re.sub(replace_re, '\\1 \\2\', FormId, \'\\3\\4', data)
-        return u"['%s']" % data
+        return mark_safe(u"['%s']" % data)
     def from_template(self, extra_context={}):
         template = loader.get_template(self.template)
         context = Context(dict([('form', self)]+extra_context.items()))

@@ -6,6 +6,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.conf import settings
 from django.utils.encoding import smart_unicode
+from django.utils.translation import gettext as _
+from django.utils.safestring import mark_safe
 from django import newforms as forms
 
 from cms import models
@@ -52,13 +54,13 @@ class PageForm(forms.Form):
 class PageContentForm(dynamicforms.Form):
     PREFIX = 'pagecontent'
     TEMPLATE = 'cms/pagecontent_form.html'
-    CORE = ('content',)
+    CORE = ('content', 'description', 'title')
 
     language = forms.ChoiceField(choices=(('', '--------'),)+settings.LANGUAGES, initial=LANGUAGE_DEFAULT)
     is_published = forms.BooleanField(required=False, initial=True)
     title = forms.CharField(max_length=200, required=False, help_text=_('Leave this empty to use the title of the page.'))
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}))
-    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}))
+    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), required=False)
     CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
     content_type = forms.ChoiceField(choices=CONTENT_TYPES, initial='markdown')
     allow_template_tags = forms.BooleanField(required=False, initial=True)
@@ -182,7 +184,7 @@ def navigation(request):
     def render(obj):
         parent, children = obj
         template = loader.get_template('cms/navigation_item.html')
-        content = template.render({'page': parent})
+        content = template.render(Context({'page': parent}))
         return '<li id="navigation-%s">%s%s</li>' % (parent.id, content, children and '<ul>%s</ul>'%''.join([render(child) for child in children]) or '')
 
     def id(name):
@@ -230,7 +232,7 @@ def navigation(request):
 
     return render_to_response('cms/navigation.html', {
             'title': _('Edit pages'),
-            'navigation': '<ul id="navigation">%s</ul>' % rendered_navigation,
+            'navigation': mark_safe('<ul id="navigation">%s</ul>' % rendered_navigation),
             'error': error,
         }, context_instance=RequestContext(request))
 
