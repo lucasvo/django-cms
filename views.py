@@ -15,8 +15,13 @@ from cms.util import language_list
 
 import markdown
 
+def resolve_dotted_path(path):
+    dot = path.rindex('.')
+    mod_name, func_name = path[:dot], path[dot+1:]
+    func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+    return func
 
-def render_pagecontent(request, language, page, page_content, args=None):
+def get_page_context(request, language, page):
     path = list(page.get_path())
 
     try:
@@ -27,20 +32,27 @@ def render_pagecontent(request, language, page, page_content, args=None):
     context = RequestContext(request)
     context.update({
             'page':page,
-            'page_content':page_content,
             'page_number':page_number,
             'path':path,
             'language':language,
             'root':'/%s/'%language,
             'site_title':SITE_TITLE,
+        })
+
+    return context
+
+def render_pagecontent(request, language, page, page_content, args=None):
+    path = list(page.get_path())
+
+    context = get_page_context(request, language, page)
+    context.update({
+            'page_content':page_content,
             'title':page_content.title,
         })
 
     if page.context:
         try:
-            dot = page.context.rindex('.')
-            mod_name, func_name = page.context[:dot], page.context[dot+1:]
-            func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+            func = resolve_dotted_path(page.context)
         except (ImportError, AttributeError, ValueError), e:
             raise StandardError, 'The context function for this page does not exist. %s: %s' % (e.__class__.__name__, e)
         if args:
@@ -54,7 +66,7 @@ def render_pagecontent(request, language, page, page_content, args=None):
     if page_content.allow_template_tags:
         template = Template('{%% load i18n cms_base cms_extras %s %%}{%% cms_pagination %d %%}%s{%% cms_end_pagination %%}' % (
                 ' '.join(TEMPLATETAGS),
-                page_number,
+                context['page_number'],
                 page_content.content
             ))
         content = template.render(context)
