@@ -7,6 +7,10 @@ var PageContent = Form.extend({
         this.fieldset.setProperty('class', 'module aligned');
         this.fieldset.innerHTML = this.html;
         $('page-contents').adopt(this.fieldset);
+        // TODO: Take flag USE_TINYMCE of cms_settings into account!
+        if (use_tinymce) {
+    		tinyMCE.execCommand('mceAddControl', false, "id_pagecontent-content." + this.id);
+        }
 
         var that = this;
         setTimeout(function(){

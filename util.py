@@ -21,9 +21,26 @@ def flatten(lst):
             yield elem
 
 def get_values(object, fields):
-    return dict([(field, getattr(object, field)) for field in fields])
+    value_dict = {}
+    for field in fields:
+        value = getattr(object, field)
+        if value.__class__.__name__ == 'ManyRelatedManager':
+            value = [item.id for item in value.all()]
+        elif value.__class__.__name__ == 'datetime':
+            value = value.date()
+        value_dict[field] = value
+    return value_dict
+
 def get_dict(fields, values):
-    return dict([(field, from_utf8(values[field])) for field in fields])
+    value_dict = {}
+    for field in fields:
+        value = from_utf8(values[field])
+        if isinstance(value, list):
+            value = [item.id for item in value]
+        else:
+            value_dict[field] = value
+    return value_dict
+
 def set_values(object, fields, values):
     for field in fields:
         setattr(object, field, from_utf8(values[field]))

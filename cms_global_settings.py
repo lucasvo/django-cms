@@ -1,6 +1,7 @@
 ###########################################################################
 # Default CMS settings. Do not change them. Edit cms_settings.py instead. #
 ###########################################################################
+from django.utils.translation import ugettext as _
 
 # The template that will be used for the website
 DEFAULT_TEMPLATE = 'yoursite/base.html'
@@ -28,8 +29,19 @@ REQUIRE_LOGIN = False
 
 # Additional templatetags for the page content, e.g. ['yourapp.extras']
 # will load yourapp/templatetags/extras.py (yourapp must be in INSTALLED_APPS)
-TEMPLATETAGS = []
+TEMPLATETAGS = [
+#    'project.app.module',
+]
 
+TEMPLATES = (
+#    ('project/custom_template.html', _('template name')),
+)
+
+PAGE_ADDONS = (
+#    'project.app.models.File',
+)
+
+USE_TINYMCE = False
 
 # Override the global settings with site-specific settings.
 try:

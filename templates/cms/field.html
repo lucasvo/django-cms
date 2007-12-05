@@ -1,0 +1,10 @@
+{% load i18n %}
+<div class="form-row{% if field.errors %} error{% endif %}">
+    {{ field.errors }}
+    <label for="id_{{ field.name }}"{% if field.field.required %} class="required"{% endif %}>{{ field.label }}</label>
+      <fieldset class="aligned" style="border: medium none ;">
+        {{ field }}
+    {% if field.help_text %}<a href="#" onclick="return false;" class="HelpTip" title="{{ field.label }} :: {{ field.help_text }}"><span>{% trans "Help" %}</span></a>{% endif %}
+  </fieldset>
+    {% if field.info_text %}<p class="help">{{ field.info_text }}</p>{% endif %}
+</div>

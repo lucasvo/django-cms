@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext, Template, loader
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import html, translation
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 
 from cms import models
@@ -14,6 +14,8 @@ from cms.cms_global_settings import *
 from cms.util import language_list
 
 import markdown
+from django.contrib.sites.models import Site
+from django.template import TemplateDoesNotExist
 
 def resolve_dotted_path(path):
     dot = path.rindex('.')
@@ -21,7 +23,7 @@ def resolve_dotted_path(path):
     func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
     return func
 
-def get_page_context(request, language, page):
+def get_page_context(request, language, page, extra_context={}):
     path = list(page.get_path())
 
     try:
@@ -31,24 +33,26 @@ def get_page_context(request, language, page):
 
     context = RequestContext(request)
     context.update({
-            'page':page,
-            'page_number':page_number,
-            'path':path,
-            'language':language,
-            'root':'/%s/'%language,
-            'site_title':SITE_TITLE,
-        })
+        'page': page,
+        'page_number': page_number,
+        'path': path,
+        'language': language,
+        'root':'/%s/' % language,
+        'site_title': SITE_TITLE,
+    })
+    context.update(extra_context)
 
     return context
 
-def render_pagecontent(request, language, page, page_content, args=None):
+def render_pagecontent(request, language, page, page_content, template_name=None, preview=False, args=None):
     path = list(page.get_path())
 
     context = get_page_context(request, language, page)
     context.update({
-            'page_content':page_content,
-            'title':page_content.title,
-        })
+        'page_content':page_content,
+        'title':page_content.title,
+        'page_title': '%s - %s' % (Site.objects.get_current().name, page.smart_title),
+    })
 
     if page.context:
         try:
@@ -80,22 +84,49 @@ def render_pagecontent(request, language, page, page_content, args=None):
         content = markdown.markdown(content)
     else:
         content = html.linebreaks(html.escape(content))
+    context.update({'content': mark_safe(content)})
 
     # Third processing stage: Use the specified template
-    context.update({ 'content': mark_safe(content) })
-
-    template = loader.get_template(page_content.template or DEFAULT_TEMPLATE)
-
+    # Templates are chosen in the following order:
+    # 1. template defined in page_content
+    # 2. template defined in page
+    # 3. template defined in function arg "template_name"
+    # 4. template defined in settings.DEFAULT_TEMPLATE
+    # If preview, than _preview is appended to the templates name. If there's no preview template: fallback to the normal one
+    if page_content.template:
+        template_path = page_content.template
+    elif page.template:
+        template_path = page.template
+    elif template_name:
+        template_path = template_name
+    else:
+        template_path = DEFAULT_TEMPLATE
+    if preview: # append _preview to template name
+        if template_path.rfind('.html') > 0:
+            template_path_preview = template_path[:template_path.rfind('.html')] + '_preview.html'
+        else:
+            template_path_preview += '_preview'
+        try:
+            template = loader.get_template(template_path_preview)
+        except TemplateDoesNotExist:
+            template = loader.get_template(template_path)
+    else:
+        try:
+            template = loader.get_template(template_path)
+        except TemplateDoesNotExist:
+            if settings.DEBUG:
+                raise
+            else:
+                template = loader.get_template(DEFAULT_TEMPLATE)
     return HttpResponse(template.render(context))
 
-
 def render_page(request, language, page, args=None):
-    if not page.is_published:
+    if not models.Page.objects.root().is_published or not page.is_published:
         raise Http404
 
     # Make translations using Django's i18n work
     translation.activate(language)
-    request.LANGUAG_CODE = translation.get_language()
+    request.LANGUAGE_CODE = translation.get_language()
 
     page_content = page.get_content(language)
 
@@ -107,7 +138,7 @@ def handle_page(request, language, url):
     # TODO: Objects with overriden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overriden URL
-    pages = models.Page.objects.filter(override_url=True, overriden_url=url)
+    pages = models.Page.objects.filter(override_url=True, overridden_url=url)
     if pages:
         return render_page(request, language, pages[0])
 

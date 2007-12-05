@@ -8,213 +8,288 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-22 12:34+0100\n"
+"POT-Creation-Date: 2007-12-05 02:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin_views.py:23
-msgid "The title of the page."
-msgstr ""
-
-#: admin_views.py:24
-msgid ""
-"The name of the page that will appear in the URL. A slug can contain "
-"letters, numbers, underscores or hyphens."
-msgstr ""
-
-#: admin_views.py:25
-msgid "Whether or not the page will be accessible from the web."
-msgstr ""
-
-#: admin_views.py:26
-msgid ""
-"The template that will be used to render the page. Only change this value if "
-"you need a custom template."
-msgstr ""
-
-#: admin_views.py:27
-msgid "The page will be appended inside the chosen category."
-msgstr ""
-
-#: admin_views.py:27
-msgid "Navigation"
-msgstr ""
-
-#: admin_views.py:45
-msgid "Please reorder the root object on the hierarchy page."
-msgstr ""
-
-#: admin_views.py:47
-msgid "Please choose in which category the page should belong."
-msgstr ""
-
-#: admin_views.py:57
-msgid "Leave this empty to use the title of the page."
-msgstr ""
-
-#: admin_views.py:60 models.py:147
-msgid "HTML"
-msgstr ""
-
-#: admin_views.py:60 models.py:147
-msgid "Markdown"
-msgstr ""
-
-#: admin_views.py:60 models.py:147
-msgid "Plain text"
-msgstr ""
-
-#: admin_views.py:63
-msgid "Template (optional)"
-msgstr ""
-
-#: admin_views.py:66
-msgid "New page content"
-msgstr ""
-
-#: admin_views.py:130
+#: admin_views.py:77
 msgid "The page was added successfully. Now you can create your content."
 msgstr ""
 
-#: admin_views.py:132
+#: admin_views.py:79
 msgid "The page was updated successfully. You may edit it again below."
 msgstr ""
 
-#: admin_views.py:145 templates/page_add.html:33
+#: admin_views.py:92 templates/cms/page_add.html:50
 msgid "Add"
 msgstr ""
 
-#: admin_views.py:145
+#: admin_views.py:92
 msgid "Edit"
 msgstr ""
 
-#: admin_views.py:145 templates/page_add.html:33
+#: admin_views.py:92 templates/cms/page_add.html:50
 msgid "page"
 msgstr ""
 
-#: admin_views.py:169
+#: admin_views.py:119
 msgid "<h2>Your form is not valid.</h2>"
 msgstr ""
 
-#: admin_views.py:217
+#: admin_views.py:166
 msgid "The navigation was updated successfully. You may edit it again below."
 msgstr ""
 
-#: admin_views.py:220
+#: admin_views.py:169
 msgid ""
 "Your changes were discarded, because there must not be more than one root "
 "element. Make sure that there is only one root element."
 msgstr ""
 
-#: admin_views.py:227
+#: admin_views.py:176
 msgid "<li>Please <a href=\"../page/add/\">create a page</a> first.</li>"
 msgstr ""
 
-#: admin_views.py:230
+#: admin_views.py:179
 msgid "Edit pages"
 msgstr ""
 
-#: admin_views.py:242
+#: admin_views.py:191
 msgid ""
 "This page content has been already removed. Please reload the page and try "
 "again."
 msgstr ""
 
-#: json.py:15
+#: forms.py:56
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+#: forms.py:84 models.py:58
+msgid "The title of the page."
+msgstr ""
+
+#: forms.py:84 forms.py:135 models.py:58
+msgid "title"
+msgstr ""
+
+#: forms.py:85
+msgid ""
+"The name of the page that will appear in the URL. A slug can contain "
+"letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: forms.py:85 models.py:59
+msgid "slug"
+msgstr ""
+
+#: forms.py:86
+msgid "override url"
+msgstr ""
+
+#: forms.py:86
+msgid "When checked, a custom URL can be entered for this page."
+msgstr ""
+
+#: forms.py:87
+msgid "overridden url"
+msgstr ""
+
+#: forms.py:87
+msgid "Enter a url to use as custom url for this page."
+msgstr ""
+
+#: forms.py:88
+msgid "override created date"
+msgstr ""
+
+#: forms.py:88
+msgid "Enter a date to use a custom creation date for this page."
+msgstr ""
+
+#: forms.py:89 models.py:67
+msgid "Whether or not the page will be accessible from the web."
+msgstr ""
+
+#: forms.py:89 forms.py:134 models.py:67
+msgid "is published"
+msgstr ""
+
+#: forms.py:90 models.py:68
+msgid "start publishing"
+msgstr ""
+
+#: forms.py:90
+msgid "Enter a date on which you want to start publishing this page."
+msgstr ""
+
+#: forms.py:91 models.py:69
+msgid "finish publishing"
+msgstr ""
+
+#: forms.py:91
+msgid "Enter a date after which you want to stop publishing this page."
+msgstr ""
+
+#: forms.py:92
+msgid ""
+"The template that will be used to render the page. Choose nothing if you "
+"don't need a custom template."
+msgstr ""
+
+#: forms.py:93
+msgid ""
+"Optional. Dotted path to a python function that receives two arguments "
+"(request, context) and can update the context."
+msgstr ""
+
+#: forms.py:94
+msgid "The page will be appended inside the chosen category."
+msgstr ""
+
+#: forms.py:94
+msgid "Navigation"
+msgstr ""
+
+#: forms.py:95
+msgid "display in navigation"
+msgstr ""
+
+#: forms.py:114
+msgid "Please reorder the root object on the hierarchy page."
+msgstr ""
+
+#: forms.py:116
+msgid "Please choose in which category the page should belong."
+msgstr ""
+
+#: forms.py:128 models.py:205
+msgid "HTML"
+msgstr ""
+
+#: forms.py:129 models.py:205
+msgid "Markdown"
+msgstr ""
+
+#: forms.py:130 models.py:205
+msgid "Plain text"
+msgstr ""
+
+#: forms.py:133
+msgid "language"
+msgstr ""
+
+#: forms.py:135
+msgid "Leave this empty to use the title of the page."
+msgstr ""
+
+#: forms.py:136
+msgid "description"
+msgstr ""
+
+#: forms.py:137
+msgid "content"
+msgstr ""
+
+#: forms.py:138
+msgid "content type"
+msgstr ""
+
+#: forms.py:139
+msgid "allow template tags"
+msgstr ""
+
+#: forms.py:140
+msgid "template (optional)"
+msgstr ""
+
+#: forms.py:143
+msgid "New page content"
+msgstr ""
+
+#: json.py:17
 msgid "Received invalid data."
 msgstr ""
 
-#: models.py:44
+#: models.py:48
 msgid "Please create at least one page."
 msgstr ""
 
-#: models.py:48
-msgid "Insert title here"
-msgstr ""
-
-#: models.py:49
+#: models.py:59
 msgid ""
-"The name of the page that will appear in the URL. Do not leave this empty "
-"unless it is the main page."
+"The name of the page that will appear in the URL. Do not leave this empty."
 msgstr ""
 
-#: models.py:154
+#: models.py:212
 msgid "Only specify this if you want to override the page template."
 msgstr ""
 
-#: models.py:156
+#: models.py:214
 msgid "Leave this empty to use the default title."
 msgstr ""
 
-#: models.py:180
+#: models.py:240
 msgid "published"
 msgstr ""
 
-#: models.py:180
+#: models.py:240
 msgid "unpublished"
 msgstr ""
 
-#: templatetags/cms_base.py:127
-msgid "Unknown"
+#: views.py:205
+msgid "Please define LANGUAGES in your project's settings."
 msgstr ""
 
-#: templatetags/cms_base.py:129
-msgid "Yes"
-msgstr ""
-
-#: templatetags/cms_base.py:131
-msgid "No"
-msgstr ""
-
-#: templates/navigation_item.html:3
-msgid "In navigation"
-msgstr ""
-
-#: templates/navigation_item.html:3
-msgid "Is published"
-msgstr ""
-
-#: templates/navigation_item.html:3
-msgid "Edit page"
-msgstr ""
-
-#: templates/navigation_item.html:3 templates/page_submit_row.html:3
-msgid "Delete"
-msgstr ""
-
-#: templates/navigation_item.html:4
-msgid "Link ID"
-msgstr ""
-
-#: templates/navigation.html:13 templates/page_add.html:28
+#: templates/admin/cms/page/change_form.html:11
+#: templates/cms/navigation.html:13 templates/cms/page_add.html:45
 msgid "Documentation"
 msgstr ""
 
-#: templates/navigation.html:13 templates/page_add.html:28
+#: templates/admin/cms/page/change_form.html:11
+#: templates/cms/navigation.html:13 templates/cms/page_add.html:45
 msgid "Change password"
 msgstr ""
 
-#: templates/navigation.html:13 templates/page_add.html:28
+#: templates/admin/cms/page/change_form.html:11
+#: templates/cms/navigation.html:13 templates/cms/page_add.html:45
 msgid "Log out"
 msgstr ""
 
-#: templates/navigation.html:16 templates/page_add.html:31
+#: templates/admin/cms/page/change_form.html:24
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/cms/page/change_form.html:42
+msgid "Ordering"
+msgstr ""
+
+#: templates/admin/cms/page/change_form.html:45
+msgid "Order:"
+msgstr ""
+
+#: templates/cms/field.html:7
+msgid "Help"
+msgstr ""
+
+#: templates/cms/navigation.html:16 templates/cms/page_add.html:48
 msgid "Home"
 msgstr ""
 
-#: templates/navigation.html:17 templates/page_add.html:32
+#: templates/cms/navigation.html:17 templates/cms/page_add.html:49
 msgid "Pages"
 msgstr ""
 
-#: templates/navigation.html:22 templates/page_add.html:38
+#: templates/cms/navigation.html:22
 msgid "Add page"
 msgstr ""
 
-#: templates/navigation.html:28
+#: templates/cms/navigation.html:28
 msgid ""
 "Here you can edit the pages of your site. Drag and drop the pages to change "
 "their order or hierarchy. Note that changing the hierarchy will affect the "
@@ -224,93 +299,123 @@ msgid ""
 "you don't reorder them."
 msgstr ""
 
-#: templates/navigation.html:29 templates/navigation.html.py:30
-#: templates/page_add.html:63
+#: templates/cms/navigation.html:29 templates/cms/navigation.html.py:30
+#: templates/cms/page_add.html:85
 msgid "Note"
 msgstr ""
 
-#: templates/navigation.html:29
+#: templates/cms/navigation.html:29
 msgid ""
 "You are using Internet Explorer. There may be problems while reordering the "
 "pages. Please use Firefox or Safari."
 msgstr ""
 
-#: templates/navigation.html:30
+#: templates/cms/navigation.html:30
 msgid ""
 "You will have to activate JavaScript in your browser's settings to be able "
 "to reorder the pages."
 msgstr ""
 
-#: templates/navigation.html:40
+#: templates/cms/navigation.html:40
 msgid "Add a new page"
 msgstr ""
 
-#: templates/navigation.html:43 templates/page_submit_row.html:4
+#: templates/cms/navigation.html:43 templates/cms/page_submit_row.html:4
 msgid "Add this page"
 msgstr ""
 
-#: templates/navigation.html:43 templates/page_submit_row.html:4
+#: templates/cms/navigation.html:43 templates/cms/page_submit_row.html:4
 msgid "Save all changes"
 msgstr ""
 
-#: templates/page_add.html:50
+#: templates/cms/navigation_item.html:3
+msgid "In navigation"
+msgstr ""
+
+#: templates/cms/navigation_item.html:3
+msgid "Is published"
+msgstr ""
+
+#: templates/cms/navigation_item.html:3
+msgid "Edit page"
+msgstr ""
+
+#: templates/cms/navigation_item.html:3 templates/cms/page_submit_row.html:3
+msgid "Delete"
+msgstr ""
+
+#: templates/cms/navigation_item.html:4
+msgid "Link ID"
+msgstr ""
+
+#: templates/cms/page_add.html:68
 msgid ""
 "This page is already in the navigation (<a href=\"../../navigation/\">edit "
 "navigation</a>):"
 msgstr ""
 
-#: templates/page_add.html:62
+#: templates/cms/page_add.html:84
 msgid "Edit page content"
 msgstr ""
 
-#: templates/page_add.html:63
+#: templates/cms/page_add.html:85
 msgid ""
 "You will have to activate JavaScript in your browser's settings to be able "
 "to edit page content."
 msgstr ""
 
-#: templates/page_add.html:65
+#: templates/cms/page_add.html:87
 msgid "Add page content"
 msgstr ""
 
-#: templates/pagecontent_form.html:5
+#: templates/cms/pagecontent_form.html:5
 msgid "Properties"
 msgstr ""
 
-#: templates/pagecontent_form.html:8
+#: templates/cms/pagecontent_form.html:8
 msgid "Show advanced options"
 msgstr ""
 
-#: templates/pagecontent_form.html:8
+#: templates/cms/pagecontent_form.html:8
 msgid "Hide advanced options"
 msgstr ""
 
-#: templates/pagecontent_form.html:11
+#: templates/cms/pagecontent_form.html:11
 msgid "Advanced"
 msgstr ""
 
-#: templates/pagecontent_form.html:24
+#: templates/cms/pagecontent_form.html:24
 msgid "Actions"
 msgstr ""
 
-#: templates/pagecontent_form.html:25
+#: templates/cms/pagecontent_form.html:25
 msgid "Preview this page"
 msgstr ""
 
-#: templates/pagecontent_form.html:25
-msgid ""
-"Previews the last saved version of this page in a new window without saving "
-"it."
+#: templates/cms/pagecontent_form.html:25
+msgid "Previews this page in a new window without saving it."
 msgstr ""
 
-#: templates/pagecontent_form.html:26
+#: templates/cms/pagecontent_form.html:26
 msgid "Preview"
 msgstr ""
 
-#: templates/pagecontent_form.html:27
+#: templates/cms/pagecontent_form.html:27
 msgid "(in a new window without saving it)"
 msgstr ""
 
-#: templates/pagecontent_form.html:30
+#: templates/cms/pagecontent_form.html:30
 msgid "Delete this content"
+msgstr ""
+
+#: templatetags/cms_base.py:171
+msgid "Unknown"
+msgstr ""
+
+#: templatetags/cms_base.py:173
+msgid "Yes"
+msgstr ""
+
+#: templatetags/cms_base.py:175
+msgid "No"
 msgstr ""

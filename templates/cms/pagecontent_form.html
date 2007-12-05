@@ -22,8 +22,8 @@
 
 <div class="form-row">{{ form.content.errors }}<label for="{{ form.content.auto_id }}">{{ form.content.label }}</label>{{ form.content }}</div>
   <div class="form-row"><label>{% trans 'Actions' %}</label>
-  <!--<div><a class="preview" href="#" id="id_{{ form.prefix }}-preview.#">{% trans 'Preview this page' %}</a> <p class="help">{% trans 'Previews the last saved version of this page in a new window without saving it.' %}</div>-->
-<div><ul class="object-tools"><li><a href="#" target="_blank" class="pagecontent-preview viewsitelink">{% trans 'Preview' %}</a></li></ul></div>
+  <!--<div><a class="preview" href="#" id="id_{{ form.prefix }}-preview.#">{% trans 'Preview this page' %}</a> <p class="help">{% trans 'Previews this page in a new window without saving it.' %}</div>-->
+<div><ul class="object-tools"><li><a href="preview/" target="_blank" class="pagecontent-preview viewsitelink">{% trans 'Preview' %}</a></li></ul></div>
 <p class="help">{% trans '(in a new window without saving it)' %}</p>
 
   {% if form.id %}

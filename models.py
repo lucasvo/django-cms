@@ -5,9 +5,10 @@ from django.conf import settings
 from django.utils.dateformat import DateFormat
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
-
+from django.db.models import Q
+from django.utils import translation
 from cms.util import language_list
-from cms.cms_global_settings import LANGUAGE_REDIRECT
+from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE
 
 """
 class Template(models.Model):
@@ -17,7 +18,7 @@ class Template(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Admin:
@@ -44,12 +45,18 @@ class PageManager(models.Manager):
         try:
             return self.filter(parent__isnull=True)[0]
         except IndexError:
-            raise RootPageDoesNotExist, 'Please create at least one page.'
+            raise RootPageDoesNotExist, unicode(_('Please create at least one page.'))
 
+    def published(self):
+        return self.filter(
+                           Q(is_published=True),
+                           Q(start_publish_date__lte=datetime.date.today()) | Q(start_publish_date__isnull=True), 
+                           Q(end_publish_date__gte=datetime.date.today()) | Q(end_publish_date__isnull=True),
+                           )
 
 class Page(models.Model):
-    title = models.CharField(max_length=200, core=True)
-    slug = models.CharField(max_length=50, null=True, blank=True)
+    title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
+    slug = models.CharField(_('slug'), max_length=50, help_text=_('The name of the page that will appear in the URL. Do not leave this empty.'), prepopulate_from=("title",))
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
@@ -57,27 +64,39 @@ class Page(models.Model):
     template = models.CharField(max_length=200, null=True, blank=True)
     context = models.CharField(max_length=200, null=True, blank=True)
 
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(_('is published'), default=True, help_text=_('Whether or not the page will be accessible from the web.'))
+    start_publish_date = models.DateTimeField(_('start publishing'), null=True, blank=True)
+    end_publish_date = models.DateTimeField(_('finish publishing'), null=True, blank=True)
 
     # Navigation
     parent = models.ForeignKey('self', null=True, blank=True)
     position = models.IntegerField()
     in_navigation = models.BooleanField(default=True)
 
+    # Access (not implemented yet)
+    #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
+    #view_access_level = models.ManyToManyField(Group, verbose_name=_('view access level'), related_name='view_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
+
     # TODO
     override_url = models.BooleanField(default=False)
-    overriden_url = models.CharField(max_length=200, null=True, blank=True)
+    overridden_url = models.CharField(max_length=200, null=True, blank=True)
+
+    is_editable = models.BooleanField(default=True)
 
     objects = PageManager()
 
     class Meta:
-        ordering = ('position',)
+        ordering = ('parent', 'position', 'title',)
 
     class Admin:
         list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
         list_filter = ('is_published',)
-        ordering = ('title',)
+        ordering = ('parent','title',)
         search_fields = ('title', 'slug',)
+        if USE_TINYMCE:
+            js = ('js/getElementsBySelector.js',
+                  'filebrowser/js/AddFileBrowser.js',
+            )
 
     def __unicode__(self):
         return self.title
@@ -88,7 +107,9 @@ class Page(models.Model):
         self.modified = datetime.datetime.now()
         super(Page, self).save()
 
-    def get_content(self, language):
+    def get_content(self, language=None, all=False):
+        if not language:
+            language = translation.get_language()
         published_page_contents = self.pagecontent_set.filter(is_published=True)
 
         page_content = None
@@ -96,13 +117,19 @@ class Page(models.Model):
         # Determine the PageContent we want to render
         page_contents = published_page_contents.filter(language=language)
         if page_contents:
-            page_content = page_contents[0]
+            if all:
+                page_content=page_contents
+            else:
+                page_content = page_contents[0]
         else:
             # Use a PageContent in an alternative language
             for l in language_list():
                 page_contents = published_page_contents.filter(language=l)
                 if page_contents:
-                    page_content = page_contents[0]
+                    if all:
+                        page_content=page_contents
+                    else:
+                        page_content = page_contents[0]
                     break
 
 
@@ -110,7 +137,13 @@ class Page(models.Model):
             # TODO: What's better?
             # return None
             page_content = PageContent(page=self)
+            if all:
+                page_content=[page_content]
 
+        if all and page_content:
+            for c in page_content:
+                c.prepare()
+            return page_content
         return page_content.prepare()
 
     def get_path(self):
@@ -125,15 +158,18 @@ class Page(models.Model):
             parent = parent.parent
         return PathList(reversed(path))
 
-    def absolute_url(self):
-        return u'/%s'%self.get_absolute_url()
+    def on_path(self, super):
+        return super in self.get_path()
 
     def get_absolute_url(self):
         if self.override_url:
-            return self.overriden_url
-        else:
-            url = u'/'.join([page.slug for page in self.get_path() if page.parent])
-            return url and u'%s/' % url or url
+            if self.overridden_url and self.overridden_url[0] == '/':
+                return self.overridden_url
+            else:
+                return '/' + self.overridden_url
+        url = u'/'.join([page.slug for page in self.get_path() if page.parent])
+        return url and u'/%s/' % url or '/' + url
+    absolute_url = get_absolute_url
 
     def get_link(self, language):
         if LANGUAGE_REDIRECT:
@@ -145,14 +181,29 @@ class Page(models.Model):
         children = Page.objects.filter(parent=self).order_by('-position')
         return children and (children[0].position+1) or 1
 
+    def get_level(self):
+        parent = self.parent
+        level = 0
+        while parent:
+            level += 1
+            parent = parent.parent
+        return level
 
+    @property
+    def smart_title(self):
+        return self.get_content().title
+
+    def published(self):
+        today = datetime.date.today()
+        return bool(self.is_published) and (not self.start_publish_date or self.start_publish_date.date() <= today) and (not self.end_publish_date or self.end_publish_date.date() >= today)
+    published.boolean = True
 
 class PageContent(models.Model):
     page = models.ForeignKey(Page, edit_inline=models.STACKED)
-    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default='', core=True)
+    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2], core=True)
     is_published = models.BooleanField(default=True)
     CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
-    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default='markdown')
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'markdown')
     allow_template_tags = models.BooleanField(default=True)
 
     created = models.DateTimeField(null=True, blank=True)

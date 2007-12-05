@@ -1,12 +1,10 @@
-import re
-
-from django.template import RequestContext, Template, Context, loader
+from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.conf import settings
 from django.utils.encoding import smart_unicode
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django import newforms as forms
 
@@ -16,62 +14,7 @@ from cms import json
 from cms import dynamicforms
 from cms import views
 from cms.cms_global_settings import *
-
-slug_re = re.compile(r'^([-\w]+|\*)$')
-
-PAGE_FIELDS = ('title', 'slug', 'template', 'context', 'is_published', 'in_navigation')
-PAGECONTENT_FIELDS = ('language', 'is_published', 'content_type', 'allow_template_tags', 'template', 'title', 'content', 'description')
-
-class PageForm(forms.Form):
-    title = forms.CharField(max_length=200, help_text=_('The title of the page.'))
-    slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens. Enter an asterix (*) to catch all addresses.'))
-    is_published = forms.BooleanField(required=False, initial=True, help_text=_('Whether or not the page will be accessible from the web.'))
-    template = forms.CharField(max_length=200, help_text=_('The template that will be used to render the page. Leave it empty if you don\'t need a custom template.'), required=False)
-    context  = forms.CharField(max_length=200, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'), required=False)
-    parent = forms.ChoiceField(required=False, help_text=_('The page will be appended inside the chosen category.'), label=_('Navigation'))
-    in_navigation = forms.BooleanField(required=False, label='Display in navigation', initial=True)
-
-    def __init__(self, request, initial=None, page=None):
-        self.page = page
-        super(PageForm, self).__init__(request.method == 'POST' and request.POST or None, initial=initial)
-        choices = [('', '--------')]
-        choices += [(p.id, smart_unicode(p.get_path())) for p in util.flatten(models.Page.objects.hierarchy()) if p != page]
-        self.fields['parent'].choices = choices
-
-    def clean_parent(self):
-        try:
-            root = models.Page.objects.root()
-        except models.RootPageDoesNotExist:
-            root = None
-        num_pages = models.Page.objects.count()
-        if num_pages > 0: # If there are no pages, parent will be empty anyway
-            if self.page and not self.page.parent and self.cleaned_data.get('parent'):
-                raise forms.ValidationError(_('Please reorder the root object on the hierarchy page.'))
-            if (not self.page or self.page.parent) and not self.cleaned_data.get('parent'):
-                raise forms.ValidationError(_('Please choose in which category the page should belong.'))
-        return self.cleaned_data.get('parent')
-
-class PageContentForm(dynamicforms.Form):
-    PREFIX = 'pagecontent'
-    TEMPLATE = 'cms/pagecontent_form.html'
-    CORE = ('content', 'description', 'title')
-
-    language = forms.ChoiceField(choices=(('', '--------'),)+settings.LANGUAGES, initial=LANGUAGE_DEFAULT)
-    is_published = forms.BooleanField(required=False, initial=True)
-    title = forms.CharField(max_length=200, required=False, help_text=_('Leave this empty to use the title of the page.'))
-    description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}))
-    content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), required=False)
-    CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
-    content_type = forms.ChoiceField(choices=CONTENT_TYPES, initial='markdown')
-    allow_template_tags = forms.BooleanField(required=False, initial=True)
-    template = forms.CharField(max_length=200, required=False, label=_('Template (optional)'))
-
-    def __unicode__(self):
-        return self.id and smart_unicode(models.PageContent.objects.get(pk=self.id)) or _('New page content')
-
-    def from_template(self, extra_context={}):
-        extra_context.update({'use_description': PAGECONTENT_DESCRIPTION})
-        return super(PageContentForm, self).from_template(extra_context)
+from cms.forms import PageForm, PageContentForm, PAGE_FIELDS, PAGECONTENT_FIELDS
 
 @staff_member_required
 def page_add_edit(request, id=None):
@@ -87,7 +30,7 @@ def page_add_edit(request, id=None):
         form = PageForm(request)
         add = True
 
-    page_contents = not add and models.PageContent.objects.filter(page=page)
+    page_contents = not add and page.pagecontent_set.all()
 
     pagecontent_data = None
 
@@ -146,13 +89,16 @@ def page_add_edit(request, id=None):
 
 
     return render_to_response('cms/page_add.html', {
-            'title':'%s %s' % (add and _('Add') or _('Edit'), _('page')),
+        'title': u'%s %s' % (add and _('Add') or _('Edit'), _('page')),
             'page':page,
             'form':form,
             'add':add,
             'page_contents':page_contents,
+            'page_addons': PAGE_ADDONS,
+            'use_tinymce': unicode(USE_TINYMCE),
             'pagecontent_template':PageContentForm().render_js('from_template'),
             'pagecontent_data':pagecontent_data,
+        'use_tinymce': USE_TINYMCE,
         }, context_instance=RequestContext(request))
 
 
@@ -172,8 +118,7 @@ def page_preview(request, id):
     else:
         return HttpResponse(_('<h2>Your form is not valid.</h2>')+smart_unicode(pagecontent_form.errors))
 
-    return views.render_pagecontent(request, request.LANGUAGE_CODE, page, page_content.prepare())
-
+    return views.render_pagecontent(request, request.LANGUAGE_CODE, page, page_content.prepare(), preview=True)
 
 class NavigationForm(dynamicforms.Form):
     in_navigation = forms.BooleanField(required=False)
