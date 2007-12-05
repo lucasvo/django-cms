@@ -1,0 +1,13 @@
+Add something like this line to your urlpatterns in urls.py:
+
+    (r'^tinymce/', include('tinymce.urls')),
+
+copy all the media files in the media dir
+	tinymce/* -> httpdocs/media/
+
+Do this, if you're not using the module together with the django-cms module:
+Add the following to your Admin class in your model (mind the absolute path of the dynamically generated init script!):
+        js = (
+              'tinymce/tiny_mce.js',
+              '/tinymce/init/tiny_mce_init.js?mode=textareas',
+        )
