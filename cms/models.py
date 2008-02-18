@@ -53,6 +53,27 @@ class PageManager(models.Manager):
                            Q(start_publish_date__lte=datetime.date.today()) | Q(start_publish_date__isnull=True), 
                            Q(end_publish_date__gte=datetime.date.today()) | Q(end_publish_date__isnull=True),
                            )
+    
+    def search(self, query, language=None):
+        if not query:
+            return
+        qs = self.published()
+        if language:
+            qs = qs.filter(
+                        Q(title__icontains=query) |
+                        Q(pagecontent__language=language) & 
+                        (Q(pagecontent__title__icontains=query) |
+                        Q(pagecontent__description__icontains=query) |
+                        Q(pagecontent__content__icontains=query))
+                    )
+        else:
+            qs = qs.filter(
+                        Q(title__icontains=query) |
+                        Q(pagecontent__title__icontains=query) |
+                        Q(pagecontent__description__icontains=query) |
+                        Q(pagecontent__content__icontains=query)
+                    )
+        return qs.distinct()
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
@@ -118,16 +139,18 @@ class Page(models.Model):
         page_contents = published_page_contents.filter(language=language)
         if page_contents:
             if all:
-                page_content=page_contents
+                page_content = page_contents
             else:
                 page_content = page_contents[0]
         else:
             # Use a PageContent in an alternative language
-            for l in language_list():
-                page_contents = published_page_contents.filter(language=l)
+            for alt_language in language_list():
+                if alt_language == language:
+                    continue
+                page_contents = published_page_contents.filter(language=alt_language)
                 if page_contents:
                     if all:
-                        page_content=page_contents
+                        page_content = page_contents
                     else:
                         page_content = page_contents[0]
                     break
@@ -138,7 +161,7 @@ class Page(models.Model):
             # return None
             page_content = PageContent(page=self)
             if all:
-                page_content=[page_content]
+                page_content=[PageContent(page=self)]
 
         if all and page_content:
             for c in page_content:

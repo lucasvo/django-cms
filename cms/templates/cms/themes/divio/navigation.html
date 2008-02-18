@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia %}
+
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}cms/admin.css" media="screen" />
+<script src="{% admin_media_prefix %}cms/mootools.js" type="text/javascript"></script>
+<script src="{% admin_media_prefix %}cms/nested.js" type="text/javascript"></script>
+<script src="{% admin_media_prefix %}cms/navigation.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
+
+{% block userlinks %}<a href="../../doc/">{% trans 'Documentation' %}</a> / <a href="../../password_change/">{% trans 'Change password' %}</a> / <a href="../../logout/">{% trans 'Log out' %}</a>{% endblock %}
+{% block breadcrumbs %}{% if not is_popup %}
+<div class="breadcrumbs">
+     <a href="../../">{% trans "Home" %}</a> &rsaquo;
+     {% trans 'Pages' %}
+</div>
+{% endif %}{% endblock %}
+
+{% block content %}
+<ul class="object-tools"><li><a href="add/" class="addlink">{% trans 'Add page' %}</a></li></ul>
+
+<form action="." method="post" id="navigation-form">
+<div id="content-main">
+		 <div class="submit-row">
+  			<input type="submit" value="{% if add %}{% trans 'Add this page' %}{% else %}{% trans 'Save all changes' %}{% endif %}" class="default" />
+  		</div>
+		<!--[if IE]><p class="errornote"><b>{% trans 'Note' %}:</b> {% trans 'You are using Internet Explorer. There may be problems while reordering the pages. Please use Firefox or Safari.' %}<![endif]-->
+		<noscript><p class="errornote"><b>{% trans 'Note' %}:</b> {% trans "You will have to activate JavaScript in your browser's settings to be able to reorder the pages." %}</p></noscript>
+		<div id="managepagesinfo">
+		<fieldset class="module aligned">
+			<h2>{% trans 'Manage Pages' %}</h2>
+    	        <div><p class="small">{% blocktrans %}Here you can edit the pages of your site. Drag and drop the pages to change their order or hierarchy. Note that changing the hierarchy will affect the URL of the pages. Click on a page to edit it. If you uncheck the "in navigation" field, the page will not be displayed in the automatically generated navigation. Note that deleting a page will delete its subpages, if you don't reorder them.{% endblocktrans %}</p></div>
+	    </fieldset>
+	  	</div>	
+		<div id="content-pages">
+			<div id="managepageslist" class="clearfix"></div>
+				<div id="errors">
+				{% if error %}
+				<ul class="errorlist"><li>{{ error }}</li></ul>
+				{% endif %}
+				</div>
+
+				{{ navigation }}
+				
+			</div>
+		</div>	
+  		<div class="clearfix"></div>
+
+
+<p><a href="add/" class="addlink">{% trans 'Add a new page' %}</a></p>
+
+  <div class="submit-row">
+  <input type="submit" value="{% if add %}{% trans 'Add this page' %}{% else %}{% trans 'Save all changes' %}{% endif %}" class="default" />
+  </div>
+
+</form>
+{% endblock %}
+
+

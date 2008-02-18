@@ -52,7 +52,7 @@ Window.onDomReady(function(){
 {% endif %}{% endblock %}
 
 {% block content %}
-<form id="page-form" action="" method="post">
+<form id="page-form" action="" method="post" onsubmit="$ES('.pagecontent-content').removeClass('hidden');">
     {#<ul class="object-tools"><li><a href="../add/" class="addlink">{% trans 'Add page' %}</a></li></ul>#}
 
     <div id="content-main">

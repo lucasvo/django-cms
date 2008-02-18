@@ -1,0 +1,29 @@
+{% extends 'main/base.html' %}
+{% load i18n %}
+{% block breadcrumb %}
+        <div id="breadcrumb">
+            <p>{% for path in page.get_path %}<a href="{{ path.get_absolute_url }}">{{ path.smart_title }}</a> &gt; {% endfor %}{% trans "Search" %}</p>
+        </div>
+{% endblock %}
+{% block content %}
+	<div id="content-main">
+		<h2>{% trans "Search results" %}</h2>
+        <p>{% trans "for" %}: &quot;{{ query|escape }}&quot;</p>
+        {% for article in search_results %}
+        {% if forloop.first %}<ul class="search-results">{% endif %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.smart_title }}</a></li>
+        {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+        {% if search_results_ml %}
+            <p>{% trans "Articles found in other languages" %}:</p>
+        {% for article in search_results_ml %}
+        {% if forloop.first %}<ul class="search-results">{% endif %}
+            <li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></li>
+        {% if forloop.last %}</ul>{% endif %}
+        {% endfor %}
+        {% endif %}
+        {% if not search_results and not search_results_ml %}
+            <p>{% trans "Sorry, no articles were found." %}</p>
+        {% endif %}
+	</div>
+{% endblock %}

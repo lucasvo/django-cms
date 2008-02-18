@@ -51,7 +51,7 @@ def render_pagecontent(request, language, page, page_content, template_name=None
     context.update({
         'page_content':page_content,
         'title':page_content.title,
-        'page_title': '%s - %s' % (Site.objects.get_current().name, page.smart_title),
+        'page_title': '%s - %s' % (Site.objects.get_current().name, page_content.title),
     })
 
     if page.context:
@@ -89,14 +89,12 @@ def render_pagecontent(request, language, page, page_content, template_name=None
     # Third processing stage: Use the specified template
     # Templates are chosen in the following order:
     # 1. template defined in page_content
-    # 2. template defined in page
+    # 2. template defined in page (over `page_content.prepare()`)
     # 3. template defined in function arg "template_name"
     # 4. template defined in settings.DEFAULT_TEMPLATE
     # If preview, than _preview is appended to the templates name. If there's no preview template: fallback to the normal one
     if page_content.template:
         template_path = page_content.template
-    elif page.template:
-        template_path = page.template
     elif template_name:
         template_path = template_name
     else:
@@ -225,3 +223,19 @@ def handler(request, url=''):
 
 if REQUIRE_LOGIN:
     handler = staff_member_required(handler)
+
+def search(request):
+    template = "cms/search.html"
+    context = {}
+    try:
+        query = request.POST['query']
+        assert query
+    except:
+        return HttpResponseRedirect('/')
+    search_results = models.Page.objects.search(query, request.LANGUAGE_CODE[:2])
+    search_results_ml = models.Page.objects.search(query).exclude(id__in=[res['id'] for res in search_results.values('id')])
+    context['search_results'] = search_results
+    context['search_results_ml'] = search_results_ml
+    context['query'] = query
+    context['page'] = models.Page.objects.root()
+    return render_to_response(template, context, RequestContext(request))
