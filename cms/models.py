@@ -190,7 +190,7 @@ class Page(models.Model):
             if self.overridden_url:
                 return '/%s/' % self.overridden_url
             else:
-                return url
+                return '/'
 
         url = u'/'.join([page.slug for page in self.get_path() if page.parent])
         return url and u'/%s/' % url or '/' + url
