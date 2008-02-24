@@ -186,19 +186,21 @@ class Page(models.Model):
 
     def get_absolute_url(self):
         if self.override_url:
-            if self.overridden_url and self.overridden_url[0] == '/':
-                return self.overridden_url
+            # The overridden URL is assumed to not have a leading or trailing slash.
+            if self.overridden_url:
+                return '/%s/' % self.overridden_url
             else:
-                return '/' + self.overridden_url
+                return url
+
         url = u'/'.join([page.slug for page in self.get_path() if page.parent])
         return url and u'/%s/' % url or '/' + url
     absolute_url = get_absolute_url
 
     def get_link(self, language):
         if LANGUAGE_REDIRECT:
-            return '/%s/%s' % (language, self.get_absolute_url())
+            return '/%s%s' % (language, self.get_absolute_url())
         else:
-            return '/%s' % (self.get_absolute_url())
+            return '%s' % (self.get_absolute_url())
 
     def get_next_position(self):
         children = Page.objects.filter(parent=self).order_by('-position')

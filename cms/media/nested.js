@@ -2,4 +2,259 @@
 // Date: 2007-01-25
 // Author: CrazyDave
 // Website: http://www.clanccc.co.uk/moo/nested.html
-eval(function(p,a,c,k,e,d){e=function(c){return(c<a?"":e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('m 1a=11 1g({1A:f(){g{j:\'2k\',z:H,1G:26,w:16,1m:1g.1E,1M:1g.1E,r:K,N:\'28\',X:\'1h\',Z:16,1P:\'29\'}},1i:f(8,4){2.2a(2.1A(),4);6(!2.4.X.2b(/^(2c|1h)$/)){2.4.X=\'1h\'}2.8=$(8);2.4.p=2.8.o;2.b={};2.b.u=2.u.F(2);2.8.s(\'C\',2.b.u);6(2.4.r){2.b.r=2.r.F(2);2.8.s(\'1B\',2.b.r)}6(2.4.1i)2.4.1i.2d(2)},u:f(a){m 3=$(a.1k);6(2.4.w){n(3.o!=2.4.j&&!3.A(2.4.w)&&3!=2.8){3=3.B()}6(!3.A(2.4.w))g H}n(3.o!=2.4.j&&3!=2.8){3=3.q}6(3.o!=2.4.j)g H;3=$(3);6(2.4.Z==\'2e\'&&!3.A(2.4.1P))g;6(2.4.z){2.z=3.2f().1y({\'8-2g-2h\':\'19\',\'2i\':0.5,\'1p\':\'1u\',\'1r\':\'1R\',\'1s\':a.k.y+\'Q\',\'1v\':(a.k.x+10)+\'Q\'}).1J(I.13)}3.1e=2.1f(3);3.O=K;2.b.G=2.G.F(2,3);2.b.v=2.v.1q(2,3);2.8.t(\'C\',2.b.u);2.8.s(\'C\',2.b.v);2.8.s(\'1t\',2.b.G);I.s(\'1x\',2.b.v);6(1Q.1l){2.b.h=2.h.F(2);$(I.13).s(\'1C\',2.b.h).s(\'1I\',2.b.h)}2.1H(\'1m\',3);a.h()},r:f(a){m 3=$(a.1k);6(2.4.w){n(3.o!=2.4.j&&!3.A(2.4.w)&&3!=2.8){3=3.B()}6(!3.A(2.4.w))g H}n(3.o!=2.4.j&&3!=2.8){3=3.q}6(3==2.8)g;3=$(3);6(!3.O){m c=$E(2.4.p,3);6(c){6(c.1S(\'V\')==\'19\'){c.14(\'V\',\'1z\');3.1w(2.4.N)}18{c.14(\'V\',\'19\');3.1U(2.4.N)}}}a.h()},h:f(a){a.h();g K},1f:f(3,1n){m 12=(1n)?1:0;n(3!=2.8){6(3.o==2.4.p)12+=1;3=3.q}g 12},G:f(a,3){m 17,9,e,15;m 7,d,T,P;m l=K;6(2.4.z&&3.O){2.z.1y({\'1p\':\'1u\',\'1r\':\'1W\',\'1s\':a.k.y+\'Q\',\'1v\':(a.k.x+10)+\'Q\'})}9=a.1k;n(9.o!=2.4.j&&9!=2.8){9=9.q}6(9==2.8)g;6(a[2.4.X]&&9!=3&&9.A(2.4.N)){e=$E(2.4.p,9);9.1w(2.4.N);e.14(\'V\',\'1z\')}20=9;6(3!=9){15=$21(2.4.j,9);15.1F(f(R){6(a.k.y>R.M()&&R.D>0)9=R})}6(9.o!=2.4.j)g;P=3.B();17=(a.k.y<3.M())?\'1D\':\'22\';d=\'J\';7=3;6(3!=9){e=9;n(e!=16&&e!=3){e=e.q}6(e==3)g;6(17==\'1D\'){d=\'J\';7=9}18{c=$E(2.4.j,9);6(c&&c.D>0){d=\'J\';7=c}18{d=\'L\';7=9}}}T=(d==\'J\')?7.1L():7;6(T){d=\'L\';7=T;e=$E(2.4.p,7);n(e&&a.k.x>e.1b()&&e.D>0){7=e.1c();e=$E(2.4.p,7)}6(!e&&a.k.x>7.1b()+2.4.1G){d=\'W\'}}U=7.B().1c();n(((d==\'L\'&&U==7)||U==3)&&7.B()!=2.8&&a.k.x<7.1b()){d=\'L\';7=$(7.q.q);U=7.B().1c()}l=K;6(d!=\'\'){l+=(7==3);l+=(d==\'L\'&&7.24()==3);l+=(d==\'J\'&&7.1L()==3);l+=(2.4.Z==\'1e\'&&3.1e!=2.1f(7,(d==\'W\')));l+=(2.4.Z==\'27\'&&(d==\'W\'||7.q!=3.q));l+=(7.D==0);c=$E(2.4.p,9);c=(c)?c.M():0;c=(c>0)?c-9.M():9.D;l+=(a.k.y<(c-3.D)+9.M());6(!l){6(d==\'W\')7=11 1T(2.4.p).1J(7);$(3).1V(7,d);3.O=H;6(!P.1X())P.1o()}}a.h()},1Z:f(){2.8.t(\'C\',2.u.F(2));6(2.4.r)2.8.t(\'1B\',2.b.r)},1N:f(S){m 1j=[];m Y;6(!S)S=2.8;$$(S.23).1F(f(1d,i){Y=$E(2.4.p,1d);1j[i]={1K:1d.1K,25:(Y)?2.1N(Y):[]}}.1q(2));g 1j},v:f(3){6(2.4.z)2.z.1o();2.8.t(\'1t\',2.b.G);I.t(\'1x\',2.b.v);2.8.t(\'C\',2.b.v);2.8.s(\'C\',2.b.u);2.1H(\'1M\',3);6(1Q.1l)$(I.13).t(\'1C\',2.b.h).t(\'1I\',2.b.h)}});1a.1O(11 1Y);1a.1O(11 2j);',62,145,'||this|el|options||if|dest|list|over|event|bound|sub|move|check|function|return|stop||childTag|page|abort|var|while|nodeName|parentTag|parentNode|collapse|addEvent|removeEvent|start|end|handleClass|||ghost|hasClass|getParent|mousedown|offsetHeight||bindWithEvent|movement|true|document|before|false|after|getTop|collapseClass|moved|prevParent|px|item|listEl|prev|last|display|inside|expandKey|kids|lock||new|counter|body|setStyle|items|null|dir|else|none|Nested|getLeft|getLast|node|depth|getDepth|Class|shift|initialize|serial|target|ie|onStart|add|remove|position|bind|visibility|top|mousemove|absolute|left|removeClass|mouseup|setStyles|block|getOptions|click|drag|up|empty|each|childStep|fireEvent|selectstart|injectInside|id|getPrevious|onComplete|serialize|implement|lockClass|window|hidden|getStyle|Element|addClass|inject|visible|getFirst|Events|detach|orig|ES|down|childNodes|getNext|children|30|parent|nCollapse|unlocked|setOptions|match|control|call|class|clone|style|type|opacity|Options|LI'.split('|'),0,{}))
+var Nested = new Class({
+    getOptions: function() {
+        return {
+            childTag: 'LI',
+            ghost: true,
+            childStep: 30, // attempts to become a child if the mouse is moved this number of pixels right
+            handleClass: null, 
+            onStart: Class.empty,
+            onComplete: Class.empty,
+            collapse: false, // true/false
+            collapseClass: 'nCollapse', // Class added to collapsed items
+            expandKey: 'shift', // control | shift
+            lock: null, // parent || depth || class
+            lockClass: 'unlocked'
+        };
+    },
+
+    initialize: function(list, options) {
+        this.setOptions(this.getOptions(), options);
+        if (!this.options.expandKey.match(/^(control|shift)$/)) {
+            this.options.expandKey = 'shift';
+        }
+        this.list = $(list);
+        this.options.parentTag = this.list.nodeName;
+        this.bound = {};
+        this.bound.start = this.start.bindWithEvent(this);
+        this.list.addEvent('mousedown', this.bound.start);
+        if (this.options.collapse) {
+            this.bound.collapse = this.collapse.bindWithEvent(this);
+            this.list.addEvent('click', this.bound.collapse);
+        }
+        if (this.options.initialize) this.options.initialize.call(this);
+    },
+
+    start: function(event) {
+        var el = $(event.target);
+        if (this.options.handleClass) {
+            while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
+                el = el.getParent();
+            }
+            if (!el.hasClass(this.options.handleClass)) return true;
+        } 
+        while (el.nodeName != this.options.childTag && el != this.list) {
+            el = el.parentNode;
+        }
+        if (el.nodeName != this.options.childTag) return true;
+        el = $(el);
+        if (this.options.lock == 'class' && !el.hasClass(this.options.lockClass)) return;
+        if (this.options.ghost) { // Create the ghost
+            this.ghost = el.clone().setStyles({
+                'list-style-type': 'none',
+                'opacity': 0.5,
+                'position': 'absolute',
+                'visibility': 'hidden',
+                'top': event.page.y+'px',
+                'left': (event.page.x+10)+'px'
+            }).injectInside(document.body);
+        }
+        el.depth = this.getDepth(el);
+        el.moved = false;
+        this.bound.movement = this.movement.bindWithEvent(this, el);
+        this.bound.end = this.end.bind(this, el);
+        this.list.removeEvent('mousedown', this.bound.start);
+        this.list.addEvent('mousedown', this.bound.end);
+        this.list.addEvent('mousemove', this.bound.movement);
+        document.addEvent('mouseup', this.bound.end);
+        if (window.ie) { // IE fix to stop selection of text when dragging
+            this.bound.stop = this.stop.bindWithEvent(this);
+            $(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
+        }
+        this.fireEvent('onStart', el);
+        event.stop();
+    },
+
+    collapse: function(event) {
+        var el = $(event.target);
+        if (this.options.handleClass) {
+            while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
+                el = el.getParent();
+            }
+            if (!el.hasClass(this.options.handleClass)) return true;
+        } 
+        while (el.nodeName != this.options.childTag && el != this.list) {
+            el = el.parentNode;
+        }
+        if (el == this.list) return;
+        el = $(el);
+        if (!el.moved) {
+            var sub = $E(this.options.parentTag, el);
+            if (sub) {
+                if (sub.getStyle('display') == 'none') {
+                    sub.setStyle('display', 'block');
+                    el.removeClass(this.options.collapseClass);
+                } else {
+                    sub.setStyle('display', 'none');
+                    el.addClass(this.options.collapseClass);
+                }
+            }
+        }
+        event.stop();
+    },
+    
+    stop: function(event) {
+        event.stop();
+        return false;
+    },
+    
+    getDepth: function(el, add) {
+        var counter = (add) ? 1 : 0;
+        while (el != this.list) {
+            if (el.nodeName == this.options.parentTag) counter += 1;
+            el = el.parentNode;
+        }
+        return counter;
+    },
+    
+    movement: function(event, el) {
+        var dir, over, check, items;
+        var dest, move, prev, prevParent;
+        var abort = false;
+        if (this.options.ghost && el.moved) { // Position the ghost
+            this.ghost.setStyles({
+                'position': 'absolute',
+                'visibility': 'visible',
+                'top': event.page.y+'px',
+                'left': (event.page.x+10)+'px'
+            });
+        }
+        over = event.target;
+        while (over.nodeName != this.options.childTag && over != this.list) {
+            over = over.parentNode;
+        }
+        if (over == this.list) return;
+        if (event[this.options.expandKey] && over != el && over.hasClass(this.options.collapseClass)) {
+            check = $E(this.options.parentTag, over);
+            over.removeClass(this.options.collapseClass);
+            check.setStyle('display', 'block');
+        }
+        // Check if it's actually inline with a child element of the event firer
+        orig = over;
+        if (el != over) {
+            items = $ES(this.options.childTag, over);
+            items.each(function(item) {
+                if (event.page.y > item.getTop() && item.offsetHeight > 0) over = item;
+            });
+        }
+        // Make sure we end up with a childTag element
+        if (over.nodeName != this.options.childTag) return;
+            
+        // store the previous parent 'ol' to remove it if a move makes it empty
+        prevParent = el.getParent();
+        dir = (event.page.y < el.getTop()) ? 'up' : 'down';
+        move = 'before';
+        dest = el;
+
+        if (el != over) {
+            check = over;
+            while (check != null && check != el) {
+                check = check.parentNode;
+            } // Make sure we're not trying to move something below itself
+            if (check == el) return;
+            if (dir == 'up') {
+                move = 'before'; dest = over;
+            } else {
+                sub = $E(this.options.childTag, over);
+                if (sub && sub.offsetHeight > 0) {
+                    move = 'before'; dest = sub;
+                } else {
+                    move = 'after'; dest = over;
+                }
+            }
+        }
+
+        // Check if we're trying to go deeper -->>
+        prev = (move == 'before') ? dest.getPrevious() : dest;
+        if (prev) {
+            move = 'after';
+            dest = prev;
+            check = $E(this.options.parentTag, dest);
+            while (check && event.page.x > check.getLeft() && check.offsetHeight > 0) {
+                dest = check.getLast();
+                check = $E(this.options.parentTag, dest);
+            }
+            if (!check && event.page.x > dest.getLeft()+this.options.childStep) {
+                move = 'inside';
+            }
+        }
+
+        last = dest.getParent().getLast();
+        while (((move == 'after' && last == dest) || last == el) && dest.getParent() != this.list && event.page.x < dest.getLeft()) {
+            move = 'after';
+            dest = $(dest.parentNode.parentNode);
+            last = dest.getParent().getLast();
+        }
+        
+        abort = false;
+        if (move != '') {
+            abort += (dest == el);
+            abort += (move == 'after' && dest.getNext() == el);
+            abort += (move == 'before' && dest.getPrevious() == el);
+            abort += (this.options.lock == 'depth' && el.depth != this.getDepth(dest, (move == 'inside')));
+            abort += (this.options.lock == 'parent' && (move == 'inside' || dest.parentNode != el.parentNode));
+            abort += (dest.offsetHeight == 0);
+            sub = $E(this.options.parentTag, over);
+            sub = (sub) ? sub.getTop() : 0;
+            sub = (sub > 0) ? sub-over.getTop() : over.offsetHeight;
+            abort += (event.page.y < (sub-el.offsetHeight)+over.getTop());
+            if (!abort) {
+                if (move == 'inside') dest = new Element(this.options.parentTag).injectInside(dest);
+                $(el).inject(dest, move);
+                el.moved = true;
+                if (!prevParent.getFirst()) prevParent.remove();
+            }
+        }
+        event.stop();
+    },
+
+    detach: function() {
+        this.list.removeEvent('mousedown', this.start.bindWithEvent(this));
+        if (this.options.collapse) this.list.removeEvent('click', this.bound.collapse);
+    },
+
+    serialize: function(listEl) {
+        var serial = [];
+        var kids;
+        if (!listEl) listEl = this.list;
+        $$(listEl.childNodes).each(function(node, i) {
+            kids = $E(this.options.parentTag.toLowerCase(), node); // FIX: toLower() required for Safari
+            serial[i] = {
+                id: node.id,
+                children: (kids) ? this.serialize(kids) : []
+            };
+        }.bind(this));
+        return serial;
+    },
+
+    end: function(el) {
+        if (this.options.ghost) this.ghost.remove();
+        this.list.removeEvent('mousemove', this.bound.movement);
+        document.removeEvent('mouseup', this.bound.end);
+        this.list.removeEvent('mousedown', this.bound.end);
+        this.list.addEvent('mousedown', this.bound.start);
+        this.fireEvent('onComplete', el);
+        if (window.ie) $(document.body).removeEvent('drag', this.bound.stop).removeEvent('selectstart', this.bound.stop);
+    }
+});
+
+// FIX: Don't select text while dragging in IE
+if (window.ie) {
+    Element.NativeEvents.push('selectstart');
+    Element.NativeEvents.push('drag');
+}
+
+Nested.implement(new Events);
+Nested.implement(new Options);
+

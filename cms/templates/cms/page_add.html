@@ -1,15 +1,13 @@
 {% extends "admin/base_site.html" %}
-{% load i18n adminmedia cms_base cms_admin %}
-
+{% load i18n adminmedia admin_modify cms_base cms_admin %}
 {% block extrahead %}{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}cms/admin.css" media="screen" />
 <script src="/admin/jsi18n/" type="text/javascript"></script>
 <script src="{% admin_media_prefix %}js/core.js" type="text/javascript"></script>
 <script src="{% admin_media_prefix %}cms/DateTimeShortcuts.js" type="text/javascript"></script>
 <script src="{% admin_media_prefix %}js/calendar.js" type="text/javascript"></script>
-<script src="{{ MEDIA_URL }}js/mootools.v1.11.js" type="text/javascript"></script>
+<script src="{% admin_media_prefix %}cms/mootools.js" type="text/javascript"></script>
 <script src="{% admin_media_prefix %}cms/dynamicforms.js" type="text/javascript"></script>
-<script type="text/javascript">var use_tinymce = {{ use_tinymce|lower }};</script>
 <script src="{% admin_media_prefix %}cms/page_add.js" type="text/javascript"></script>
 {% if use_tinymce %}
 <script src="{% admin_media_prefix %}tinymce/tiny_mce.js" type="text/javascript"></script>
@@ -17,6 +15,7 @@
 {% endif %}
 <script type="text/javascript">
 //<![CDATA[
+
 Window.onDomReady(function(){
     PageContent.template = {{ pagecontent_template }};
 
@@ -52,43 +51,61 @@ Window.onDomReady(function(){
 {% endif %}{% endblock %}
 
 {% block content %}
-<form id="page-form" action="" method="post" onsubmit="$ES('.pagecontent-content').removeClass('hidden');">
+<form id="page-form" action="" method="post">
     {#<ul class="object-tools"><li><a href="../add/" class="addlink">{% trans 'Add page' %}</a></li></ul>#}
 
     <div id="content-main">
-        <fieldset class="module aligned">
-            {% render_field form.title %}
-            {% render_field form.slug %}
-            {% render_field form.is_published %}
-            {% render_field form.template %}
-            {% render_field form.context %}
-            {% render_field form.parent %}
-            {% render_field form.in_navigation %}
-            {% if navigations %}
-            <div><p class="info">{% trans 'This page is already in the navigation (<a href="../../navigation/">edit navigation</a>):' %}</p>
-            <ul>
-            {% for navigation in navigations %}
-                <li>{{ navigation }} {% if not navigation.in_navigation %}<span class="small">(not displayed in navigation)</span>{% endif %} <a class="deletelink navigation-delete" href="../../navigation/{{ navigation.id }}/delete/">Delete</a></li>
-            {% endfor %}
-            </ul></div>
-            {% endif %}
-            {% render_field form.override_url %}
-            {% render_field form.overridden_url %}
-            {% render_field form.start_publish_date %}
-            {% render_field form.end_publish_date %}
-    </fieldset>
-
-{% include 'cms/page_submit_row.html' %}
-
-{% if not add %}
-<h2>{% trans 'Edit page content' %}</h2>
-<noscript><p class="errornote"><b>{% trans 'Note' %}:</b> {% trans "You will have to activate JavaScript in your browser's settings to be able to edit page content." %}</p></noscript>
-<div id="page-contents"></div>
-<p><a href="#" class="addlink page-content-add">{% trans 'Add page content' %}</a></p>
-{% include 'cms/page_submit_row.html' %}
-{% endif %}
-
-    </div>
-  </form>
-
+        {% include 'cms/page_submit_row.html' %}
+		<div id="content-cms">
+			<div id="itemdetails">
+		    	<fieldset class="module aligned">
+    			    <h2>{% trans 'Page Info' %}</h2>
+                    {% render_field form.title %}
+                    {% render_field form.slug %}
+                    {% render_field form.parent %}
+			    </fieldset>
+			</div>
+			<div id="page-contents" class="clearfix"></div>
+			{% if not add %}
+			<noscript><p class="errornote"><b>{% trans 'Note' %}:</b> {% trans "You will have to activate JavaScript in your browser's settings to be able to edit page content." %}</p></noscript>
+			<p><a href="#" class="addlink page-content-add">{% trans 'Add page content' %}</a></p>
+			{% endif %}
+		</div>
+  		<div id="right">
+			<div id="publishinginfo">
+		      	<fieldset class="module aligned">
+					<h2>{% trans 'Publishing Info' %}</h2>
+			        {% if navigations %}
+			        <div><p class="info">{% trans 'This page is already in the navigation (<a href="../../navigation/">edit navigation</a>):' %}</p>
+			        <ul>
+			        {% for navigation in navigations %}
+			            <li>{{ navigation }} {% if not navigation.in_navigation %}<span class="small">(not displayed in navigation)</span>{% endif %} <a class="deletelink navigation-delete" href="../../navigation/{{ navigation.id }}/delete/">Delete</a></li>
+			        {% endfor %}
+    			        </ul>
+                    </div>
+			        {% endif %}
+                    {% render_field form.in_navigation %}
+                    {% render_field form.is_published %}
+                    {% render_field form.override_url %}
+                    {% render_field form.overridden_url %}
+                    {% render_field form.template %}
+                    {% render_field form.start_publish_date %}
+                    {% render_field form.end_publish_date %}
+		      	</fieldset>
+		  	</div>	
+            {% if page_addons %}
+      		<div class="module">
+    	      	<fieldset class="module aligned">
+    				<h2>{% trans 'Add-ons' %}</h2>
+                    <div class="form-row">
+                        <a href="add_ons/?_popup=1" onclick="document.open(this.href, '_blank', 'width=800,height=600,resizable=yes,scrollbars=yes');return false">{% trans 'Add-ons' %}</a>
+		            </div>
+		        </fieldset>
+			</div>
+			{% endif %}
+		</div>
+	</div>	
+		<div class="clearfix"></div>
+	{% include 'cms/page_submit_row.html' %}
+</form>
 {% endblock %}

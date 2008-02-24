@@ -1,4 +1,4 @@
-// mootools: Dom, Event, Ajax, Window.Base, Json.Remote
+// mootools: Window.DomReady, Element.Selectors, Element.Dimensions, Json.Remote, Tips
 
 var PageContent = Form.extend({
     initialize: function(value){

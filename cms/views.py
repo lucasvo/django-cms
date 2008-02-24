@@ -23,7 +23,8 @@ def resolve_dotted_path(path):
     func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
     return func
 
-def get_page_context(request, language, page, extra_context={}):
+
+def get_page_context_dict(request, language, page):
     path = list(page.get_path())
 
     try:
@@ -31,18 +32,22 @@ def get_page_context(request, language, page, extra_context={}):
     except (TypeError, ValueError):
         page_number = 1
 
-    context = RequestContext(request)
-    context.update({
-        'page': page,
-        'page_number': page_number,
-        'path': path,
-        'language': language,
-        'root':'/%s/' % language,
-        'site_title': SITE_TITLE,
-    })
-    context.update(extra_context)
+    return {
+            'page': page,
+            'page_number': page_number,
+            'path': path,
+            'language': language,
+            'root':'/%s/' % language,
+            'site_title': SITE_TITLE,
+        }
 
+
+def get_page_context(request, language, page, extra_context={}):
+    context = RequestContext(request)
+    context.update(get_page_context_dict(request, language, page))
+    context.update(extra_context)
     return context
+
 
 def render_pagecontent(request, language, page, page_content, template_name=None, preview=False, args=None):
     path = list(page.get_path())
@@ -92,7 +97,7 @@ def render_pagecontent(request, language, page, page_content, template_name=None
     # 2. template defined in page (over `page_content.prepare()`)
     # 3. template defined in function arg "template_name"
     # 4. template defined in settings.DEFAULT_TEMPLATE
-    # If preview, than _preview is appended to the templates name. If there's no preview template: fallback to the normal one
+    # If preview, then _preview is appended to the templates name. If there's no preview template: fallback to the normal one
     if page_content.template:
         template_path = page_content.template
     elif template_name:
@@ -118,6 +123,7 @@ def render_pagecontent(request, language, page, page_content, template_name=None
                 template = loader.get_template(DEFAULT_TEMPLATE)
     return HttpResponse(template.render(context))
 
+
 def render_page(request, language, page, args=None):
     if not models.Page.objects.root().is_published or not page.is_published:
         raise Http404
@@ -133,21 +139,20 @@ def render_page(request, language, page, args=None):
 
 def handle_page(request, language, url):
 
-    # TODO: Objects with overriden URLs have two URLs now. This shouldn't be the case.
+    # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
-    # First take a look if there's a navigation object with an overriden URL
+    # First take a look if there's a navigation object with an overridden URL
     pages = models.Page.objects.filter(override_url=True, overridden_url=url)
     if pages:
         return render_page(request, language, pages[0])
 
     # If not, go and look it up
-    #parts = url and ('/%s'%url).split('/') or ['']
     parts = url and url.split('/') or []
 
     root = models.Page.objects.root()
 
     if not parts and not DISPLAY_ROOT:
-        return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_absolute_url())
+        return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_link(language))
 
     parent = root
 
@@ -166,28 +171,21 @@ def handle_page(request, language, url):
     if pages:
         page = pages[0]
     else:
-        page = models.Page.objects.root()
+        page = root
 
     return render_page(request, language, page, args)
 
 
-def handler(request, url=''):
+def handler(request):
+    url = request.path
+
     languages = language_list()
     language = None
 
     # Skip multiple slashes in the URL
-    do_redirect = False
     if '//' in url:
         url = re.sub("/+" , "/", url)
-        do_redirect = True
-    if url and url[0] == '/':
-        url = url[1:]
-        do_redirect = True
-    if url and url[-1] == '/':
-        url = url[:-1]
-        do_redirect = True
-    if do_redirect:
-        return HttpResponseRedirect('/%s/'%url)
+        return HttpResponseRedirect('%s' % url)
 
     try:
         language = request.LANGUAGE_CODE
@@ -206,23 +204,25 @@ def handler(request, url=''):
     if LANGUAGE_REDIRECT:
         if url:
             for l in languages:
-                if url == l:
-                    return handle_page(request, l, '')
-                if url.startswith('%s/'%l):
-                    return handle_page(request, l, url[len(l)+1:])
+                if url.startswith('/%s/' % l):
+                    return handle_page(request, l, url[len(l)+2:-1])
 
         # Make sure the language code is prepended to the URL
         # See also: http://www.mail-archive.com/django-users@googlegroups.com/msg11604.html
-        return HttpResponseRedirect('/%s/%s' % (language, url))
+        if not DISPLAY_ROOT and url == '/':
+            # Avoid two redirects: handle_page will return a redirect to the correct page.
+            return handle_page(request, language, '')
+        return HttpResponseRedirect('/%s%s' % (language, url))
             
     else:
         # TODO: Not implemented
         pass
 
-    return handle_page(request, language, url)
+    return handle_page(request, language, url[1:-1])
 
 if REQUIRE_LOGIN:
     handler = staff_member_required(handler)
+
 
 def search(request):
     template = "cms/search.html"

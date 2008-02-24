@@ -1,3 +1,6 @@
+/* Import divio cms styles */
+@import url('cmslayout.css');
+
 p.help { display:inline; margin:0 0 0 1em !important; padding:0 !important; }
 fieldset p.info { margin-top:0.5em; margin-bottom:0; color:#666; }
 fieldset ul { margin-left:10em !important; }
@@ -21,17 +24,18 @@ div.inline label { float:none !important; width:auto !important; display:inline 
 .form-row a.toggle-advanced { text-decoration:underline; }
 
 /*.form-row { padding:0.4em 1em; }*/
-#navigation li { #margin:-0.5em 0 -0.5em 3em; }
-#navigation { padding-top:0.5em; padding-bottom:0.5em; }
+#navigation ul { padding-left:40px; }
+#navigation ul li {}
+#navigation li { margin: 0.1em 0 0.1em 0em; list-style: none; }
+#navigation { padding-top:0.5em; padding-bottom:0.5em; padding-left: 0px;}
 #navigation li { clear:both; }
 #navigation li span { cursor:pointer; color:#999; }
-#navigation li a span { color:#333; }
+#navigation li a span { color:#5B80B2; font-weight: bold }
+#navigation li a:hover span { color:#036; text-decoration:none;}
 /*#navigation li span:hover, #navigation li span:focus { text-decoration:underline; }
 #navigation li span:hover span, #navigation li span:focus span { text-decoration:none; }*/
-#navigation li a.pagelink { color:#999; }
-#navigation li a:active { text-decoration:underline; }
 /*#navigation li.drag span { background-color:#eee; }*/
-#navigation li.changed span { font-weight:bold; background-color:#ffc !important; }
+#navigation li.changed .border { background-color:#ffc !important; }
 #navigation .toolbox { float:right; margin-right:1em; }
 #navigation .toolbox a, #navigation .toolbox label { margin:0 0.5em; }
 #navigation .toolbox label { margin-left:0; }
@@ -41,11 +45,28 @@ div.inline label { float:none !important; width:auto !important; display:inline 
 #navigation .toolbox label { font-size:1em; }
 #navigation .toolbox label.left { margin-left:0.5em; }
 #navigation .toolbox img { margin-right:1em; }
-#navigation div.border:hover { background-color:#eee; }
+#navigation div.border:hover { background-color:#eee;}
+#navigation div.border { border-bottom: 1px solid #ddd; padding: 5px 5px 5px 10px; background-color:#f1f6ff; /*margin-right: 350px*/}
 /*#navigation div.border .toolbox { display:none; }
 #navigation div.border:hover .toolbox { display:block; }*/
-#navigation .path { width:20em; display:block; float:left; overflow:hidden; text-align:left; }
-#navigation .path a { font-weight:normal; color:#666; font-size:0.9em; overflow:hidden; }
-#navigation .link_id { font-weight:normal; padding-left:1em; color:#999; font-size:0.9em; }
-#navigation a:hover { text-decoration:underline; }
-fieldset .small { color:#999; font-size:0.9em; }
+#navigation .path { width:10em; display:block; float:left; overflow:hidden; text-align:left; }
+#navigation .path a { font-weight:normal; color:#666; font-size:0.9em; overflow:hidden;}
+#navigation .movespan { font-weight:normal; margin-right: 10px; color:#999; font-size:0.9em; padding-left:15px; background:url(icon_move.gif) 0 0 no-repeat; cursor: move;}
+#navigation .movespan:link { text-decoration: none; color: #036;}
+#navigation .movespan:hover { text-decoration: none; color: #036;}
+#navigation .view { font-weight:normal; margin-right: 0px; color:#999; padding-left:15px; background:url(selector-addall.gif) 0 0.1em no-repeat; }
+#navigation .link_id { cursor:default; font-weight:normal; padding-left:1em; color:#999; font-size:0.9em; }
+
+fieldset .small { 
+    color:#999; 
+    font-size:0.9em;
+}
+
+fieldset .small b { 
+    color: red; 
+}
+.hideme { display: none; }
+
+/* NAVVIGATION TOOLS */
+
+

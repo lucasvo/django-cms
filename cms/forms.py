@@ -83,8 +83,8 @@ PAGECONTENT_FIELDS = (
 class PageForm(forms.Form):
     title = forms.CharField(max_length=200, help_text=_('The title of the page.'), label=_('title'))
     slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens.'), label=_('slug'))
-    override_url = forms.BooleanField(label=_('override url'), help_text=_('When checked, a custom URL can be entered for this page.'), required=False)
-    overridden_url = forms.CharField(label=_('overridden url'), help_text=_('Enter a url to use as custom url for this page.'), required=False)
+    override_url = forms.BooleanField(label=_('override URL'), help_text=_('When checked, a custom URL can be entered for this page.'), required=False)
+    overridden_url = forms.CharField(label=_('overridden URL'), help_text=_('Enter a URL to use as custom URL for this page. Do not use a trailing or leading slash.'), required=False)
     override_created = forms.DateTimeField(widget=DateWidget, required=False, input_formats=DATETIME_FORMATS, label=_('override created date'), help_text=_('Enter a date to use a custom creation date for this page.'))
     is_published = forms.BooleanField(required=False, initial=True, help_text=_('Whether or not the page will be accessible from the web.'), label=_('is published'))
     start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATE_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date on which you want to start publishing this page.'))

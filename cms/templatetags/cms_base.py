@@ -120,8 +120,24 @@ class CmsLinkNode(template.Node):
 
         link = page.get_link(context['language'])
 
-        page_content = page.get_content(context.get('language'))
-        return self.html and '<a href="%s">%s</a>' % (link, escape(page_content and page_content.title or page.title)) or link
+        if self.html:
+            page_content = page.get_content(context.get('language'))
+ 
+            extra_class = ''
+            try:
+                active_page = template.resolve_variable('page', context)
+
+                if active_page == page:
+                    extra_class = ' class="active"'
+                elif page in active_page.get_path():
+                    extra_class = ' class="active_path"'
+            except template.VariableDoesNotExist:
+                pass
+
+            return '<a%s href="%s">%s</a>' % (extra_class, link, escape(page_content and page_content.title or page.title))
+        else:
+            return link
+
 
 @register.tag
 def cms_link(parser, token):
