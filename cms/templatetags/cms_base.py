@@ -28,7 +28,7 @@ class CmsSubpagesNode(template.Node):
         except models.Page.DoesNotExist:
             context[self.varname] = None
         else:
-            pages = models.Page.objects.filter(parent=page)
+            pages = models.Page.objects.filter(parent=page, in_navigation=True)
             context[self.varname] = pages
         return ''
 
