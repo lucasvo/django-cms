@@ -18,12 +18,9 @@ from cms.forms import PageForm, PageContentForm, PAGE_FIELDS, PAGECONTENT_FIELDS
 
 @staff_member_required
 def page_add_edit(request, id=None):
-
     if id:
         page = get_object_or_404(models.Page, pk=id)
-        initial = util.get_values(page, PAGE_FIELDS)
-        initial['parent'] = page.parent and page.parent.id
-        form = PageForm(request, initial=initial, page=page)
+        form = PageForm(request, instance=page)
         add = False
     else:
         page = None
@@ -39,28 +36,8 @@ def page_add_edit(request, id=None):
             pagecontent_forms = PageContentForm.get_forms(request)
             pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
         if form.is_valid() and (add or pagecontent_forms.are_valid()):
-            data = form.cleaned_data
-            try:
-                parent = models.Page.objects.get(pk=data.get('parent'))
-            except models.Page.DoesNotExist:
-                parent = None
+            page = form.save()
 
-            if add or page.parent != parent:
-                change_parent = True
-            else:
-                change_parent = False
-
-            if add:
-                page = models.Page(**util.get_dict(PAGE_FIELDS, data))
-            else:
-                util.set_values(page, PAGE_FIELDS, data)
-
-            if change_parent:
-                page.position = parent and parent.get_next_position() or 1
-                page.parent = parent
-
-            page.save()
-                
             if not add:
                 # Save the PageContents
                 for pagecontent_form in pagecontent_forms:
@@ -157,7 +134,6 @@ def navigation(request):
             except KeyError:
                 pass # Should we fail silently?
 
-        print (request.POST.get('navigation'))
         hierarchy_data = json.load(request.POST.get('navigation'))
         parents(pages, hierarchy_data)
 

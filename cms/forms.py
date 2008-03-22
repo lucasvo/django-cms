@@ -66,6 +66,7 @@ PAGE_FIELDS = (
     'in_navigation', 
     'override_url', 
     'overridden_url', 
+    'redirect_to', 
     'start_publish_date', 
     'end_publish_date',
 )
@@ -80,28 +81,22 @@ PAGECONTENT_FIELDS = (
     'template',
 )
 
-class PageForm(forms.Form):
-    title = forms.CharField(max_length=200, help_text=_('The title of the page.'), label=_('title'))
-    slug = forms.RegexField(slug_re, max_length=50, help_text=_('The name of the page that will appear in the URL. A slug can contain letters, numbers, underscores or hyphens.'), label=_('slug'))
-    override_url = forms.BooleanField(label=_('override URL'), help_text=_('When checked, a custom URL can be entered for this page.'), required=False)
-    overridden_url = forms.CharField(label=_('overridden URL'), help_text=_('Enter a URL to use as custom URL for this page. Do not use a trailing or leading slash.'), required=False)
-    override_created = forms.DateTimeField(widget=DateWidget, required=False, input_formats=DATETIME_FORMATS, label=_('override created date'), help_text=_('Enter a date to use a custom creation date for this page.'))
-    is_published = forms.BooleanField(required=False, initial=True, help_text=_('Whether or not the page will be accessible from the web.'), label=_('is published'))
+class PageForm(forms.ModelForm):
+    template = forms.ChoiceField(choices=cms_global_settings.TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
     start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATE_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date on which you want to start publishing this page.'))
     end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATE_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
-    template = forms.ChoiceField(choices=cms_global_settings.TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
-    context  = forms.CharField(max_length=200, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'), required=False)
-    parent = forms.ChoiceField(required=False, help_text=_('The page will be appended inside the chosen category.'), label=_('Navigation'))
-    in_navigation = forms.BooleanField(required=False, label=_('display in navigation'), initial=True)
 #    not yet implemented
 #    change_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('change access level'), help_text=_('Select groups which are allowed to edit this page.'))
 #    view_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('view access level'), help_text=_('If groups are selected, only these groups are allowed to view this page and every page rooted under it.'))
 
-    def __init__(self, request, initial=None, page=None):
-        self.page = page
-        super(PageForm, self).__init__(request.method == 'POST' and request.POST or None, initial=initial)
+    class Meta:
+        model = Page
+        exclude = ('created', 'modified', 'position', 'is_editable')
+
+    def __init__(self, request, instance=None):
+        super(PageForm, self).__init__(request.method == 'POST' and request.POST or None, instance=instance)
         choices = [('', '--------')]
-        choices += [(p.id, smart_unicode(p.get_path())) for p in util.flatten(Page.objects.hierarchy()) if p != page]
+        choices += [(p.id, smart_unicode(p.get_path())) for p in util.flatten(Page.objects.hierarchy()) if instance not in p.get_path()]
         self.fields['parent'].choices = choices
         choices = [('', '--------')]
         choices += cms_global_settings.TEMPLATES
@@ -110,11 +105,24 @@ class PageForm(forms.Form):
     def clean_parent(self):
         num_pages = Page.objects.count()
         if num_pages > 0: # If there are no pages, parent will be empty anyway
-            if self.page and not self.page.parent and self.cleaned_data.get('parent'):
+            if self.instance.id and not self.instance.parent and self.cleaned_data.get('parent'):
                 raise forms.ValidationError(_('Please reorder the root object on the hierarchy page.'))
-            if (not self.page or self.page.parent) and not self.cleaned_data.get('parent'):
+            if (not self.instance.id or self.instance.parent) and not self.cleaned_data.get('parent'):
                 raise forms.ValidationError(_('Please choose in which category the page should belong.'))
         return self.cleaned_data.get('parent')
+
+    def save(self):
+        old_parent = self.instance.parent
+        instance = super(PageForm, self).save(commit=False)
+        parent = instance.parent
+
+        if not instance.id or old_parent != parent:
+            instance.position = parent and parent.get_next_position() or 1
+
+        instance.save()
+
+        return instance
+
 
 class PageContentForm(dynamicforms.Form):
     PREFIX = 'pagecontent'

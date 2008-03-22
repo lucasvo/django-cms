@@ -77,30 +77,31 @@ class PageManager(models.Manager):
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
-    slug = models.CharField(_('slug'), max_length=50, help_text=_('The name of the page that will appear in the URL. Do not leave this empty.'), prepopulate_from=("title",))
+    slug = models.CharField(_('slug'), max_length=50, help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'), prepopulate_from=("title",))
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
 
     template = models.CharField(max_length=200, null=True, blank=True)
-    context = models.CharField(max_length=200, null=True, blank=True)
+    context = models.CharField(max_length=200, null=True, blank=True, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'))
 
-    is_published = models.BooleanField(_('is published'), default=True, help_text=_('Whether or not the page will be accessible from the web.'))
+    is_published = models.BooleanField(_('is published'), default=True, help_text=_('Whether or not the page is accessible from the web.'))
     start_publish_date = models.DateTimeField(_('start publishing'), null=True, blank=True)
     end_publish_date = models.DateTimeField(_('finish publishing'), null=True, blank=True)
 
     # Navigation
-    parent = models.ForeignKey('self', null=True, blank=True)
+    parent = models.ForeignKey('self', verbose_name=_('Navigation'), null=True, blank=True, help_text=_('The page will be appended inside the chosen category.'))
     position = models.IntegerField()
-    in_navigation = models.BooleanField(default=True)
+    in_navigation = models.BooleanField(_('display in navigation'), default=True)
 
     # Access (not implemented yet)
     #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
     #view_access_level = models.ManyToManyField(Group, verbose_name=_('view access level'), related_name='view_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
 
-    # TODO
+    # Override the page URL or redirect the page to another page.
     override_url = models.BooleanField(default=False)
     overridden_url = models.CharField(max_length=200, null=True, blank=True)
+    redirect_to = models.ForeignKey('self', null=True, blank=True, related_name='redirected_pages')
 
     is_editable = models.BooleanField(default=True)
 
@@ -185,6 +186,9 @@ class Page(models.Model):
         return super in self.get_path()
 
     def get_absolute_url(self):
+        if self.redirect_to:
+            return self.redirect_to.get_absolute_url()
+
         if self.override_url:
             # The overridden URL is assumed to not have a leading or trailing slash.
             if self.overridden_url:

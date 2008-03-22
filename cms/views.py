@@ -134,7 +134,7 @@ def render_page(request, language, page, args=None):
 
     page_content = page.get_content(language)
 
-    return render_pagecontent(request, language, page, page_content, args)
+    return render_pagecontent(request, language, page, page_content, args=args)
 
 
 def handle_page(request, language, url):
@@ -142,7 +142,7 @@ def handle_page(request, language, url):
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overridden URL
-    pages = models.Page.objects.filter(override_url=True, overridden_url=url)
+    pages = models.Page.objects.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
     if pages:
         return render_page(request, language, pages[0])
 
@@ -172,6 +172,9 @@ def handle_page(request, language, url):
         page = pages[0]
     else:
         page = root
+
+    if page.redirect_to:
+        return HttpResponseRedirect(page.redirect_to.get_link(language))
 
     return render_page(request, language, page, args)
 
