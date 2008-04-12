@@ -11,7 +11,12 @@ replace_res = [re.compile('(<[^>]+) (%s=\\\\"[a-zA-Z0-9-_]+\.)#(\\\\")([^<]*>)' 
 # see http://code.djangoproject.com/ticket/2986
 def addslashes(value):
     "Adds slashes - useful for passing strings to JavaScript, for example."
-    return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'").replace('\n', '\\n').replace('\r', '\\r')
+    value = value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
+
+    # Line terminators according to ECMA-262
+    value = value.replace('\n', '\\n').replace('\r', '\\r').replace(u'\u2028', '').replace(u'\u2029', '')
+
+    return value
 
 class FormCollection(list):
     def are_valid(self):
