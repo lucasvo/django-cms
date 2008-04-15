@@ -27,7 +27,7 @@
 }
 
 .mceEditor {
-	background: #F0F0EE;
+	/*background: #F0F0EE;*/
 	border: 1px solid #cccccc;
 }
 
@@ -38,10 +38,14 @@
 
 .mceToolbar {
 	background: #F0F0EE;
-	border-top: 1px solid #cccccc;
+	border: 1px solid #cccccc;
 	line-height: 1px;
 	font-size: 1px;
 	padding-bottom: 1px;
+}
+
+.mceEditor td {
+    border-bottom: 1px solid #cccccc;
 }
 
 .mceEditorIframe {

@@ -6,7 +6,8 @@
 .mceLabel, .mceLabelDisabled {font-family: 'MS Sans Serif', sans-serif, Verdana, Arial; font-size: 9pt;}
 .mceLabel {color: #000000;}
 .mceLabelDisabled {cursor: text; color: #999999;}
-.mceEditor {background: #F0F0EE; border: 1px solid #cccccc; padding: 0; margin: 0;}
+.mceEditor {/*background: #F0F0EE;*/ border: 1px solid #cccccc; padding: 0; margin: 0;}
+.mceEditor td {border-bottom: 1px solid #cccccc;}
 .mceEditorArea { font-family: 'MS Sans Serif', sans-serif, Verdana, Arial; background: #FFFFFF; padding: 0; margin: 0; }
 .mceToolbarTop, .mceToolbarBottom {background: #F0F0EE; line-height: 1px; font-size: 1px;}
 .mceToolbarTop {border-bottom: 1px solid #cccccc; padding-bottom: 1px;}
@@ -15,7 +16,7 @@
 .mceStatusbarTop, .mceStatusbarBottom, .mceStatusbar {height: 20px;}
 .mceStatusbarTop .mceStatusbarPathText, .mceStatusbarBottom .mceStatusbarPathText, .mceStatusbar .mceStatusbarPathText {font-family: 'MS Sans Serif', sans-serif, Verdana, Arial; font-size: 9pt; padding: 2px; line-height: 16px; overflow: visible;}
 .mceStatusbarTop {border-bottom: 1px solid #cccccc;}
-.mceStatusbarBottom {border-top: 1px solid #cccccc;}
+.mceStatusbarBottom {border-top: 1px solid #cccccc; background: #F0F0EE;}
 .mceStatusbar {border-bottom: 1px solid #cccccc;}
 .mcePathItem, .mcePathItem:link, .mcePathItem:visited, .mcePathItem:hover {text-decoration: none; font-family: 'MS Sans Serif', sans-serif, Verdana, Arial; font-size: 9pt; color: #000000;}
 .mcePathItem:hover {text-decoration: underline;}

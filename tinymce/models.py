@@ -2,13 +2,14 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import permalink
+from tinymce.util import SlugifyUniquely
 import os
 
 class Template(models.Model):
     title = models.CharField(_('title'), max_length=100)
     description = models.CharField(_('description'), max_length=200, blank=True)
     content = models.TextField(_('content'))
-    name = models.SlugField(_('name'), unique=True, prepopulate_from=('title',))
+    name = models.CharField(_('name'), max_length=200, editable=False)
     is_snippet = models.BooleanField(_('is snippet'), default=True)
     
     class Meta:
@@ -27,7 +28,7 @@ class Template(models.Model):
         return self.title
         
     def save(self):
-        self.name += u'.html'
+        self.name = SlugifyUniquely(self, slug_base='title', slug_field='name')
         super(self.__class__, self).save()
     
     @permalink
@@ -52,11 +53,12 @@ class CssClassManager(models.Manager):
 
 class CssClass(models.Model):
     ELEMENTS = (
-        ('img', 'Image'),
-        ('a', 'Hyperlink'),
+        ('img', 'Image <img>'),
+        ('a', 'Hyperlink <a>'),
+        ('all', 'all Elements <*>'),
     )
     description = models.CharField(_('description'), max_length=200)
-    element = models.CharField(choices=ELEMENTS, max_length=30, help_text=_('Determines use of this class in either "advimage" or "advlink" module.'))
+    element = models.CharField(choices=ELEMENTS, max_length=30, help_text=_('Determines for which elements this class can be used.'))
     css_class = models.CharField(_('CSS class'), max_length=30)
     css_style = models.TextField(_('CSS Style'), blank=True)
     

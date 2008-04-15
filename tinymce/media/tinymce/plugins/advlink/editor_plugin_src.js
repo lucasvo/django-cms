@@ -1,5 +1,5 @@
 /**
- * $Id: editor_plugin_src.js 268 2007-04-28 15:52:59Z spocke $
+ * $Id: editor_plugin_src.js 304 2007-10-25 13:30:51Z spocke $
  *
  * @author Moxiecode
  * @copyright Copyright © 2004-2007, Moxiecode Systems AB, All rights reserved.
@@ -35,11 +35,8 @@ var TinyMCE_AdvancedLinkPlugin = {
 	execCommand : function(editor_id, element, command, user_interface, value) {
 		switch (command) {
 			case "mceAdvLink":
-				var inst = tinyMCE.getInstanceById(editor_id), anySelection = false;
+				var inst = tinyMCE.getInstanceById(editor_id), anySelection = !inst.selection.isCollapsed();
 				var focusElm = inst.getFocusElement(), selectedText = inst.selection.getSelectedText();
-
-				if (tinyMCE.selectedElement)
-					anySelection = (tinyMCE.selectedElement.nodeName.toLowerCase() == "img") || (selectedText && selectedText.length > 0);
 
 				if (anySelection || (focusElm != null && focusElm.nodeName == "A")) {
 					tinyMCE.openWindow({

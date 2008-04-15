@@ -188,11 +188,11 @@ var TinyMCE_XHTMLXtrasPlugin = {
 	},
 
 	_anySel : function(editor_id) {
-		var inst = tinyMCE.getInstanceById(editor_id), t = inst.selection.getSelectedText(), pe;
+		var inst = tinyMCE.getInstanceById(editor_id), pe;
 
 		pe = tinyMCE.getParentElement(inst.getFocusElement(), 'CITE,ACRONYM,ABBR,HTML:ABBR,DEL,INS');
 
-		return pe || inst.getFocusElement().nodeName == "IMG" || (t && t.length > 0);
+		return pe || !inst.selection.isCollapsed();
 	}
 };
 

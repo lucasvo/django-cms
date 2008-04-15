@@ -393,10 +393,10 @@ function updateAction() {
 
 	h = h.substring(0, h.lastIndexOf('</body>'));
 
-	if (h.indexOf('<title>') == -1)
-		h = h.replace(/<head.*?>/, '$&\n' + '<title>' + inst.cleanup.xmlEncode(f.metatitle.value) + '</title>');
-	else
-		h = h.replace(/<title>(.*?)<\/title>/, '<title>' + inst.cleanup.xmlEncode(f.metatitle.value) + '</title>');
+//	if (h.indexOf('<title>') == -1)
+//		h = h.replace(/<head.*?>/, '$&\n' + '<title>' + inst.cleanup.xmlEncode(f.metatitle.value) + '</title>');
+//	else
+//		h = h.replace(/<title>(.*?)<\/title>/, '<title>' + inst.cleanup.xmlEncode(f.metatitle.value) + '</title>');
 
 	if ((v = getSelectValue(f, 'doctypes')) != '')
 		h = v + '\n' + h;
