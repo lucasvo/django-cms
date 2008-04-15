@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import Http404
 from django.db import models
 from django.conf import settings
 from django.utils.dateformat import DateFormat
@@ -84,6 +85,15 @@ class PageManager(models.Manager):
                         Q(pagecontent__content__icontains=query)
                     )
         return qs.distinct()
+    
+    def get_by_overridden_url(self, url):
+        qs = self.published()
+        try:
+            return qs.get(overridden_url=url, override_url=True)
+        except AssertionError:
+            return qs.filter(overridden_url=url, override_url=True)[0]
+        except Page.DoesNotExist:
+            raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
