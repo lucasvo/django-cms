@@ -20,7 +20,7 @@ def get_conf_var(name, default='', request=None, config=None):
         # If you don't want to let someone hijack a setting (over GET), don't pass a request object
         if request:
             if not config:
-                config = request.GET.get("tmdivio_config", "default") 
+                config = request.GET.get("tm_config", "default") 
             ret = request.GET.get(name, default) or tinymce_settings.__dict__.get(config).get(name.upper())
             return ret 
         else:
@@ -33,7 +33,7 @@ def get_conf_var(name, default='', request=None, config=None):
 def init_mce(request):
     context = RequestContext(request)
     if request.method == 'GET':
-        config = request.GET.get("tmdivio_config", "default") 
+        config = request.GET.get("tm_config", "default") 
         context.update({
             'mode': get_conf_var('mode', request=request),
             'elements': get_conf_var('elements', request=request),                        

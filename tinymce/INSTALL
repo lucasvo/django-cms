@@ -1,13 +1,67 @@
-Add something like this line to your urlpatterns in urls.py:
+urls.py
+=======
 
+urlpatterns = patterns('',
+	...
     (r'^tinymce/', include('tinymce.urls')),
+	...
+)
 
-copy all the media files in the media dir
+Setup media files and templates
+===============================
+
+copy all the media files into your ADMIN_MEDIA_ROOT
 	tinymce/* -> httpdocs/media/
 
-Do this, if you're not using the module together with the django-cms module:
-Add the following to your Admin class in your model (mind the absolute path of the dynamically generated init script!):
+
+Settings
+========
+
+1. Copy the default "tinymce_settings.py.dist" into your python path and rename it to "tinymce_settings.py". 
+2. Edit tinymce_settings.py; you can add new config tuple-dicts like in the example below. Make sure to 
+   include every parameter in your own config. There's no fallback to the default config.
+
+myconf = dict(
+    MODE = 'exact',
+    ELEMENTS = 'textarea1,textarea2',
+    PLUGINS = 'advimage,advlink,table,searchreplace,contextmenu,template,paste,save,autosave,safari',
+...
+)
+
+In this example, the editor only is used for textarea1 and textarea2 (see TinyMCE docs at
+http://tinymce.moxiecode.com/documentation.php).
+
+USAGE IN YOUR models.py
+=======================
+
+Usage together with the cms app (django-cms):
+Set the config parameter "USE_TINYMCE" to True (in cms_settings.py).
+
+Usage in your own models:
+Add the following to your Admin class in your model instance (mind the absolute path of the dynamically generated init script!):
         js = (
               'tinymce/tiny_mce.js',
               '/tinymce/init/tiny_mce_init.js?mode=textareas',
         )
+
+In this example, the tiny_mce_init.js is called with a GET parameter. You can use GET parameters to 
+dynamically override the default config parameters defined in your tinymce_settings.py. The settings are
+retrieved and applied in the following order:
+
+1. GET request (only if allowed, see below)
+2. tinymce_settings.py, config set name given in the request variable "tm_config" or "default" config set if 
+   no "tm_config" parameter is given
+3. predefined default
+
+You can override the following config parameters with GET:
+            'mode'
+            'elements'
+            'language'
+            'theme'
+            'width'
+            'height'
+            'content_css'
+            'editor_css'
+            'show_styles_menu'
+            'theme_advanced_resizing'
+            'theme_advanced_path'
