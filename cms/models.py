@@ -7,7 +7,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.db.models import Q
 from django.utils import translation
+
 from cms.util import language_list
+from cms.middleware import get_current_user
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE
 
 """
@@ -48,7 +50,15 @@ class PageManager(models.Manager):
             raise RootPageDoesNotExist, unicode(_('Please create at least one page.'))
 
     def published(self):
-        return self.filter(
+        try:
+            user_logged_in = get_current_user().is_authenticated()
+        except:
+            user_logged_in = False
+        if not user_logged_in:
+            qs = self.exclude(requires_login=True)
+        else:
+            qs = self
+        return qs.filter(
                            Q(is_published=True),
                            Q(start_publish_date__lte=datetime.date.today()) | Q(start_publish_date__isnull=True), 
                            Q(end_publish_date__gte=datetime.date.today()) | Q(end_publish_date__isnull=True),
@@ -94,7 +104,9 @@ class Page(models.Model):
     position = models.IntegerField()
     in_navigation = models.BooleanField(_('display in navigation'), default=True)
 
-    # Access (not implemented yet)
+    # Access
+    requires_login = models.BooleanField(_('requires login'), help_text=_('If checked, only logged-in users can view the page.'))
+    #(not implemented yet)
     #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
     #view_access_level = models.ManyToManyField(Group, verbose_name=_('view access level'), related_name='view_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
 

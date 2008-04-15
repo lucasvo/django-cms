@@ -18,11 +18,11 @@ def render_field(field):
     
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
-        self.rel_var = rel_var
+        self.rel_var = template.Variable(rel_var)
 
     def render(self, context):
         from django.db import models
-        relation = template.resolve_variable(self.rel_var, context)
+        relation = self.rel_var.resolve(context)
         add_on_name = u'%s.%s' % (relation.model.__module__, relation.model.__name__)
         if add_on_name in cms_settings.PAGE_ADDONS:
             context.push()

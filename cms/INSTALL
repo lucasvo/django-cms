@@ -48,6 +48,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
     'cms.middleware.XHTMLToHTMLMiddleware',
+	'cms.middleware.ThreadLocals',
 )
 
 INSTALLED_APPS = (

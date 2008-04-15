@@ -90,12 +90,13 @@ Window.onDomReady(function(){
                     {% render_field form.overridden_url %}
                     {% render_field form.redirect_to %}
                     {% render_field form.template %}
+                    {% render_field form.requires_login %}
                     {% render_field form.start_publish_date %}
                     {% render_field form.end_publish_date %}
                     {% render_field form.context %}
 		      	</fieldset>
 		  	</div>	
-            {% if page_addons %}
+            {% if page_addons and not add %}
       		<div class="module">
     	      	<fieldset class="module aligned">
     				<h2>{% trans 'Add-ons' %}</h2>

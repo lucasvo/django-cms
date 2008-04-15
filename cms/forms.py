@@ -67,6 +67,7 @@ PAGE_FIELDS = (
     'override_url', 
     'overridden_url', 
     'redirect_to', 
+    'requires_login', 
     'start_publish_date', 
     'end_publish_date',
 )
