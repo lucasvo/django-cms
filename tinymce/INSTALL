@@ -17,8 +17,23 @@ copy all the media files into your ADMIN_MEDIA_ROOT
 Settings
 ========
 
-1. Copy the default "tinymce_settings.py.dist" into your python path and rename it to "tinymce_settings.py". 
-2. Edit tinymce_settings.py; you can add new config tuple-dicts like in the example below. Make sure to 
+1. Add the tinymce app to INSTALLED_APPS in your django project settings.py. Make sure 
+   'django.middleware.locale.LocaleMiddleware' is in your MIDDLEWARE_CLASSES.
+
+MIDDLEWARE_CLASSES = (
+	...
+    'django.middleware.locale.LocaleMiddleware',
+    ...
+)
+INSTALLED_APPS = (
+    ...
+    'django.contrib.admin',
+    'cms',
+    'tinymce',
+)
+
+2. Copy the default "tinymce_settings.py.dist" into your python path and rename it to "tinymce_settings.py". 
+3. Edit tinymce_settings.py; you can add new config tuple-dicts like in the example below. Make sure to 
    include every parameter in your own config. There's no fallback to the default config.
 
 myconf = dict(
