@@ -1,10 +1,13 @@
-from cms import cms_global_settings
+import datetime
 import re
+
 from django.conf import settings
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django import newforms as forms
 from django.newforms.widgets import SelectMultiple
+
+from cms import cms_global_settings
 from cms import dynamicforms, util
 from cms.cms_global_settings import *
 from cms.models import Page, PageContent
@@ -84,8 +87,8 @@ PAGECONTENT_FIELDS = (
 
 class PageForm(forms.ModelForm):
     template = forms.ChoiceField(choices=cms_global_settings.TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
-    start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATE_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date on which you want to start publishing this page.'))
-    end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATE_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
+    start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
+    end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
 #    not yet implemented
 #    change_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('change access level'), help_text=_('Select groups which are allowed to edit this page.'))
 #    view_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('view access level'), help_text=_('If groups are selected, only these groups are allowed to view this page and every page rooted under it.'))
@@ -111,6 +114,13 @@ class PageForm(forms.ModelForm):
             if (not self.instance.id or self.instance.parent) and not self.cleaned_data.get('parent'):
                 raise forms.ValidationError(_('Please choose in which category the page should belong.'))
         return self.cleaned_data.get('parent')
+    
+    def clean_end_publish_date(self):
+        end_publish_date = self.cleaned_data.get('end_publish_date')
+        if end_publish_date and end_publish_date.hour == 0 and end_publish_date.minute == 0 and end_publish_date.second == 0:
+            # set the end publish time to the end of the day (when using date chooser, no time is given)
+            end_publish_date += datetime.timedelta(hours=23, minutes=59)
+        return end_publish_date
 
     def save(self):
         old_parent = self.instance.parent

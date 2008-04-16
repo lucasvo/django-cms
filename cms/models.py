@@ -61,8 +61,8 @@ class PageManager(models.Manager):
             qs = self
         return qs.filter(
                            Q(is_published=True),
-                           Q(start_publish_date__lte=datetime.date.today()) | Q(start_publish_date__isnull=True), 
-                           Q(end_publish_date__gte=datetime.date.today()) | Q(end_publish_date__isnull=True),
+                           Q(start_publish_date__lte=datetime.datetime.now()) | Q(start_publish_date__isnull=True), 
+                           Q(end_publish_date__gte=datetime.datetime.now()) | Q(end_publish_date__isnull=True),
                            )
     
     def search(self, query, language=None):
@@ -245,8 +245,7 @@ class Page(models.Model):
         return self.get_content().title
 
     def published(self):
-        today = datetime.date.today()
-        return bool(self.is_published) and (not self.start_publish_date or self.start_publish_date.date() <= today) and (not self.end_publish_date or self.end_publish_date.date() >= today)
+        return self in Page.objects.published()
     published.boolean = True
 
 class PageContent(models.Model):

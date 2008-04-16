@@ -125,8 +125,8 @@ def render_pagecontent(request, language, page, page_content, template_name=None
 
 
 def render_page(request, language, page, args=None):
-    if not models.Page.objects.root().published() or not page.published() 
-    	or page.requires_login and not request.user.is_authenticated():
+    if not models.Page.objects.root().published() or not page.published() \
+        or page.requires_login and not request.user.is_authenticated():
         raise Http404
 
     # Make translations using Django's i18n work
