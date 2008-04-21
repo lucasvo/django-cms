@@ -11,6 +11,7 @@ default = dict(
     THEME_ADVANCED_BUTTONS1 = "save,template,separator,pastetext,pasteword,separator,bold,italic,separator,bullist,numlist,separator,undo,redo,separator,link,unlink,anchor,separator,image,cleanup,help,separator,code,cleanup",
     THEME_ADVANCED_BUTTONS2 = "search,replace,separator,formatselect",
     THEME_ADVANCED_BUTTONS3 = "",
+    THEME_ADVANCED_BLOCKFORMATS = "p,h3,h4",
     # Styles
     CONTENT_CSS = "", # example: settings.MEDIA_URL + "path/to/your.css"
     SHOW_STYLES_MENU = True,

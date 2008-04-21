@@ -53,7 +53,7 @@ tinyMCE.init({
 	theme_advanced_buttons1_add : "{{ theme_advanced_buttons1_add }}",
 	theme_advanced_buttons2_add : "{{ theme_advanced_buttons2_add }}",
 	theme_advanced_buttons3_add : "{{ theme_advanced_buttons3_add }}",
-    theme_advanced_blockformats : "p,h2,h3,h4",
+    theme_advanced_blockformats : "{{ theme_advanced_blockformats }}",
     theme_advanced_styles : "{% for style in theme_advanced_styles %}{{ style.description }}={{ style.css_class }}{% if not forloop.last %};{% endif %}{% endfor %}",
     theme_advanced_statusbar_location : "bottom",
     theme_advanced_resizing : {{ theme_advanced_resizing|yesno:"true,false" }},

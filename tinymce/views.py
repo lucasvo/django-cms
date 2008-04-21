@@ -21,7 +21,7 @@ def get_conf_var(name, default='', request=None, config=None):
         if request:
             if not config:
                 config = request.GET.get("tm_config", "default") 
-            ret = request.GET.get(name, default) or tinymce_settings.__dict__.get(config).get(name.upper())
+            ret = request.GET.get(name, tinymce_settings.__dict__.get(config).get(name.upper())) or default
             return ret 
         else:
             if not config:
@@ -41,6 +41,7 @@ def init_mce(request):
             'theme_advanced_buttons1': get_conf_var('theme_advanced_buttons1', config=config),
             'theme_advanced_buttons2': get_conf_var('theme_advanced_buttons2', config=config),
             'theme_advanced_buttons3': get_conf_var('theme_advanced_buttons3', config=config),
+            'theme_advanced_blockformats': get_conf_var('theme_advanced_blockformats', default="p,h2,h3,h4", config=config),
             'plugins': get_conf_var('plugins', config=config),
             'language': get_conf_var('language', request.LANGUAGE_CODE[:2], request=request),
             'theme': get_conf_var('theme', 'advanced', config=config),
