@@ -153,7 +153,10 @@ def handle_page(request, language, url):
     root = models.Page.objects.root()
 
     if not parts and not DISPLAY_ROOT:
-        return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_link(language))
+        try:
+            return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_link(language))
+        except IndexError:
+            raise models.RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
 
     parent = root
 
