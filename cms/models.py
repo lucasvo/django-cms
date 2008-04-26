@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.http import Http404
 from django.db import models
@@ -12,6 +13,10 @@ from django.utils import translation
 from cms.util import language_list
 from cms.middleware import get_current_user
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE
+
+
+protocol_re = re.compile('^\w+://')
+
 
 """
 class Template(models.Model):
@@ -212,6 +217,10 @@ class Page(models.Model):
             return self.redirect_to.get_absolute_url()
 
         if self.override_url:
+            # Check whether it is an absolute URL
+            if protocol_re.match(self.overridden_url):
+                return self.overridden_url
+
             # The overridden URL is assumed to not have a leading or trailing slash.
             if self.overridden_url:
                 return '/%s/' % self.overridden_url
