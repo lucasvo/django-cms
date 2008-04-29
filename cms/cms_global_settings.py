@@ -1,7 +1,7 @@
 ###########################################################################
 # Default CMS settings. Do not change them. Edit cms_settings.py instead. #
 ###########################################################################
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 # The template that will be used for the website
 DEFAULT_TEMPLATE = 'yoursite/base.html'
@@ -42,6 +42,14 @@ PAGE_ADDONS = (
 )
 
 USE_TINYMCE = False
+
+# Specify multiple content positions here.
+# For example, you can have a separate page content for a sidebar.
+POSITIONS = (
+    ('', _('Default')),
+#    ('left', _('Left column')),
+#    ('right', _('Right column')),
+)
 
 # Override the global settings with site-specific settings.
 try:

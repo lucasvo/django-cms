@@ -12,7 +12,7 @@ from django.utils import translation
 
 from cms.util import language_list
 from cms.middleware import get_current_user
-from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE
+from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 
 
 protocol_re = re.compile('^\w+://')
@@ -156,10 +156,10 @@ class Page(models.Model):
         self.modified = datetime.datetime.now()
         super(Page, self).save()
 
-    def get_content(self, language=None, all=False):
+    def get_content(self, language=None, all=False, position=''):
         if not language:
             language = translation.get_language()
-        published_page_contents = self.pagecontent_set.filter(is_published=True)
+        published_page_contents = self.pagecontent_set.filter(is_published=True, position=position)
 
         page_content = None
 
@@ -269,6 +269,8 @@ class PageContent(models.Model):
     modified = models.DateTimeField(null=True, blank=True)
 
     template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
+
+    position = models.CharField(max_length=32, null=True, blank=True, choices=POSITIONS)
 
     title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Leave this empty to use the default title.'))
     description = models.TextField(null=True, blank=True)

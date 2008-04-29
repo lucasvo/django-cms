@@ -2,8 +2,9 @@
 <h2>{{ form }}</h2>
 <div class="pagecontent-content">
 
-<div class="form-row">{{ form.language.errors }}{{ form.is_published.errors }}<label class="required">{% trans 'Properties' %}</label>
+<div class="form-row">{{ form.position.errors }}{{ form.language.errors }}{{ form.is_published.errors }}<label class="required">{% trans 'Properties' %}</label>
   <div class="inline"><label for="{{ form.language.auto_id }}" class="required">{{ form.language.label|capfirst }}:</label> {{ form.language }}</div>
+  <div class="inline"><label for="{{ form.position.auto_id }}" class="required">{{ form.position.label|capfirst }}:</label> {{ form.position }}</div>
   <div class="inline">{{ form.is_published }} <label for="{{ form.is_published.auto_id }}">{{ form.is_published.label|capfirst }}</label></div>
   <div class="inline"><a href="#" class="toggle-advanced">{% trans 'Show advanced options' %}</a><a href="#" class="toggle-advanced hidden">{% trans 'Hide advanced options' %}</a></div>
 </div>

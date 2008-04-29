@@ -95,7 +95,7 @@ def page_preview(request, id):
     else:
         return HttpResponse(_('<h2>Your form is not valid.</h2>')+smart_unicode(pagecontent_form.errors))
 
-    return views.render_pagecontent(request, request.LANGUAGE_CODE, page, page_content.prepare(), preview=True)
+    return views.render_page(request, request.LANGUAGE_CODE, page, preview=page_content.prepare())
 
 class NavigationForm(dynamicforms.Form):
     in_navigation = forms.BooleanField(required=False)

@@ -76,6 +76,7 @@ PAGE_FIELDS = (
 )
 PAGECONTENT_FIELDS = (
     'language', 
+    'position',
     'is_published', 
     'content_type', 
     'title', 
@@ -150,6 +151,7 @@ class PageContentForm(dynamicforms.Form):
     )
 
     language = forms.ChoiceField(choices=((lang_code, _(lang)) for lang_code, lang in settings.LANGUAGES), initial=settings.LANGUAGE_CODE[:2], label=_('language'))
+    position = forms.ChoiceField(choices=POSITIONS, initial=POSITIONS[0][0], label=_('position'), required=False)
     is_published = forms.BooleanField(required=False, initial=True, label=_('is published'))
     title = forms.CharField(max_length=200, required=False, help_text=_('Leave this empty to use the title of the page.'), label=_('title'))
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))

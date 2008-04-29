@@ -17,6 +17,23 @@ import markdown
 from django.contrib.sites.models import Site
 from django.template import TemplateDoesNotExist
 
+
+class PositionDict(dict):
+    """
+    Dictionary which is used for the content and title objects.
+    It is designed to be used in a Django template.
+    e.g.: {{ content }} - displays the default page content
+          {{ content.left }} - displays the page content at the left position
+    """
+
+    def __init__(self, default):
+        super(dict, self).__init__()
+        self.default = default
+
+    def __unicode__(self):
+        return self.get(self.default)
+
+
 def resolve_dotted_path(path):
     dot = path.rindex('.')
     mod_name, func_name = path[:dot], path[dot+1:]
@@ -49,16 +66,55 @@ def get_page_context(request, language, page, extra_context={}):
     return context
 
 
-def render_pagecontent(request, language, page, page_content, template_name=None, preview=False, args=None):
-    path = list(page.get_path())
+def render_pagecontent(page_content, context):
+    # Parse template tags
+    if page_content.allow_template_tags:
+        template = Template(
+                '{%% load i18n cms_base cms_extras %s %%}'
+                '{%% cms_pagination %d %%}%s{%% cms_end_pagination %%}' % (
+                    ' '.join(TEMPLATETAGS),
+                    context['page_number'],
+                    page_content.content
+                )
+            )
+        content = template.render(context)
+    else:
+        content = page_content.content
+
+    # Convert the content to HTML
+    if page_content.content_type == 'html':
+        pass # Nothing to do
+    elif page_content.content_type == 'markdown':
+        content = markdown.markdown(content)
+    else:
+        content = html.linebreaks(html.escape(content))
+
+    return page_content.title, mark_safe(content)
+
+
+def render_page(request, language, page, template_name=None, preview=None, args=None):
+    """
+    Renders a page in the given language.
+
+    A template_name can be given to override the default page template.
+    A PageContent object can be passed as a preview.
+    """
+
+    if not models.Page.objects.root().published() or not page.published() \
+        or page.requires_login and not request.user.is_authenticated():
+        raise Http404
+
+    # Make translations using Django's i18n work
+    translation.activate(language)
+    request.LANGUAGE_CODE = translation.get_language()
+
+    # Initialize content/title dicts.
+    content_dict = PositionDict(POSITIONS[0][0])
+    title_dict = PositionDict(POSITIONS[0][0])
 
     context = get_page_context(request, language, page)
-    context.update({
-        'page_content':page_content,
-        'title':page_content.title,
-        'page_title': '%s - %s' % (Site.objects.get_current().name, page_content.title),
-    })
 
+    # Call a custom context function for this page, if it exists.
     if page.context:
         try:
             func = resolve_dotted_path(page.context)
@@ -71,41 +127,43 @@ def render_pagecontent(request, language, page, page_content, template_name=None
         if response:
             return response
 
-    # First processing stage: Parse template tags
-    if page_content.allow_template_tags:
-        template = Template('{%% load i18n cms_base cms_extras %s %%}{%% cms_pagination %d %%}%s{%% cms_end_pagination %%}' % (
-                ' '.join(TEMPLATETAGS),
-                context['page_number'],
-                page_content.content
-            ))
-        content = template.render(context)
-    else:
-        content = page_content.content
 
-    # Second processing stage: Convert the content to HTML
-    if page_content.content_type == 'html':
-        pass # Nothing to do
-    elif page_content.content_type == 'markdown':
-        content = markdown.markdown(content)
-    else:
-        content = html.linebreaks(html.escape(content))
-    context.update({'content': mark_safe(content)})
+    for n, position in enumerate(POSITIONS):
+        position = position[0]
+
+        if preview and position == preview.position:
+            page_content = preview
+        else:
+            page_content = page.get_content(language, position=position)
+
+        if n == 0:
+            # This is the main page content.
+            context.update({
+                'page_content':page_content,
+                'page_title': '%s - %s' % (Site.objects.get_current().name, page_content.title),
+            })
+
+        title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
+
+        
+    context.update({ 'content': content_dict, 'title': title_dict })
+
 
     # Third processing stage: Use the specified template
     # Templates are chosen in the following order:
-    # 1. template defined in page_content
-    # 2. template defined in page (over `page_content.prepare()`)
-    # 3. template defined in function arg "template_name"
-    # 4. template defined in settings.DEFAULT_TEMPLATE
+    # 1. template defined in page (over `page_content.prepare()`)
+    # 2. template defined in function arg "template_name"
+    # 3. template defined in settings.DEFAULT_TEMPLATE
     # If preview, then _preview is appended to the templates name. If there's no preview template: fallback to the normal one
-    if page_content.template:
-        template_path = page_content.template
-    elif template_name:
+    if template_name:
         template_path = template_name
+    elif page.template:
+        template_path = page.template
     else:
         template_path = DEFAULT_TEMPLATE
+
     if preview: # append _preview to template name
-        if template_path.rfind('.html') > 0:
+        if template_path.endswith('.html'):
             template_path_preview = template_path[:template_path.rfind('.html')] + '_preview.html'
         else:
             template_path_preview += '_preview'
@@ -121,21 +179,8 @@ def render_pagecontent(request, language, page, page_content, template_name=None
                 raise
             else:
                 template = loader.get_template(DEFAULT_TEMPLATE)
+
     return HttpResponse(template.render(context))
-
-
-def render_page(request, language, page, args=None):
-    if not models.Page.objects.root().published() or not page.published() \
-        or page.requires_login and not request.user.is_authenticated():
-        raise Http404
-
-    # Make translations using Django's i18n work
-    translation.activate(language)
-    request.LANGUAGE_CODE = translation.get_language()
-
-    page_content = page.get_content(language)
-
-    return render_pagecontent(request, language, page, page_content, args=args)
 
 
 def handle_page(request, language, url):
