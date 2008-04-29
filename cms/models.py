@@ -135,12 +135,11 @@ class Page(models.Model):
     objects = PageManager()
 
     class Meta:
-        ordering = ('parent', 'position', 'title',)
+        ordering = ('position', 'title',)
 
     class Admin:
         list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
         list_filter = ('is_published',)
-        ordering = ('parent','title',)
         search_fields = ('title', 'slug',)
         if USE_TINYMCE:
             js = ('js/getElementsBySelector.js',
