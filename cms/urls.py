@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('cms',
-    (r'^search/', 'views.search'),
-    (r'', 'views.handler'),
+    # (r'^search/', 'views.search'),
+    (r'^.*/$', 'views.handler'),
+    (r'^$', 'views.handler'),
 )
