@@ -46,10 +46,7 @@ class Template(models.Model):
         
 class CssClassManager(models.Manager):
     def render_css(self):
-        output = ''
-        for css in self.all():
-            output += css.element + ' .' + css.css_class + ' {' + css.css_style + '}'
-        return ''.join([u'%s .%s { %s }\n' % (css.element, css.css_class, css.css_style) for css in self.all()])
+        return ''.join([u'%s .%s { %s }\n' % (css.element == 'all' and ' ' or css.element, css.css_class, css.css_style) for css in self.all()])
 
 class CssClass(models.Model):
     ELEMENTS = (

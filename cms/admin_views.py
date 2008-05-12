@@ -85,7 +85,7 @@ def page_preview(request, id):
     try:
         pagecontent_form = [form for form in PageContentForm.get_forms(request) if form.postfix == form_id][0]
     except IndexError:
-        raise Http404
+        raise Http404, _('Please fill in some page content.')
 
     page = get_object_or_404(models.Page, pk=id)
 
