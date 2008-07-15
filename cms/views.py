@@ -1,5 +1,6 @@
 import re
 
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
@@ -81,15 +82,7 @@ def render_pagecontent(page_content, context):
     else:
         content = page_content.content
 
-    # Convert the content to HTML
-    if page_content.content_type == 'html':
-        pass # Nothing to do
-    elif page_content.content_type == 'markdown':
-        content = markdown.markdown(content)
-    else:
-        content = html.linebreaks(html.escape(content))
-
-    return page_content.title, mark_safe(content)
+    return page_content.title, content
 
 
 def render_page(request, language, page, template_name=None, preview=None, args=None):
@@ -140,7 +133,7 @@ def render_page(request, language, page, template_name=None, preview=None, args=
             # This is the main page content.
             context.update({
                 'page_content':page_content,
-                'page_title': '%s - %s' % (Site.objects.get_current().name, page_content.title),
+                'page_title': page_content.page_title or page_content.title,
             })
 
         title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
@@ -199,7 +192,7 @@ def handle_page(request, language, url):
 
     if not parts and not DISPLAY_ROOT:
         try:
-            return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_link(language))
+            return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_absolute_url(language))
         except IndexError:
             raise models.RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
 
@@ -210,7 +203,7 @@ def handle_page(request, language, url):
     args = []
 
     for part in parts:
-        pages = parent.page_set.filter(slug=part) or parent.page_set.filter(slug='*')
+        pages = parent.page_set.filter(Q(slug=part) | Q(pagecontent__slug=part)) or parent.page_set.filter(slug='*')
         if not pages:
             raise Http404
         parent = pages[0]
@@ -223,7 +216,7 @@ def handle_page(request, language, url):
         page = root
 
     if page.redirect_to:
-        return HttpResponseRedirect(page.redirect_to.get_link(language))
+        return HttpResponseRedirect(page.redirect_to.get_absolute_url(language))
 
     return render_page(request, language, page, args)
 

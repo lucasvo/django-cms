@@ -1,4 +1,34 @@
 from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.template.defaultfilters import force_escape
+
+class MetaTag:
+    """Simple class to output XHTML conform <meta> tags."""
+    def __init__(self, content='', name=None, http_equiv=None, scheme=None, lang=None):
+        self.content = content
+        self.name = name
+        self.http_equiv = http_equiv
+        self.scheme = scheme
+        self.lang = lang and lang.lower()[:5]
+        
+    def __unicode__(self, request=None):
+        if not self.lang:
+            if not request:
+                lang = settings.LANGUAGE_CODE[:2]
+            else:
+                lang = request.LANGUAGE_CODE[:2]
+        else:
+            lang = self.lang
+        attrs = u''
+        if self.name:
+            attrs += u'name="%s" ' % force_escape(self.name)
+        attrs += u'content="%s" ' % force_escape(self.content)
+        if self.http_equiv:
+            attrs += u'http_equiv="%s" ' % force_escape(self.http_equiv)
+        if self.scheme:
+            attrs += u'scheme="%s" ' % force_escape(self.scheme)
+        attrs += u'lang="%s" ' % force_escape(lang)
+        return mark_safe(u'<meta %s/>' % attrs)
 
 def to_utf8(string):
     if isinstance(string, str):

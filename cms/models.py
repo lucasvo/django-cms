@@ -1,3 +1,6 @@
+from django.utils.safestring import mark_safe
+from cms.util import MetaTag
+import markdown
 import datetime
 import re
 
@@ -9,9 +12,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.db.models import Q
 from django.utils import translation
+from django.utils import html
 
 from cms.util import language_list
-from cms.middleware import get_current_user
+from cms.middleware.threadlocals import get_current_user
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 
 
@@ -91,18 +95,19 @@ class PageManager(models.Manager):
                     )
         return qs.distinct()
     
-    def get_by_overridden_url(self, url):
+    def get_by_overridden_url(self, url, raise404=True):
         qs = self.published()
         try:
             return qs.get(overridden_url=url, override_url=True)
         except AssertionError:
             return qs.filter(overridden_url=url, override_url=True)[0]
         except Page.DoesNotExist:
-            raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
+            if raise404:
+                raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
-    slug = models.CharField(_('slug'), max_length=50, help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'), prepopulate_from=("title",))
+    slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'), prepopulate_from=("title",))
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
@@ -153,6 +158,7 @@ class Page(models.Model):
         if not self.id:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
+        self.overridden_url = self.overridden_url.strip('/ ')
         super(Page, self).save()
 
     def get_content(self, language=None, all=False, position=''):
@@ -211,10 +217,11 @@ class Page(models.Model):
     def on_path(self, super):
         return super in self.get_path()
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, language=None):
         if self.redirect_to:
             return self.redirect_to.get_absolute_url()
 
+        url = u'/'
         if self.override_url:
             # Check whether it is an absolute URL
             if protocol_re.match(self.overridden_url):
@@ -222,19 +229,18 @@ class Page(models.Model):
 
             # The overridden URL is assumed to not have a leading or trailing slash.
             if self.overridden_url:
-                return '/%s/' % self.overridden_url
+                return u'%s%s/' % (url, self.overridden_url.strip('/ '))
             else:
-                return '/'
+                return url
 
-        url = u'/'.join([page.slug for page in self.get_path() if page.parent])
-        return url and u'/%s/' % url or '/' + url
-    absolute_url = get_absolute_url
-
-    def get_link(self, language):
         if LANGUAGE_REDIRECT:
-            return '/%s%s' % (language, self.get_absolute_url())
-        else:
-            return '%s' % (self.get_absolute_url())
+            if not language:
+                language = translation.get_language()
+            url += u'%s/' % language
+
+        url += u'/'.join([page.smart_slug for page in self.get_path() if page.parent]) + '/'
+        return url
+    absolute_url = get_absolute_url
 
     def get_next_position(self):
         children = Page.objects.filter(parent=self).order_by('-position')
@@ -252,9 +258,26 @@ class Page(models.Model):
     def smart_title(self):
         return self.get_content().title
 
+    @property
+    def smart_slug(self):
+        return self.get_content().slug
+
     def published(self):
         return self in Page.objects.published()
     published.boolean = True
+    
+    def get_meta_tags(self, language=None):
+        if not language:
+            language = translation.get_language()
+        pagecontent_set = self.pagecontent_set.filter(is_published=True, language=language)
+        tags = []
+        tags += [MetaTag(page_content.keywords, 'keywords', lang=page_content.language) 
+            for page_content in pagecontent_set.filter(is_published=True) if page_content.keywords]
+        tags += [MetaTag(page_content.description, 'description', lang=page_content.language) 
+            for page_content in pagecontent_set if page_content.description]
+        tags += [MetaTag(page_content.page_topic, 'page_topic', lang=page_content.language) 
+            for page_content in pagecontent_set if page_content.page_topic]
+        return tags
 
 class PageContent(models.Model):
     page = models.ForeignKey(Page, edit_inline=models.STACKED)
@@ -271,18 +294,35 @@ class PageContent(models.Model):
 
     position = models.CharField(max_length=32, null=True, blank=True, choices=POSITIONS)
 
-    title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Leave this empty to use the default title.'))
-    description = models.TextField(null=True, blank=True)
+    title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
+    slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'), prepopulate_from=("title",))
+    page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
+    keywords = models.CharField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
+    description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
+    page_topic = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     content = models.TextField(core=True)
 
     def prepare(self):
         # Set the template and title for the page content, if they are not set (but don't save them)
         self.title = self.title or self.page.title
         self.template = self.template or self.page.template
+        self.slug = self.slug or self.page.slug
 
         if not self.description:
             self.description = ''
-
+        if not self.keywords:
+            self.keywords = ''
+        if not self.page_topic:
+            self.page_topic = ''
+    
+        # Convert the content to HTML
+        if self.content_type == 'html':
+            pass # Nothing to do
+        elif self.content_type == 'markdown':
+            self.content = markdown.markdown(self.content)
+        else:
+            self.content = html.linebreaks(html.escape(self.content))
+        self.content = mark_safe(self.content)
         return self
 
     def save(self):
@@ -298,3 +338,6 @@ class PageContent(models.Model):
         created = self.created and (', created: %s' % DateFormat(self.created).format('jS F Y H:i')) or ''
         modified = self.modified and (', modified: %s' % DateFormat(self.modified).format('jS F Y H:i')) or ''
         return u'%s (%s%s%s%s%s)' % (self.title or self.page.title, self.get_language_display(), created, modified, created and ', ' or '', self.is_published and _('published') or _('unpublished'))
+
+    def language_bidi(self):
+        return self.language in settings.LANGUAGES_BIDI 

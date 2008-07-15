@@ -21,8 +21,8 @@ LANGUAGE_REDIRECT = True
 # Default language (e.g. de)
 LANGUAGE_DEFAULT = 'en'
 
-# Whether there should be a description field for each page content (experimental)
-PAGECONTENT_DESCRIPTION = False
+# Whether there should be SEO fields for each page content
+SEO_FIELDS = False
 
 # Whether the whole page should be password protected
 REQUIRE_LOGIN = False

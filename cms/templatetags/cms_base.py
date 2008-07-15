@@ -5,6 +5,7 @@ from django.utils.html import escape
 from cms import models
 from cms.cms_global_settings import *
 from cms import languages
+from django.utils import translation
 
 
 register = template.Library()
@@ -104,24 +105,24 @@ def cms_language_links(parser, token):
 
 
 class CmsLinkNode(template.Node):
-    def __init__(self, name, html=False):
-        self.name = name
+    def __init__(self, page, language=None, html=False):
+        self.page = page
+        self.language = language
         self.html = html
 
     def render(self, context):
-        name = template.resolve_variable(self.name, context)
-        if isinstance(name, int):
+        page = template.resolve_variable(self.page, context)
+        language = self.language and template.resolve_variable(self.language, context) or translation.get_language()
+        if isinstance(page, int):
             try:
-                page = models.Page.objects.get(pk=name)
+                page = models.Page.objects.get(pk=page)
             except models.Page.DoesNotExist:
                 return self.html and '<a href="#">(none)</a>' or '#'
-        else:
-            page = name
 
-        link = page.get_link(context['language'])
+        link = page.get_absolute_url(language)
 
         if self.html:
-            page_content = page.get_content(context.get('language'))
+            page_content = page.get_content(language)
  
             extra_class = ''
             try:
@@ -149,6 +150,10 @@ def cms_html_link(parser, token):
     tokens = token.split_contents()
     return CmsLinkNode(tokens[1], True)
 
+@register.tag
+def cms_language_link(parser, token):
+    tokens = token.split_contents()
+    return CmsLinkNode(tokens[1], tokens[2])
 
 class CmsIsSubpageNode(template.Node):
     def __init__(self, sub_page, page, nodelist):

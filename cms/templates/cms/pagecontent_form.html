@@ -9,17 +9,23 @@
   <div class="inline"><a href="#" class="toggle-advanced">{% trans 'Show advanced options' %}</a><a href="#" class="toggle-advanced hidden">{% trans 'Hide advanced options' %}</a></div>
 </div>
 
-<div class="form-row advanced hidden">{{ form.content_type.errors }}{{ form.allow_template_tags.errors }}{{ form.template.errors }}<label>{% trans 'Advanced' %}</label>
+<div class="form-row advanced hidden">{{ form.content_type.errors }}{{ form.allow_template_tags.errors }}{{ form.template.errors }}<label class="required">{% trans 'Advanced' %}</label>
   <div class="inline"><label for="{{ form.content_type.auto_id }}">{{ form.content_type.label|capfirst }}:</label> {{ form.content_type }}</div>
   <div class="inline">{{ form.allow_template_tags }} <label for="{{ form.allow_template_tags.auto_id }}">{{ form.allow_template_tags.label|capfirst }}</label></div>
   <div class="inline"><label for="{{ form.template.auto_id }}">{{ form.template.label|capfirst }}:</label> {{ form.template }}</div>
 </div>
+{% if use_seo %}
+<div class="form-row advanced hidden">{{ form.page_title.errors }}{{ form.keywords.errors }}{{ form.description.errors }}{{ form.page_topic.errors }}<label class="required">{% trans 'SEO' %}</label>
+    <div class="form-row">{{ form.page_title.errors }}<label for="{{ form.page_title.auto_id }}">{{ form.page_title.label|capfirst }}</label>{{ form.page_title }}<p class="help">{{ form.page_title.help_text }}</p></div>
+    <div class="form-row">{{ form.keywords.errors }}<label for="{{ form.keywords.auto_id }}">{{ form.keywords.label|capfirst }}</label>{{ form.keywords }}<p class="help">{{ form.keywords.help_text }}</p></div>
+    <div class="form-row">{{ form.description.errors }}<label for="{{ form.description.auto_id }}">{{ form.description.label|capfirst }}</label>{{ form.description }}<p class="help">{{ form.description.help_text }}</p></div>
+    <div class="form-row">{{ form.page_topic.errors }}<label for="{{ form.page_topic.auto_id }}">{{ form.page_topic.label|capfirst }}</label>{{ form.page_topic }}<p class="help">{{ form.page_topic.help_text }}</p></div>
+</div>
+{% endif %}
 
 <div class="form-row">{{ form.title.errors }}<label for="{{ form.title.auto_id }}">{{ form.title.label|capfirst }}</label>{{ form.title }}<p class="help">{{ form.title.help_text }}</p></div>
+<div class="form-row">{{ form.slug.errors }}<label for="{{ form.slug.auto_id }}">{{ form.slug.label|capfirst }}</label>{{ form.slug }}<p class="help">{{ form.slug.help_text }}</p></div>
 
-{% if use_description %}
-<div class="form-row">{{ form.description.errors }}<label for="{{ form.description.auto_id }}">{{ form.description.label|capfirst }}</label>{{ form.description }}</div>
-{% endif %}
 
 <div class="form-row">{{ form.content.errors }}<label for="{{ form.content.auto_id }}">{{ form.content.label|capfirst }}</label>{{ form.content }}</div>
   <div class="form-row"><label>{% trans 'Actions' %}</label>

@@ -6,13 +6,12 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django import newforms as forms
 from django.newforms.widgets import SelectMultiple
+from django.core.validators import slug_re
 
 from cms import cms_global_settings
 from cms import dynamicforms, util
 from cms.cms_global_settings import *
 from cms.models import Page, PageContent
-
-slug_re = re.compile(r'^[-\w]+$')
 
 DATETIME_FORMATS = (
     '%d.%m.%Y %H:%M:%S',     # '25.10.2006 14:30:59'
@@ -60,6 +59,11 @@ class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):
         super(ModelMultipleChoiceField, self).__init__(queryset, cache_choices,
             required, widget, label, initial, help_text)
 
+class SlugField(forms.RegexField):
+    def __init__(self, max_length=50, min_length=None, *args, **kwargs):
+        error_message = _("This value must contain only letters, numbers, underscores or hyphens.")
+        super(SlugField, self).__init__(slug_re, max_length, min_length, error_message, *args, **kwargs)
+    
 PAGE_FIELDS = (
     'title',
     'slug', 
@@ -80,13 +84,18 @@ PAGECONTENT_FIELDS = (
     'is_published', 
     'content_type', 
     'title', 
-    'content', 
+    'slug',
+    'page_title',
+    'keywords',
     'description', 
+    'page_topic',
+    'content', 
     'allow_template_tags', 
     'template',
 )
 
 class PageForm(forms.ModelForm):
+    slug = SlugField()
     template = forms.ChoiceField(choices=cms_global_settings.TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
     start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
     end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
@@ -154,7 +163,11 @@ class PageContentForm(dynamicforms.Form):
     position = forms.ChoiceField(choices=POSITIONS, initial=POSITIONS[0][0], label=_('position'), required=False)
     is_published = forms.BooleanField(required=False, initial=True, label=_('is published'))
     title = forms.CharField(max_length=200, required=False, help_text=_('Leave this empty to use the title of the page.'), label=_('title'))
+    slug = SlugField(required=False, help_text=_('Only specify this if you want to give this page content a specific slug.'), label=_('slug'))
+    page_title = forms.CharField(max_length=200, required=False, help_text=_('Used for page title. Should be no longer than 150 chars.'), label=_('page title'))
+    keywords = forms.CharField(max_length=200, required=False, help_text=_('Comma separated'), label=_('keywords'))
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))
+    page_topic = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 5, 'cols': 80}), label=_('page topic'))
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), label=_('content'))
     content_type = forms.ChoiceField(choices=CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'markdown', label=_('content type'))
     allow_template_tags = forms.BooleanField(required=False, initial=True, label=_('allow template tags'))
@@ -164,5 +177,5 @@ class PageContentForm(dynamicforms.Form):
         return self.id and smart_unicode(PageContent.objects.get(pk=self.id)) or _('New page content')
 
     def from_template(self, extra_context={}):
-        extra_context.update({'use_description': PAGECONTENT_DESCRIPTION})
+        extra_context.update({'use_seo': SEO_FIELDS})
         return super(PageContentForm, self).from_template(extra_context)

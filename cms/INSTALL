@@ -38,7 +38,8 @@ urlpatterns = patterns('',
 settings.py
 ===========
 
-Make sure LocaleMiddleware is in your MIDDLEWARE_CLASSES:
+Make sure LocaleMiddleware (either cms.middleware.locale.LocaleMiddleware or 
+django.middleware.locale.LocaleMiddleware) is in your MIDDLEWARE_CLASSES:
 
 MIDDLEWARE_CLASSES = (
     #'cms.middleware.BenchmarkMiddleware',
