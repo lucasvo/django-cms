@@ -35,7 +35,7 @@ simple = dict(
     THEME_ADVANCED_BUTTONS3 = "",
     THEME_ADVANCED_LAYOUT_MANAGER = "SimpleLayout",
     # Styles
-    CONTENT_CSS = os.path.join(settings.MEDIA_URL, 'css/tinymce_style.css'),
+    CONTENT_CSS = "", # example: settings.MEDIA_URL + "path/to/your.css"
     SHOW_STYLES_MENU = True,
     FORCED_ROOT_BLOCK = 'p',
     EXTENDED_VALID_ELEMENTS = 'a[class|name|href|title|onclick],img[class|src|alt=image|title|onmouseover|onmouseout],p[id|style|dir|class],span[class|style]',
@@ -56,7 +56,7 @@ spartanic = dict(
     THEME_ADVANCED_BUTTONS3 = "",
     THEME_ADVANCED_LAYOUT_MANAGER = "SimpleLayout",
     # Styles
-    CONTENT_CSS = os.path.join(settings.MEDIA_URL, 'css/tinymce_style.css'),
+    CONTENT_CSS = "", # example: settings.MEDIA_URL + "path/to/your.css"
     SHOW_STYLES_MENU = True,
     FORCED_ROOT_BLOCK = 'p',
     EXTENDED_VALID_ELEMENTS = 'a[class|name|href|title|onclick],img[class|src|alt=image|title|onmouseover|onmouseout],p[id|style|dir|class],span[class|style]',
@@ -67,4 +67,5 @@ spartanic = dict(
 try:
     from tinymce_settings import *
 except ImportError:
-    raise StandardError, "Could not import tinymce settings. Please configure the tinymce application (create tinymce_settings.py in project path)."
+    pass
+#    raise StandardError, "Could not import tinymce settings. Please configure the tinymce application (create tinymce_settings.py in project path)."
