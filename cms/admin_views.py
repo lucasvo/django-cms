@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django import newforms as forms
+from django import forms
 
 from cms import models
 from cms import util

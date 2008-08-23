@@ -22,22 +22,6 @@ from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 protocol_re = re.compile('^\w+://')
 
 
-"""
-class Template(models.Model):
-    name = models.CharField(max_length=100)
-    content = models.TextField()
-
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
-
-    class Admin:
-        list_display = ('name', 'created', 'modified')
-"""
-
-
 class RootPageDoesNotExist(Exception):
     pass
 
@@ -107,7 +91,7 @@ class PageManager(models.Manager):
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
-    slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'), prepopulate_from=("title",))
+    slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
 
     created = models.DateTimeField(null=True, blank=True)
     modified = models.DateTimeField(null=True, blank=True)
@@ -142,6 +126,7 @@ class Page(models.Model):
     class Meta:
         ordering = ('position', 'title',)
 
+    # TODO: Make sure TinyMCE works in admin and delete this block
     class Admin:
         list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
         list_filter = ('is_published',)
@@ -295,7 +280,7 @@ class PageContent(models.Model):
     position = models.CharField(max_length=32, null=True, blank=True, choices=POSITIONS)
 
     title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
-    slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'), prepopulate_from=("title",))
+    slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'))
     page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
     keywords = models.CharField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
     description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
@@ -330,9 +315,6 @@ class PageContent(models.Model):
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         super(PageContent, self).save()
-
-    #class Admin:
-    #    pass
 
     def __unicode__(self):
         created = self.created and (', created: %s' % DateFormat(self.created).format('jS F Y H:i')) or ''

@@ -1,6 +1,6 @@
 from django import template
-from django.contrib.admin.templatetags.admin_modify import TabularBoundRelatedObject
-from django.contrib.admin.templatetags.admin_modify import StackedBoundRelatedObject
+#from django.contrib.admin.templatetags.admin_modify import TabularBoundRelatedObject
+#from django.contrib.admin.templatetags.admin_modify import StackedBoundRelatedObject
 from django.template import loader
 from django.conf import settings
 from cms import cms_global_settings as cms_settings
@@ -26,12 +26,14 @@ class EditInlineNode(template.Node):
         add_on_name = u'%s.%s' % (relation.model.__module__, relation.model.__name__)
         if add_on_name in cms_settings.PAGE_ADDONS:
             context.push()
+            """
             if relation.field.rel.edit_inline == models.TABULAR:
                 bound_related_object_class = TabularBoundRelatedObject
             elif relation.field.rel.edit_inline == models.STACKED:
                 bound_related_object_class = StackedBoundRelatedObject
             else:
                 bound_related_object_class = relation.field.rel.edit_inline
+            """
             original = context.get('original', None)
             bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
             context['bound_related_object'] = bound_related_object

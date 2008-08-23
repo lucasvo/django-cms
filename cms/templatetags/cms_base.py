@@ -112,7 +112,7 @@ class CmsLinkNode(template.Node):
 
     def render(self, context):
         page = template.resolve_variable(self.page, context)
-        language = self.language and template.resolve_variable(self.language, context) or translation.get_language()
+        language = self.language and template.resolve_variable('language', context) or translation.get_language()
         if isinstance(page, int):
             try:
                 page = models.Page.objects.get(pk=page)

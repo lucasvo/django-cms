@@ -4,8 +4,8 @@ import re
 from django.conf import settings
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
-from django import newforms as forms
-from django.newforms.widgets import SelectMultiple
+from django import forms
+from django.forms.widgets import SelectMultiple
 from django.core.validators import slug_re
 
 from cms import cms_global_settings
