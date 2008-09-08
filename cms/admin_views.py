@@ -41,10 +41,13 @@ def page_add_edit(request, id=None):
             if not add:
                 # Save the PageContents
                 for pagecontent_form in pagecontent_forms:
-                    try:
-                        page_content = models.PageContent.objects.get(pk=pagecontent_form.id)
-                    except models.PageContent.DoesNotExist:
-                        page_content = models.PageContent() # Is this ok?
+                    if pagecontent_form.id:
+                        try:
+                            page_content = models.PageContent.objects.get(pk=pagecontent_form.id)
+                        except models.PageContent.DoesNotExist:
+                            page_content = models.PageContent() # Is this ok?
+                    else:
+                        page_content = models.PageContent()
                     util.set_values(page_content, PAGECONTENT_FIELDS, pagecontent_form.cleaned_data)
                     page_content.page = page
                     page_content.save()

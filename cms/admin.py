@@ -7,4 +7,3 @@ class PageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Page, PageAdmin)
-

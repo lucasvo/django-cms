@@ -1,6 +1,9 @@
 /* Import divio cms styles */
 @import url('cmslayout.css');
 
+#navigation-form .submit-row input.default { float:none; }
+#page-form .submit-row input.default { float:none; }
+
 p.help { display:inline; margin:0 0 0 1em !important; padding:0 !important; }
 fieldset p.info { margin-top:0.5em; margin-bottom:0; color:#666; }
 fieldset ul { margin-left:10em !important; }

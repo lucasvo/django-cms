@@ -90,7 +90,7 @@ class PageManager(models.Manager):
                 raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
 
 class Page(models.Model):
-    title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'), core=True)
+    title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'))
     slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
 
     created = models.DateTimeField(null=True, blank=True)
@@ -223,7 +223,9 @@ class Page(models.Model):
                 language = translation.get_language()
             url += u'%s/' % language
 
-        url += u'/'.join([page.smart_slug for page in self.get_path() if page.parent]) + '/'
+        url += u'/'.join([page.smart_slug for page in self.get_path() if page.parent])
+        if not url.endswith('/'):
+            url += '/'
         return url
     absolute_url = get_absolute_url
 
@@ -265,8 +267,8 @@ class Page(models.Model):
         return tags
 
 class PageContent(models.Model):
-    page = models.ForeignKey(Page, edit_inline=models.STACKED)
-    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2], core=True)
+    page = models.ForeignKey(Page)
+    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
     is_published = models.BooleanField(default=True)
     CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'markdown')
@@ -285,7 +287,7 @@ class PageContent(models.Model):
     keywords = models.CharField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
     description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     page_topic = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
-    content = models.TextField(core=True)
+    content = models.TextField()
 
     def prepare(self):
         # Set the template and title for the page content, if they are not set (but don't save them)

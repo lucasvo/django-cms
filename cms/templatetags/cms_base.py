@@ -96,8 +96,8 @@ def cms_pagecontent(parser, token):
 
 class CmsLanguageLinksNode(template.Node):
     def render(self, context):
-        url = context['page'].get_absolute_url()
-        return ' '.join(['<a href="/%s/%s">%s</a>' % (code, url, languages.VERSION.get(code, name)) for code, name in context['LANGUAGES'] if code != context['language']])
+        page = context['page']
+        return ' '.join(['<a href="%s">%s</a>' % (page.get_absolute_url(code), languages.VERSION.get(code, name)) for code, name in context['LANGUAGES'] if code != context['language']])
 
 @register.tag
 def cms_language_links(parser, token):
