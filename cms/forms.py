@@ -6,7 +6,7 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django import forms
 from django.forms.widgets import SelectMultiple
-from django.core.validators import slug_re
+from django.forms.fields import slug_re
 
 from cms import cms_global_settings
 from cms import dynamicforms, util
