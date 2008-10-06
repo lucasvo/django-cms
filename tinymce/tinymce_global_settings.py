@@ -1,5 +1,11 @@
 from django.conf import settings
 
+SCRIPT_DIR = settings.ADMIN_MEDIA_PREFIX + 'tiny_mce/'
+if settings.DEBUG:
+    JS_SCRIPT_PATH = SCRIPT_DIR + 'tiny_mce_src.js'
+else:
+    JS_SCRIPT_PATH = SCRIPT_DIR + 'tiny_mce.js'
+
 default = dict(
     MODE = 'exact',
     PLUGINS = "advimage,advlink,table,searchreplace,contextmenu,template,paste,save,autosave",

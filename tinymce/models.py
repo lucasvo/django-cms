@@ -1,9 +1,12 @@
+import os
+
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import permalink
+
 from tinymce.util import SlugifyUniquely
-import os
+import tinymce_global_settings as tinymce_settings
 
 class Template(models.Model):
     title = models.CharField(_('title'), max_length=100)
@@ -20,7 +23,7 @@ class Template(models.Model):
         list_display = ('__unicode__', 'get_name', 'is_snippet')
         list_filter = ('is_snippet',)
         js = (
-            os.path.join(settings.ADMIN_MEDIA_PREFIX, 'tinymce/tiny_mce_src.js'),
+            tinymce_settings.JS_SCRIPT_PATH,
             '/tinymce/init/tiny_mce_init.js?mode=textareas',
         )
 

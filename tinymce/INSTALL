@@ -1,3 +1,17 @@
+Download
+========
+
+You can download the tinymce module for django-cms either directly from SVN, or you can download a stable release from
+http://django-cms.org/.
+
+Downloading tinymce for django-cms from SVN
+1. Go to your Django project directory:
+$ cd ~/cmstest
+
+2. Check out latest tinymce for django-cms
+$ svn co http://svn.django-cms.org/trunk/tinymce tinymce
+
+
 urls.py
 =======
 
@@ -7,18 +21,19 @@ urlpatterns = patterns('',
 	...
 )
 
-Setup media files and templates
-===============================
 
-copy all the media files into your ADMIN_MEDIA_ROOT
-	tinymce/* -> httpdocs/media/
+Setup media files
+=================
+
+Move the folder "tiny_mce" (tinymce/media/tiny_mce) to your admin_media dir:
+$ mv tinymce/media/tiny_mce <path_to_your_admin_media_dir>/
 
 
 Settings
 ========
 
-1. Add the tinymce app to INSTALLED_APPS in your django project settings.py. Make sure 
-   'django.middleware.locale.LocaleMiddleware' is in your MIDDLEWARE_CLASSES.
+1. Make sure LocaleMiddleware (either cms.middleware.locale.LocaleMiddleware or 
+   django.middleware.locale.LocaleMiddleware) is in your MIDDLEWARE_CLASSES:
 
 MIDDLEWARE_CLASSES = (
 	...
@@ -32,8 +47,9 @@ INSTALLED_APPS = (
     'tinymce',
 )
 
-2. Copy the default "tinymce_settings.py.dist" into your python path and rename it to "tinymce_settings.py". 
-3. Edit tinymce_settings.py; you can add new config tuple-dicts like in the example below. Make sure to 
+2. Set USE_TINYMCE setting in your cms_settings.py to True
+3. Copy the default "tinymce_settings.py.dist" into your python path and rename it to "tinymce_settings.py". 
+4. Edit tinymce_settings.py; you can add new config tuple-dicts like in the example below. Make sure to 
    include every parameter in your own config. There's no fallback to the default config.
 
 myconf = dict(
@@ -80,3 +96,30 @@ You can override the following config parameters with GET:
             'show_styles_menu'
             'theme_advanced_resizing'
             'theme_advanced_path'
+
+USING django-filebrowser WITH tinymce
+=====================================
+
+You can download the django-filebrowser for django-cms directly from the django-cms SVN. It links to
+the repository where the django-filebrowser project is hosted. To get a revision which works together
+with the rest of django-cms, we recommend you to checkout as follows (subversion which supports.
+
+1. Downloading django-filebrowser from SVN
+
+1.1. Go to your Django project directory:
+$ cd ~/cmstest
+
+1.2. Check out latest filebrowser
+$ svn co http://svn.django-cms.org/trunk/filebrowser filebrowser
+
+Alternatively you can manually download and install the django-filebrowser app from 
+http://code.google.com/p/django-filebrowser/.
+
+2. Configure the fb_settings.py (filebrowser/fb_settings.py). Set the following vars to the correct
+   values. By default, your configuration could look like this (change admin_media paths according
+   to your project setup):
+   
+   URL_TINYMCE = getattr(settings, "FILEBROWSER_URL_TINYMCE", settings.ADMIN_MEDIA_PREFIX + "tiny_mce/")
+   PATH_TINYMCE = getattr(settings, "FILEBROWSER_PATH_TINYMCE", os.path.join(settings.MEDIA_ROOT, 'admin/tiny_mce/'))
+
+   
