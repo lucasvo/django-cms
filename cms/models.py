@@ -125,16 +125,8 @@ class Page(models.Model):
 
     class Meta:
         ordering = ('position', 'title',)
-
-    # TODO: Make sure TinyMCE works in admin and delete this block
-    class Admin:
-        list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
-        list_filter = ('is_published',)
-        search_fields = ('title', 'slug',)
-        if USE_TINYMCE:
-            js = ('js/getElementsBySelector.js',
-                  'filebrowser/js/AddFileBrowser.js',
-            )
+        verbose_name = _('page')
+        verbose_name_plural = _('pages')
 
     def __unicode__(self):
         return self.title
