@@ -62,9 +62,6 @@ class PageAdmin(admin.ModelAdmin):
             return self.page_add_edit(request, unquote(url))
         else:
             return super(PageAdmin, self).__call__(request, url)
-    
-    # # Handle add in related objects edit inline
-    # #(r'^cms/(?P<re_url>[a-zA-Z0-9-_./]+)/$', redirect_to, {'url': '/admin/%(re_url)s/?_popup=1'}),
 
     def page_add_edit(self, request, id=None):
         model = self.model
