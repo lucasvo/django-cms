@@ -20,16 +20,15 @@ mkdir templates
 cd templates
 ln -s ../cms/templates cms
 
-mkdir media  # (or cp -r /path-to-django/django/contrib/admin/media .)
-cd media
-ln -s ../cms/media media
+mkdir site_media
+cd site_media
+ln -s ../cms/media cms
 
 
 urls.py
 =======
 
 urlpatterns = patterns('',
-    (r'^admin/', include('cms.admin_urls')),
     (r'^admin/', include('django.contrib.admin.urls')),
     (r'', include('cms.urls')),
 )
