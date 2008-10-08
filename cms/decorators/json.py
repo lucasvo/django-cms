@@ -6,17 +6,17 @@ from django.conf import settings
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
-from util import to_utf8, from_utf8
+from cms.util import to_utf8, from_utf8
 
-def view(view_func):
-    def _json(request, *args, **kwargs):
+def admin_view(view_func):
+    def _json(adminsite, request, *args, **kwargs):
         try:
             data = load(request.POST.get('json'))
             error = None
         except (TypeError, ValueError):
             return_data = {'error': _('Received invalid data.')}
         else:
-            return_data = view_func(request, data, *args, **kwargs)
+            return_data = view_func(adminsite, request, data, *args, **kwargs)
         
         return HttpResponse(dump(return_data), 
                 mimetype='text/plain; charset=%s' % settings.DEFAULT_CHARSET)
