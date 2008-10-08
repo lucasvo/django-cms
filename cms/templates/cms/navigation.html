@@ -7,17 +7,11 @@
 
 {% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
 
-{% block userlinks %}
-    {% url django-admindocs-docroot as docsroot %}{% if docsroot %}<li><a href="{{ docsroot }}">{% trans 'Documentation' %}</a></li>{% endif %}
-    <li><a href="{{ root_path }}password_change/">{% trans 'Change password' %}</a></li>
-    <li><a href="{{ root_path }}logout/">{% trans 'Log out' %}</a></li>
-{% endblock %}
-
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ opts.app_label|capfirst|escape }}</a> &rsaquo; 
-     <a href="../">{{ opts.verbose_name|capfirst }}</a>
+     <a href="../../">{% trans "Home" %}</a> &rsaquo;
+     <a href="../">{{ opts.app_label|capfirst|escape }}</a> &rsaquo; 
+     {{ opts.verbose_name|capfirst }}
 </div>
 {% endif %}{% endblock %}
 
