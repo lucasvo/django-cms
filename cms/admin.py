@@ -66,7 +66,7 @@ class PageAdmin(admin.ModelAdmin):
     def page_add_edit(self, request, id=None):
         model = self.model
         opts = model._meta
-        
+
         if id:
             page = get_object_or_404(Page, pk=id)
             form = PageForm(request, instance=page)
@@ -204,6 +204,7 @@ class PageAdmin(admin.ModelAdmin):
                 'error': error,
                 'media': mark_safe(media),
                 'opts': opts,
+                'root_path': self.admin_site.root_path,
             }, context_instance=RequestContext(request))
 
     def page_preview(self, request, id):
