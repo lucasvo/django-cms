@@ -31,7 +31,7 @@ var PageContent = Form.extend({
                 var confirmed = confirm('Are you sure you want delete the following content?\nIt will be deleted immediately.\n"'+value+'"');
                 if (confirmed)
                 {
-                    new Json.Remote('../../pagecontent/json/', { onComplete: function(obj) {
+                    new Json.Remote('../../page/content/json/', { onComplete: function(obj) {
                         if (!obj['error']) {
                             event.target.parentNode.parentNode.parentNode.parentNode.remove();
                         } else { alert(obj['error']); }
