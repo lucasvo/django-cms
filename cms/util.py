@@ -76,4 +76,4 @@ def set_values(object, fields, values):
         setattr(object, field, from_utf8(values[field]))
 
 def language_list():
-    return [l[0] for l in settings.LANGUAGES]
+    return dict(settings.LANGUAGES).keys()
