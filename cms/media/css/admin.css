@@ -54,10 +54,10 @@ div.inline label { float:none !important; width:auto !important; display:inline 
 #navigation div.border:hover .toolbox { display:block; }*/
 #navigation .path { width:10em; display:block; float:left; overflow:hidden; text-align:left; }
 #navigation .path a { font-weight:normal; color:#666; font-size:0.9em; overflow:hidden;}
-#navigation .movespan { font-weight:normal; margin-right: 10px; color:#999; font-size:0.9em; padding-left:15px; background:url(icon_move.gif) 0 0 no-repeat; cursor: move;}
+#navigation .movespan { font-weight:normal; margin-right: 10px; color:#999; font-size:0.9em; padding-left:15px; background:url(../icon_move.gif) 0 0 no-repeat; cursor: move;}
 #navigation .movespan:link { text-decoration: none; color: #036;}
 #navigation .movespan:hover { text-decoration: none; color: #036;}
-#navigation .view { font-weight:normal; margin-right: 0px; color:#999; padding-left:15px; background:url(selector-addall.gif) 0 0.1em no-repeat; }
+#navigation .view { font-weight:normal; margin-right: 0px; color:#999; padding-left:15px; background:url(../selector-addall.gif) 0 0.1em no-repeat; }
 #navigation .link_id { cursor:default; font-weight:normal; padding-left:1em; color:#999; font-size:0.9em; }
 
 fieldset .small { 

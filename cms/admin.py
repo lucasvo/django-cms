@@ -33,11 +33,11 @@ class PageAdmin(admin.ModelAdmin):
     
     class Media:
         css = {
-            "screen": ("cms/admin.css",)
+            "screen": ("cms/css/admin.css",)
         }
         js = (
-            "cms/mootools.js",
-            "cms/DateTimeShortcuts.js",
+            "cms/js/mootools.js",
+            "cms/js/DateTimeShortcuts.js",
         )
 
     def __call__(self, request, url):
@@ -120,8 +120,8 @@ class PageAdmin(admin.ModelAdmin):
         if USE_TINYMCE:
             media.add_js(self.tinymce_js)
         media.add_js((
-            "cms/dynamicforms.js",
-            "cms/page_add.js",
+            "cms/js/dynamicforms.js",
+            "cms/js/page_add.js",
         ))
 
         return render_to_response('cms/page_add.html', {
@@ -194,8 +194,8 @@ class PageAdmin(admin.ModelAdmin):
 
         media = self.media
         media.add_js((
-           "cms/nested.js",
-           "cms/navigation.js",
+           "cms/js/nested.js",
+           "cms/js/navigation.js",
         ))
 
         return render_to_response('cms/navigation.html', {

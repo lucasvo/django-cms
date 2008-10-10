@@ -112,7 +112,7 @@ visibility: hidden;
 	margin: 0;
 	color: #fff;
 	padding: 4px 8px 4px;
-	background:white url(../img/admin/default-bg.gif) bottom repeat-x;
+	background:white url(../img/default-bg.gif) bottom repeat-x;
 
 }
  
@@ -125,7 +125,7 @@ visibility: hidden;
 a.HelpTip {
 	height: 10px;
 	width: 10px;
-	background:url(../img/admin/icon-unknown.gif) center bottom no-repeat;
+	background:url(../img/icon-unknown.gif) center bottom no-repeat;
 }
 
 a.HelpTip span {

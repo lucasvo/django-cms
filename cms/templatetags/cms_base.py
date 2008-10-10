@@ -189,11 +189,11 @@ def if_cms_is_subpage(parser, token):
 @register.filter(name='cms_yesno')
 def yesno(value):
     if value == '':
-        return '<img src="%simg/admin/icon-unknown.gif" alt="%s" />' % (settings.MEDIA_URL, _('Unknown'))
+        return '<img src="%scms/img/icon-unknown.gif" alt="%s" />' % (settings.MEDIA_URL, _('Unknown'))
     elif value:
-        return '<img src="%simg/admin/icon-yes.gif" alt="%s" />' % (settings.MEDIA_URL, _('Yes'))
+        return '<img src="%scms/img/icon-yes.gif" alt="%s" />' % (settings.MEDIA_URL, _('Yes'))
     else:
-        return '<img src="%simg/admin/icon-no.gif" alt="%s" />' % (settings.MEDIA_URL, _('No'))
+        return '<img src="%scms/img/icon-no.gif" alt="%s" />' % (settings.MEDIA_URL, _('No'))
 
 @register.filter(name='cms_get_content_title')
 def get_content_title(page, language):
