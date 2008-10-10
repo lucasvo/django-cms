@@ -51,6 +51,15 @@ POSITIONS = (
 #    ('right', _('Right column')),
 )
 
+# Find more options for the rst formatter at
+# http://docutils.sourceforge.net/docs/user/config.html
+RESTRUCTUREDTEXT_FILTER_SETTINGS = {
+    'cloak_email_addresses': True,
+    'file_insertion_enabled': False,
+    'raw_enabled': False,
+    'strip_comments': True,
+}
+
 # Override the global settings with site-specific settings.
 try:
     from cms_settings import *
