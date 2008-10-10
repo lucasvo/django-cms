@@ -4,20 +4,14 @@ from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
-from django.template import RequestContext, Template, loader
+from django.template import RequestContext, Template, loader, TemplateDoesNotExist
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils import html, translation
+from django.utils import translation
 from django.utils.translation import ugettext as _
-from django.utils.safestring import mark_safe
 
-from cms import models
-from cms.cms_global_settings import *
+from cms.models import Page, RootPageDoesNotExist
 from cms.util import language_list
-
-import markdown
-from django.contrib.sites.models import Site
-from django.template import TemplateDoesNotExist
-
+from cms.cms_global_settings import *
 
 class PositionDict(dict):
     """
@@ -93,7 +87,7 @@ def render_page(request, language, page, template_name=None, preview=None, args=
     A PageContent object can be passed as a preview.
     """
 
-    if not models.Page.objects.root().published() or not page.published() \
+    if not Page.objects.root().published() or not page.published() \
         or page.requires_login and not request.user.is_authenticated():
         raise Http404
 
@@ -181,20 +175,20 @@ def handle_page(request, language, url):
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overridden URL
-    pages = models.Page.objects.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
+    pages = Page.objects.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
     if pages:
         return render_page(request, language, pages[0])
 
     # If not, go and look it up
     parts = url and url.split('/') or []
 
-    root = models.Page.objects.root()
+    root = Page.objects.root()
 
     if not parts and not DISPLAY_ROOT:
         try:
-            return HttpResponseRedirect(models.Page.objects.filter(parent=root)[0].get_absolute_url(language))
+            return HttpResponseRedirect(Page.objects.filter(parent=root)[0].get_absolute_url(language))
         except IndexError:
-            raise models.RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
+            raise RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
 
     parent = root
 
@@ -277,10 +271,10 @@ def search(request):
         assert query
     except:
         return HttpResponseRedirect('/')
-    search_results = models.Page.objects.search(query, request.LANGUAGE_CODE[:2])
-    search_results_ml = models.Page.objects.search(query).exclude(id__in=[res['id'] for res in search_results.values('id')])
+    search_results = Page.objects.search(query, request.LANGUAGE_CODE[:2])
+    search_results_ml = Page.objects.search(query).exclude(id__in=[res['id'] for res in search_results.values('id')])
     context['search_results'] = search_results
     context['search_results_ml'] = search_results_ml
     context['query'] = query
-    context['page'] = models.Page.objects.root()
+    context['page'] = Page.objects.root()
     return render_to_response(template, context, RequestContext(request))

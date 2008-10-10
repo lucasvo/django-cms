@@ -1,23 +1,21 @@
-from django.utils.safestring import mark_safe
-from cms.util import MetaTag
-import markdown
-import datetime
 import re
+import datetime
 
 from django.http import Http404
 from django.db import models
 from django.conf import settings
 from django.utils.dateformat import DateFormat
-from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.utils import translation
-from django.utils import html
-
-from cms.util import language_list
+from django.utils.html import linebreaks, escape
+from django.contrib.markup.templatetags.markup import markdown, textile, \
+                                                      restructuredtext as rst
+from cms.util import language_list, MetaTag
 from cms.middleware.threadlocals import get_current_user
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
-
 
 protocol_re = re.compile('^\w+://')
 
@@ -259,10 +257,16 @@ class Page(models.Model):
         return tags
 
 class PageContent(models.Model):
+    CONTENT_TYPES = (
+        ('html', _('HTML')),
+        ('markdown', _('Markdown')),
+        ('textile', _('Textile')),
+        ('restructuredtext', _('reStructuredText')),
+        ('text', _('Plain text')),
+    )
     page = models.ForeignKey(Page)
     language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
     is_published = models.BooleanField(default=True)
-    CONTENT_TYPES = (('html', _('HTML')), ('markdown', _('Markdown')), ('text', _('Plain text')))
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'markdown')
     allow_template_tags = models.BooleanField(default=True)
 
@@ -298,10 +302,13 @@ class PageContent(models.Model):
         if self.content_type == 'html':
             pass # Nothing to do
         elif self.content_type == 'markdown':
-            self.content = markdown.markdown(self.content)
+            self.content = markdown(self.content)
+        elif self.content_type == 'textile':
+            self.content = textile(self.content)
+        elif self.content_type == 'rst':
+            self.content = rst(self.content)
         else:
-            self.content = html.linebreaks(html.escape(self.content))
-        self.content = mark_safe(self.content)
+            self.content = mark_safe(linebreaks(escape(self.content)))
         return self
 
     def save(self):
