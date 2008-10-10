@@ -1,5 +1,4 @@
 import datetime
-import re
 
 from django.conf import settings
 from django.utils.encoding import smart_unicode
@@ -153,12 +152,6 @@ class PageContentForm(dynamicforms.Form):
         'description', 
         'title',
     )
-    CONTENT_TYPES = (
-        ('html', _('HTML')), 
-        ('markdown', _('Markdown')), 
-        ('text', _('Plain text')),
-    )
-
     language = forms.ChoiceField(choices=((lang_code, _(lang)) for lang_code, lang in settings.LANGUAGES), initial=settings.LANGUAGE_CODE[:2], label=_('language'))
     position = forms.ChoiceField(choices=POSITIONS, initial=POSITIONS[0][0], label=_('position'), required=False)
     is_published = forms.BooleanField(required=False, initial=True, label=_('is published'))
@@ -169,7 +162,7 @@ class PageContentForm(dynamicforms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))
     page_topic = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 5, 'cols': 80}), label=_('page topic'))
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), label=_('content'))
-    content_type = forms.ChoiceField(choices=CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'markdown', label=_('content type'))
+    content_type = forms.ChoiceField(choices=PageContent.CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'markdown', label=_('content type'))
     allow_template_tags = forms.BooleanField(required=False, initial=True, label=_('allow template tags'))
     template = forms.CharField(max_length=200, required=False, label=_('template (optional)'))
 
