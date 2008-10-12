@@ -41,14 +41,13 @@ Make sure LocaleMiddleware (either cms.middleware.locale.LocaleMiddleware or
 django.middleware.locale.LocaleMiddleware) is in your MIDDLEWARE_CLASSES:
 
 MIDDLEWARE_CLASSES = (
-    #'cms.middleware.BenchmarkMiddleware',
+    'cms.middleware.util.BenchmarkMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'cms.middleware.XHTMLToHTMLMiddleware',
-	'cms.middleware.ThreadLocals',
+    'cms.middleware.util.XHTMLToHTMLMiddleware',
 )
 
 INSTALLED_APPS = (
