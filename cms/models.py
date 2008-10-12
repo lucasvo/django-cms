@@ -16,8 +16,7 @@ from django.contrib.markup.templatetags.markup import markdown, textile, \
 from cms.util import language_list, MetaTag
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 
-protocol_re = re.compile('^\w+://')
-
+PROTOCOL_RE = re.compile('^\w+://')
 
 class RootPageDoesNotExist(Exception):
     pass
@@ -192,7 +191,7 @@ class Page(models.Model):
         url = u'/'
         if self.override_url:
             # Check whether it is an absolute URL
-            if protocol_re.match(self.overridden_url):
+            if PROTOCOL_RE.match(self.overridden_url):
                 return self.overridden_url
 
             # The overridden URL is assumed to not have a leading or trailing slash.

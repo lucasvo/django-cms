@@ -77,3 +77,23 @@ def set_values(object, fields, values):
 
 def language_list():
     return dict(settings.LANGUAGES).keys()
+
+class PositionDict(dict):
+    """
+    Dictionary which is used for the content and title objects.
+    It is designed to be used in a Django template.
+    e.g.: {{ content }} - displays the default page content
+          {{ content.left }} - displays the page content at the left position
+    """
+
+    def __init__(self, default):
+        super(dict, self).__init__()
+        self.default = default
+
+    def __unicode__(self):
+        return self.get(self.default)
+
+def resolve_dotted_path(path):
+    dot = path.rindex('.')
+    mod_name, func_name = path[:dot], path[dot+1:]
+    return getattr(__import__(mod_name, {}, {}, ['']), func_name)

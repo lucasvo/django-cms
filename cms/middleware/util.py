@@ -1,11 +1,11 @@
 import datetime
 import re
 
-HTML_CONTENT_TYPE = re.compile(r'^text/html\b')
+HTML_CONTENT_TYPE_RE = re.compile(r'^text/html\b')
 
 class XHTMLToHTMLMiddleware:
     def process_response(self, request, response):
-        if HTML_CONTENT_TYPE.match(response['Content-Type']):
+        if HTML_CONTENT_TYPE_RE.match(response['Content-Type']):
             response.content = response.content.replace(' />', '>')
         return response
 

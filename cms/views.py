@@ -11,30 +11,8 @@ from django.utils.translation import ugettext as _
 
 from cms.forms import SearchForm
 from cms.models import Page, RootPageDoesNotExist
-from cms.util import language_list
+from cms.util import PositionDict, language_list, resolve_dotted_path
 from cms.cms_global_settings import *
-
-class PositionDict(dict):
-    """
-    Dictionary which is used for the content and title objects.
-    It is designed to be used in a Django template.
-    e.g.: {{ content }} - displays the default page content
-          {{ content.left }} - displays the page content at the left position
-    """
-
-    def __init__(self, default):
-        super(dict, self).__init__()
-        self.default = default
-
-    def __unicode__(self):
-        return self.get(self.default)
-
-
-def resolve_dotted_path(path):
-    dot = path.rindex('.')
-    mod_name, func_name = path[:dot], path[dot+1:]
-    func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-    return func
 
 def get_page_context(request, language, page, extra_context={}):
     context = RequestContext(request)
