@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.html import escape
 from django.utils.translation import get_language
 
-from cms import models
+from cms.models import Page
 from cms.cms_global_settings import *
 
 register = template.Library()
@@ -20,18 +20,17 @@ class CmsSubpagesNode(template.Node):
     def render(self, context):
         nav = template.resolve_variable(self.nav, context)
         try:
-            if not isinstance(nav, models.Page):
-                page = models.Page.objects.get(pk=nav)
+            if not isinstance(nav, Page):
+                page = Page.objects.get(pk=nav)
             else:
                 page = nav
-        except models.Page.DoesNotExist:
+        except Page.DoesNotExist:
             context[self.varname] = None
         else:
-            pages = models.Page.objects.filter(parent=page, in_navigation=True)
+            pages = Page.objects.filter(parent=page, in_navigation=True)
             context[self.varname] = pages
         return ''
 
-@register.tag
 def cms_subpages(parser, token):
     tokens = token.contents.split()
     if len(tokens) != 4:
@@ -39,7 +38,7 @@ def cms_subpages(parser, token):
     if tokens[2] != 'as':
         raise template.TemplateSyntaxError, "Second argument to '%s' tag must be 'as'" % tokens[0]
     return CmsSubpagesNode(tokens[1], tokens[3])
-
+cms_subpages = register.tag(cms_subpages)
 
 class CmsNavigationNode(template.Node):
     def __init__(self, level, varname):
@@ -52,7 +51,7 @@ class CmsNavigationNode(template.Node):
         except template.VariableDoesNotExist:
             return ''
         if self.level >= 0 and self.level <= len(path):
-            pages = models.Page.objects.filter(in_navigation=True)
+            pages = Page.objects.filter(in_navigation=True)
             if self.level == 0:
                 pages = pages.filter(parent__isnull=True)
             else:
@@ -62,7 +61,6 @@ class CmsNavigationNode(template.Node):
             context[self.varname] = None
         return ''
 
-@register.tag
 def cms_navigation_level(parser, token):
     tokens = token.contents.split()
     if len(tokens) != 4:
@@ -70,9 +68,9 @@ def cms_navigation_level(parser, token):
     if tokens[2] != 'as':
         raise template.TemplateSyntaxError, "Second argument to '%s' tag must be 'as'" % tokens[0]
     return CmsNavigationNode(tokens[1], tokens[3])
+cms_navigation_level = register.tag(cms_navigation_level)
 
-
-class CmsPagecontentNode(template.Node):
+class CmsPageContentNode(template.Node):
     def __init__(self, item, varname):
         self.item = item
         self.varname = varname
@@ -82,25 +80,23 @@ class CmsPagecontentNode(template.Node):
         context[self.varname] = page.get_content(context['language'])
         return ''
 
-@register.tag
 def cms_pagecontent(parser, token):
     tokens = token.contents.split()
     if len(tokens) != 4:
         raise template.TemplateSyntaxError, "'%s' tag requires three arguments" % tokens[0]
     if tokens[2] != 'as':
         raise template.TemplateSyntaxError, "Second argument to '%s' tag must be 'as'" % tokens[0]
-    return CmsPagecontentNode(tokens[1], tokens[3])
-
+    return CmsPageContentNode(tokens[1], tokens[3])
+cms_pagecontent = register.tag(cms_pagecontent)
 
 class CmsLanguageLinksNode(template.Node):
     def render(self, context):
         page = context['page']
         return ' '.join(['<a href="%s">%s</a>' % (page.get_absolute_url(code), dict(LANGUAGE_NAME_OVERRIDE).get(code, name)) for code, name in context['LANGUAGES'] if code != context['language']])
 
-@register.tag
 def cms_language_links(parser, token):
     return CmsLanguageLinksNode()
-
+cms_language_links = register.tag(cms_language_links)
 
 class CmsLinkNode(template.Node):
     def __init__(self, page, language=None, html=False):
@@ -113,8 +109,8 @@ class CmsLinkNode(template.Node):
         language = self.language and template.resolve_variable('language', context) or get_language()
         if isinstance(page, int):
             try:
-                page = models.Page.objects.get(pk=page)
-            except models.Page.DoesNotExist:
+                page = Page.objects.get(pk=page)
+            except Page.DoesNotExist:
                 return self.html and '<a href="#">(none)</a>' or '#'
 
         link = page.get_absolute_url(language)
@@ -137,21 +133,20 @@ class CmsLinkNode(template.Node):
         else:
             return link
 
-
-@register.tag
 def cms_link(parser, token):
     tokens = token.split_contents()
     return CmsLinkNode(tokens[1])
+cms_link = register.tag(cms_link)
 
-@register.tag
 def cms_html_link(parser, token):
     tokens = token.split_contents()
-    return CmsLinkNode(tokens[1], True)
+    return CmsLinkNode(tokens[1], html=True)
+cms_html_link = register.tag(cms_html_link)
 
-@register.tag
 def cms_language_link(parser, token):
     tokens = token.split_contents()
     return CmsLinkNode(tokens[1], tokens[2])
+cms_language_link = register.tag(cms_language_link)
 
 class CmsIsSubpageNode(template.Node):
     def __init__(self, sub_page, page, nodelist):
@@ -164,9 +159,9 @@ class CmsIsSubpageNode(template.Node):
         page = template.resolve_variable(self.page, context)
 
         if isinstance(page, int):
-            page = models.Page.objects.get(pk=page)
+            page = Page.objects.get(pk=page)
         if isinstance(sub_page, int):
-            sub_page = models.Page.objects.get(pk=sub_page)
+            sub_page = Page.objects.get(pk=sub_page)
 
         while sub_page:
             if sub_page == page:
@@ -175,7 +170,6 @@ class CmsIsSubpageNode(template.Node):
 
         return ''
 
-@register.tag
 def if_cms_is_subpage(parser, token):
     tokens = token.contents.split()
     if len(tokens) != 3:
@@ -183,20 +177,21 @@ def if_cms_is_subpage(parser, token):
     nodelist = parser.parse(('end_if_cms_is_subpage',))
     parser.delete_first_token()
     return CmsIsSubpageNode(tokens[1], tokens[2], nodelist)
+if_cms_is_subpage = register.tag(if_cms_is_subpage)
 
-@register.filter(name='cms_yesno')
 def yesno(value):
+    yesno_template = '<img src="%scms/img/%s" alt="%s" />'
     if value == '':
-        return '<img src="%scms/img/icon-unknown.gif" alt="%s" />' % (settings.MEDIA_URL, _('Unknown'))
+        return yesno_template % (settings.MEDIA_URL, 'icon-unknown.gif', _('Unknown'))
     elif value:
-        return '<img src="%scms/img/icon-yes.gif" alt="%s" />' % (settings.MEDIA_URL, _('Yes'))
+        return yesno_template % (settings.MEDIA_URL, 'icon-yes.gif', _('Yes'))
     else:
-        return '<img src="%scms/img/icon-no.gif" alt="%s" />' % (settings.MEDIA_URL, _('No'))
+        return yesno_template % (settings.MEDIA_URL, 'icon-no.gif', _('No'))
+cms_yesno = register.filter('cms_yesno', yesno)
 
-@register.filter(name='cms_get_content_title')
-def get_content_title(page, language):
+def content_title(page, language):
     return page.get_content(language).title
-
+get_content_title = register.filter('cms_get_content_title', content_title)
 
 class CmsPaginationNode(template.Node):
     def __init__(self, nodelist, num_pages):
@@ -209,7 +204,6 @@ class CmsPaginationNode(template.Node):
         context['more_than_one_page'] = self.num_pages>1
         return self.nodelist.render(context)
 
-@register.tag
 def cms_pagination(parser, token):
     tokens = token.contents.split()
     if len(tokens) != 2:
@@ -237,3 +231,4 @@ def cms_pagination(parser, token):
         num_pages += 1
 
     return CmsPaginationNode(the_nodelist, num_pages)
+cms_pagination = register.tag(cms_pagination)
