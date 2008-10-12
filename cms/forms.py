@@ -140,9 +140,7 @@ class PageForm(forms.ModelForm):
             instance.position = parent and parent.get_next_position() or 1
 
         instance.save()
-
         return instance
-
 
 class PageContentForm(dynamicforms.Form):
     PREFIX = 'pagecontent'
@@ -172,3 +170,6 @@ class PageContentForm(dynamicforms.Form):
     def from_template(self, extra_context={}):
         extra_context.update({'use_seo': SEO_FIELDS})
         return super(PageContentForm, self).from_template(extra_context)
+
+class SearchForm(forms.Form):
+    query = forms.CharField(label=_('search'))

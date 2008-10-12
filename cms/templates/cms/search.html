@@ -1,4 +1,4 @@
-{% extends 'main/base.html' %}
+{% extends 'cms/base.html' %}
 {% load i18n %}
 {% block breadcrumb %}
         <div id="breadcrumb">
@@ -6,8 +6,9 @@
         </div>
 {% endblock %}
 {% block content %}
-	<div id="content-main">
-		<h2>{% trans "Search results" %}</h2>
+    <div id="content-main">
+        {% if query %}
+        <h2>{% trans "Search results" %}</h2>
         <p>{% trans "for" %}: &quot;{{ query|escape }}&quot;</p>
         {% for article in search_results %}
         {% if forloop.first %}<ul class="search-results">{% endif %}
@@ -25,5 +26,6 @@
         {% if not search_results and not search_results_ml %}
             <p>{% trans "Sorry, no articles were found." %}</p>
         {% endif %}
-	</div>
+        {% endif %}
+    </div>
 {% endblock %}

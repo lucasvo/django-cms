@@ -9,6 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
+from cms.forms import SearchForm
 from cms.models import Page, RootPageDoesNotExist
 from cms.util import language_list
 from cms.cms_global_settings import *
@@ -35,8 +36,8 @@ def resolve_dotted_path(path):
     func = getattr(__import__(mod_name, {}, {}, ['']), func_name)
     return func
 
-
-def get_page_context_dict(request, language, page):
+def get_page_context(request, language, page, extra_context={}):
+    context = RequestContext(request)
     path = list(page.get_path())
 
     try:
@@ -44,22 +45,16 @@ def get_page_context_dict(request, language, page):
     except (TypeError, ValueError):
         page_number = 1
 
-    return {
-            'page': page,
-            'page_number': page_number,
-            'path': path,
-            'language': language,
-            'root':'/%s/' % language,
-            'site_title': SITE_TITLE,
-        }
-
-
-def get_page_context(request, language, page, extra_context={}):
-    context = RequestContext(request)
-    context.update(get_page_context_dict(request, language, page))
+    context.update({
+        'page': page,
+        'page_number': page_number,
+        'path': path,
+        'language': language,
+        'root':'/%s/' % language,
+        'site_title': SITE_TITLE,
+    })
     context.update(extra_context)
     return context
-
 
 def render_pagecontent(page_content, context):
     # Parse template tags
@@ -87,8 +82,10 @@ def render_page(request, language, page, template_name=None, preview=None, args=
     A PageContent object can be passed as a preview.
     """
 
-    if not Page.objects.root().published() or not page.published() \
-        or page.requires_login and not request.user.is_authenticated():
+    if not Page.objects.root().published(request.user) or \
+        not page.published(request.user) or \
+        page.requires_login and \
+        not request.user.is_authenticated():
         raise Http404
 
     # Make translations using Django's i18n work
@@ -132,9 +129,10 @@ def render_page(request, language, page, template_name=None, preview=None, args=
 
         title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
 
-        
-    context.update({ 'content': content_dict, 'title': title_dict })
-
+    context.update({
+        'content': content_dict,
+        'title': title_dict,
+    })
 
     # Third processing stage: Use the specified template
     # Templates are chosen in the following order:
@@ -171,7 +169,6 @@ def render_page(request, language, page, template_name=None, preview=None, args=
 
 
 def handle_page(request, language, url):
-
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overridden URL
@@ -191,9 +188,7 @@ def handle_page(request, language, url):
             raise RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
 
     parent = root
-
     pages = None
-
     args = []
 
     for part in parts:
@@ -216,6 +211,10 @@ def handle_page(request, language, url):
 
 
 def handler(request):
+    """
+    Main handler view that calls the views to render a page or redirects to
+    the appropriate language URL.
+    """
     url = request.path
 
     languages = language_list()
@@ -262,19 +261,40 @@ def handler(request):
 if REQUIRE_LOGIN:
     handler = staff_member_required(handler)
 
+def search(request, form_class=SearchForm, extra_context={}, 
+        template_name="cms/search.html"):
+    """
+    Performs a search over Page and PageContent fields depending on the
+    current language and also returns the search results for other languages.
+    """
 
-def search(request):
-    template = "cms/search.html"
-    context = {}
-    try:
-        query = request.POST['query']
-        assert query
-    except:
-        return HttpResponseRedirect('/')
-    search_results = Page.objects.search(query, request.LANGUAGE_CODE[:2])
-    search_results_ml = Page.objects.search(query).exclude(id__in=[res['id'] for res in search_results.values('id')])
-    context['search_results'] = search_results
-    context['search_results_ml'] = search_results_ml
-    context['query'] = query
-    context['page'] = Page.objects.root()
-    return render_to_response(template, context, RequestContext(request))
+    language = request.LANGUAGE_CODE[:2]
+    page = Page.objects.root()
+    context = get_page_context(request, language, page)
+
+    if request.GET.get('query', False):
+        # create search form with GET variables if given
+        search_form = form_class(request.GET)
+
+        if search_form.is_valid():
+            query = search_form.cleaned_data['query']
+
+            # perform actual search
+            search_results = Page.objects.search(request.user, query, language)
+            page_ids = [res['id'] for res in search_results.values('id')]
+            search_results_ml = Page.objects.search(request.user, query).exclude(id__in=page_ids)
+
+            # update context to contain query and search results
+            context.update({
+                'search_results': search_results,
+                'search_results_ml': search_results_ml,
+                'query': query,
+            })
+    else:
+        search_form = form_class()
+
+    context.update({
+        'search_form': search_form,
+    })
+    return render_to_response(template_name, extra_context,
+        context_instance=RequestContext(request, context))

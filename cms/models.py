@@ -14,7 +14,6 @@ from django.utils.html import linebreaks, escape
 from django.contrib.markup.templatetags.markup import markdown, textile, \
                                                       restructuredtext as rst
 from cms.util import language_list, MetaTag
-from cms.middleware.threadlocals import get_current_user
 from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 
 protocol_re = re.compile('^\w+://')
@@ -41,44 +40,38 @@ class PageManager(models.Manager):
         except IndexError:
             raise RootPageDoesNotExist, unicode(_('Please create at least one page.'))
 
-    def published(self):
-        try:
-            user_logged_in = get_current_user().is_authenticated()
-        except:
-            user_logged_in = False
-        if not user_logged_in:
-            qs = self.exclude(requires_login=True)
-        else:
-            qs = self
-        return qs.filter(
-                           Q(is_published=True),
-                           Q(start_publish_date__lte=datetime.datetime.now()) | Q(start_publish_date__isnull=True), 
-                           Q(end_publish_date__gte=datetime.datetime.now()) | Q(end_publish_date__isnull=True),
-                           )
-    
-    def search(self, query, language=None):
-        if not query:
-            return
-        qs = self.published()
+    def published(self, user, now=datetime.datetime.now()):
+        queryset = self.all()
+        if not user.is_authenticated():
+            queryset = queryset.exclude(requires_login=True)
+        return queryset.filter(
+            Q(is_published=True),
+            Q(start_publish_date__lte=now) | Q(start_publish_date__isnull=True), 
+            Q(end_publish_date__gte=now) | Q(end_publish_date__isnull=True),
+        )
+
+    def search(self, user, query, language=None):
+        queryset = self.published(user)
         if language:
-            qs = qs.filter(
-                        Q(title__icontains=query) |
-                        Q(pagecontent__language=language) & 
-                        (Q(pagecontent__title__icontains=query) |
-                        Q(pagecontent__description__icontains=query) |
-                        Q(pagecontent__content__icontains=query))
-                    )
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(pagecontent__language=language) & (
+                    Q(pagecontent__title__icontains=query) |
+                    Q(pagecontent__description__icontains=query) |
+                    Q(pagecontent__content__icontains=query)
+                )
+            )
         else:
-            qs = qs.filter(
-                        Q(title__icontains=query) |
-                        Q(pagecontent__title__icontains=query) |
-                        Q(pagecontent__description__icontains=query) |
-                        Q(pagecontent__content__icontains=query)
-                    )
-        return qs.distinct()
-    
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(pagecontent__title__icontains=query) |
+                Q(pagecontent__description__icontains=query) |
+                Q(pagecontent__content__icontains=query)
+            )
+        return queryset.distinct()
+
     def get_by_overridden_url(self, url, raise404=True):
-        qs = self.published()
+        qs = self.published() # TODO: what is this for??
         try:
             return qs.get(overridden_url=url, override_url=True)
         except AssertionError:
@@ -169,7 +162,7 @@ class Page(models.Model):
             # return None
             page_content = PageContent(page=self)
             if all:
-                page_content=[PageContent(page=self)]
+                page_content = [PageContent(page=self)]
 
         if all and page_content:
             for c in page_content:
@@ -231,16 +224,16 @@ class Page(models.Model):
             parent = parent.parent
         return level
 
-    @property
     def smart_title(self):
         return self.get_content().title
+    smart_title = property(smart_title)
 
-    @property
     def smart_slug(self):
         return self.get_content().slug
+    smart_slug = property(smart_slug)
 
-    def published(self):
-        return self in Page.objects.published()
+    def published(self, user):
+        return self in Page.objects.published(user)
     published.boolean = True
     
     def get_meta_tags(self, language=None):
