@@ -89,6 +89,16 @@ def cms_pagecontent(parser, token):
     return CmsPageContentNode(tokens[1], tokens[3])
 cms_pagecontent = register.tag(cms_pagecontent)
 
+def cms_breadcrumbs(context, separator=None, style=None):
+    if 'page' in context and 'language' in context:
+        return {
+            'page': context['page'],
+            'language': context['language'],
+            'separator': separator,
+            'style': style,
+        }
+cms_breadcrumbs = register.inclusion_tag('cms/breadcrumbs.html', takes_context=True)(cms_breadcrumbs)
+
 class CmsLanguageLinksNode(template.Node):
     def render(self, context):
         page = context['page']

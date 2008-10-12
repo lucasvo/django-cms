@@ -33,7 +33,7 @@
 <div><ul class="object-tools"><li><a href="preview/" target="_blank" class="pagecontent-preview viewsitelink">{% trans 'Preview' %}</a></li></ul></div>
 <p class="help">{% trans '(in a new window without saving it)' %}</p>
 
-  {% if form.id %}
+{% if form.id %}
 <div class="delete"><a href="../../pagecontent/{{ form.id }}/delete/" class="deletelink pagecontent-delete">{% trans 'Delete this content' %}</a></div>
 {% endif %}
 

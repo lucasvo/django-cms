@@ -1,0 +1,18 @@
+{% load i18n cms_base %}
+
+<span class="{% if style %}{{ style }}{% else %}breadcrumbs{% endif %}">
+    {% for path in page.get_path %}
+        {% if not forloop.first %}{% if separator %}{{ separator }}{% else %} &rarr; {% endif %}{% endif %} 
+        {% if not forloop.last %}
+            <a href="{% cms_link path %}">
+        {% else %}
+            <span class="active">
+        {% endif %}
+        {{ path|cms_get_content_title:language|escape }}
+        {% if not forloop.last %}
+            </a>
+        {% else %}
+            </span>
+        {% endif %}
+    {% endfor %}
+</span>
