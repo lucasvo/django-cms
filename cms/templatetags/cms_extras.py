@@ -1,12 +1,7 @@
 from django import template
 
-from cms import models
-
-
 register = template.Library()
 
-
-@register.tag
 def background(parser, token):
     try:
         tag_name, path, width, height = token.split_contents()
@@ -15,6 +10,7 @@ def background(parser, token):
     nodelist = parser.parse(('endbackground',))
     parser.delete_first_token()
     return BackgroundNode(nodelist, path, width, height)
+background = register.tag(background)
 
 class BackgroundNode(template.Node):
     def __init__(self, nodelist, path, width, height):
@@ -29,8 +25,6 @@ class BackgroundNode(template.Node):
         output = self.nodelist.render(context)
         return '<div class="background" style="background-image:url(%s); width:%spx; height:%spx;">\n\n<div>%s\n</div>\n\n</div>' % (path, width, height, output) 
 
-
-@register.filter(name='cms_word_slice')
 def word_slice(value, arg):
     words = value.split(' ')
     args = arg.split(':')
@@ -46,10 +40,11 @@ def word_slice(value, arg):
     else:
         out = words[int(args[0])]
     return ' '.join(out)
+register.filter('cms_word_slice', word_slice)
     
-@register.filter(name='cms_at')
 def at(value, arg):
     try:
         return value and value[arg] or ''
     except IndexError:
         return ''
+register.filter('cms_at', at)

@@ -7,14 +7,14 @@ from cms import cms_global_settings as cms_settings
 
 register = template.Library()
 
-@register.filter
 def is_datetime(value):
     from django import newforms as forms
     return isinstance(value.field, forms.fields.DateTimeField)
+is_datetime = register.filter(is_datetime)
 
-@register.inclusion_tag('cms/field.html')
 def render_field(field):
     return {'field': field,}
+render_field = register.inclusion_tag('cms/field.html')(render_field)
     
 class EditInlineNode(template.Node):
     def __init__(self, rel_var):
@@ -43,9 +43,9 @@ class EditInlineNode(template.Node):
             return output
         return ''
 
-@register.tag(name="cms_edit_inline")
 def edit_inline(parser, token):
     bits = token.contents.split()
     if len(bits) != 2:
         raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
     return EditInlineNode(bits[1])
+cms_edit_inline = register.tag('cms_edit_inline', edit_inline)
