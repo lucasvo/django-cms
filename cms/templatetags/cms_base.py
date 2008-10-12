@@ -1,12 +1,10 @@
 from django import template
 from django.conf import settings
 from django.utils.html import escape
+from django.utils.translation import get_language
 
 from cms import models
 from cms.cms_global_settings import *
-from cms import languages
-from django.utils import translation
-
 
 register = template.Library()
 
@@ -97,7 +95,7 @@ def cms_pagecontent(parser, token):
 class CmsLanguageLinksNode(template.Node):
     def render(self, context):
         page = context['page']
-        return ' '.join(['<a href="%s">%s</a>' % (page.get_absolute_url(code), languages.VERSION.get(code, name)) for code, name in context['LANGUAGES'] if code != context['language']])
+        return ' '.join(['<a href="%s">%s</a>' % (page.get_absolute_url(code), dict(LANGUAGE_NAME_OVERRIDE).get(code, name)) for code, name in context['LANGUAGES'] if code != context['language']])
 
 @register.tag
 def cms_language_links(parser, token):
@@ -112,7 +110,7 @@ class CmsLinkNode(template.Node):
 
     def render(self, context):
         page = template.resolve_variable(self.page, context)
-        language = self.language and template.resolve_variable('language', context) or translation.get_language()
+        language = self.language and template.resolve_variable('language', context) or get_language()
         if isinstance(page, int):
             try:
                 page = models.Page.objects.get(pk=page)

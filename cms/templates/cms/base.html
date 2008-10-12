@@ -12,6 +12,8 @@
     <div id="breadcrumbs"> {% for path in page.get_path %}{% if not forloop.first %} &gt; {% endif %} {% if not forloop.last %}<a href="{% cms_link path %}">{% else %}<span class="active">{% endif %}{{ path|cms_get_content_title:language|escape }}{% if not forloop.last %}</a>{% else %}</span>{% endif %} {% endfor %}</div>
 {% endif %}
 
+<small>{% cms_language_links %}</small>
+
 <h2>{% trans "Search" %}</h2>
 
 <form action="{% url cms_search %}" method="get" accept-charset="utf-8">

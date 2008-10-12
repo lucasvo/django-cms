@@ -21,6 +21,12 @@ LANGUAGE_REDIRECT = True
 # Default language (e.g. de)
 LANGUAGE_DEFAULT = 'en'
 
+# overrides the language name when using cms_language_links template tag
+LANGUAGE_NAME_OVERRIDE = (
+    ('de', 'Deutsche Version'),
+    ('en', 'English version'),
+)
+
 # Whether there should be SEO fields for each page content
 SEO_FIELDS = False
 
@@ -29,9 +35,9 @@ REQUIRE_LOGIN = False
 
 # Additional templatetags for the page content, e.g. ['yourapp.extras']
 # will load yourapp/templatetags/extras.py (yourapp must be in INSTALLED_APPS)
-TEMPLATETAGS = [
+TEMPLATETAGS = (
 #    'project.app.module',
-]
+)
 
 TEMPLATES = (
 #    ('project/custom_template.html', _('template name')),
