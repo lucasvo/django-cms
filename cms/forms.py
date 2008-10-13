@@ -160,7 +160,7 @@ class PageContentForm(dynamicforms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))
     page_topic = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 5, 'cols': 80}), label=_('page topic'))
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), label=_('content'))
-    content_type = forms.ChoiceField(choices=PageContent.CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'markdown', label=_('content type'))
+    content_type = forms.ChoiceField(choices=PageContent.CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'text', label=_('content type'))
     allow_template_tags = forms.BooleanField(required=False, initial=True, label=_('allow template tags'))
     template = forms.CharField(max_length=200, required=False, label=_('template (optional)'))
 

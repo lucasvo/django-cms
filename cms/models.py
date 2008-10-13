@@ -259,7 +259,7 @@ class PageContent(models.Model):
     page = models.ForeignKey(Page)
     language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
     is_published = models.BooleanField(default=True)
-    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'markdown')
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'text')
     allow_template_tags = models.BooleanField(default=True)
 
     created = models.DateTimeField(null=True, blank=True)
