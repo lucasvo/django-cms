@@ -8,22 +8,11 @@ CMS settings
 Setup media files and templates
 ===============================
 
-In settings.py:
-
-TEMPLATE_DIRS = (
-    '/path-to-your-project/templates',
-)
-
 In your project directory:
-
-mkdir templates
-cd templates
-ln -s ../cms/templates cms
 
 mkdir site_media
 cd site_media
-ln -s ../cms/media cms
-
+ln -s <path-to-django-cms>/cms/media/cms cms
 
 urls.py
 =======
@@ -54,4 +43,12 @@ INSTALLED_APPS = (
     ...
     'django.contrib.admin',
     'cms',
+)
+
+Also the app template loader needs to be enabled -- TEMPLATE_LOADERS should 
+look something like this:
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.load_template_source',
+    'django.template.loaders.app_directories.load_template_source',
 )
