@@ -8,7 +8,7 @@ var NavigationNested = Nested.extend({
 
 Window.onDomReady(function(){
     var rootError = new Element('div').setProperty('id', 'root-error');
-    rootError.innerHTML = '<ul class="errorlist"><li>There must not be more than one root element. Please reorder the pages so that there is only one root element.</li></ul>'; // TODO: gettext
+    rootError.innerHTML = '<ul class="errorlist"><li>' + gettext('There must not be more than one root element. Please reorder the pages so that there is only one root element.') + '</li></ul>';
     rootError.addClass('hidden');
     $('errors').adopt(rootError);
     var sortIt = new NavigationNested('navigation', {

@@ -1,0 +1,67 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-10-15 17:30+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: media/cms/js/DateTimeShortcuts.js:47 media/cms/js/DateTimeShortcuts.js:81
+msgid "Now"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:82
+msgid "Midnight"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:83
+msgid "6 a.m."
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:84
+msgid "Noon"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:88 media/cms/js/DateTimeShortcuts.js:183
+msgid "Cancel"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:128 media/cms/js/DateTimeShortcuts.js:177
+msgid "Today"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:132
+msgid "Calendar"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:175
+msgid "Yesterday"
+msgstr ""
+
+#: media/cms/js/DateTimeShortcuts.js:179
+msgid "Tomorrow"
+msgstr ""
+
+#: media/cms/js/navigation.js:11
+msgid ""
+"There must not be more than one root element. Please reorder the pages so "
+"that there is only one root element."
+msgstr ""

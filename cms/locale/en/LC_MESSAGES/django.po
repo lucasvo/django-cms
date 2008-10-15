@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-07 18:16+0200\n"
+"POT-Creation-Date: 2008-10-15 17:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,260 +16,272 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:109
+#: admin.py:106
 msgid "The page was added successfully. Now you can create your content."
 msgstr ""
 
-#: admin.py:111
+#: admin.py:108
 msgid "The page was updated successfully. You may edit it again below."
 msgstr ""
 
-#: admin.py:131 templates/cms/page_add.html:46
+#: admin.py:128 templates/cms/page_add.html:46
 msgid "Add"
 msgstr ""
 
-#: admin.py:131
+#: admin.py:128
 msgid "Edit"
 msgstr ""
 
-#: admin.py:131 models.py:128
+#: admin.py:128 models.py:118
 msgid "page"
 msgstr ""
 
-#: admin.py:186
+#: admin.py:183
 msgid "The navigation was updated successfully. You may edit it again below."
 msgstr ""
 
-#: admin.py:189
+#: admin.py:186
 msgid ""
 "Your changes were discarded, because there must not be more than one root "
 "element. Make sure that there is only one root element."
 msgstr ""
 
-#: admin.py:196
+#: admin.py:193
 msgid "<li>Please <a href=\"../page/add/\">create a page</a> first.</li>"
 msgstr ""
 
-#: admin.py:205
+#: admin.py:202
 msgid "Edit pages"
 msgstr ""
 
-#: admin.py:217
+#: admin.py:215
 msgid "Please fill in some page content."
 msgstr ""
 
-#: admin.py:225
+#: admin.py:223
 msgid "<h2>Your form is not valid.</h2>"
 msgstr ""
 
-#: admin.py:234
+#: admin.py:232
 msgid ""
 "This page content has been already removed. Please reload the page and try "
 "again."
 msgstr ""
 
-#: cms_global_settings.py:49
+#: cms_global_settings.py:55
 msgid "Default"
 msgstr ""
 
-#: forms.py:58
+#: forms.py:57
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#: forms.py:64
+#: forms.py:63
 msgid "This value must contain only letters, numbers, underscores or hyphens."
 msgstr ""
 
-#: forms.py:99
+#: forms.py:98
 msgid ""
 "The template that will be used to render the page. Choose nothing if you "
 "don't need a custom template."
 msgstr ""
 
-#: forms.py:100 models.py:103
+#: forms.py:99 models.py:93
 msgid "start publishing"
 msgstr ""
 
-#: forms.py:100
+#: forms.py:99
 msgid ""
 "Enter a date (and time) on which you want to start publishing this page."
 msgstr ""
 
-#: forms.py:101 models.py:104
+#: forms.py:100 models.py:94
 msgid "finish publishing"
 msgstr ""
 
-#: forms.py:101
+#: forms.py:100
 msgid "Enter a date after which you want to stop publishing this page."
 msgstr ""
 
-#: forms.py:123
+#: forms.py:122
 msgid "Please reorder the root object on the hierarchy page."
 msgstr ""
 
-#: forms.py:125
+#: forms.py:124
 msgid "Please choose in which category the page should belong."
 msgstr ""
 
-#: forms.py:157 models.py:265
-msgid "HTML"
-msgstr ""
-
-#: forms.py:158 models.py:265
-msgid "Markdown"
-msgstr ""
-
-#: forms.py:159 models.py:265
-msgid "Plain text"
-msgstr ""
-
-#: forms.py:162
+#: forms.py:153
 msgid "language"
 msgstr ""
 
-#: forms.py:163
+#: forms.py:154
 msgid "position"
 msgstr ""
 
-#: forms.py:164 models.py:102
+#: forms.py:155 models.py:92
 msgid "is published"
 msgstr ""
 
-#: forms.py:165
+#: forms.py:156
 msgid "Leave this empty to use the title of the page."
 msgstr ""
 
-#: forms.py:165 models.py:93
+#: forms.py:156 models.py:83
 msgid "title"
 msgstr ""
 
-#: forms.py:166 models.py:277
+#: forms.py:157 models.py:273
 msgid ""
 "Only specify this if you want to give this page content a specific slug."
 msgstr ""
 
-#: forms.py:166 models.py:94 models.py:277
+#: forms.py:157 models.py:84 models.py:273
 msgid "slug"
 msgstr ""
 
-#: forms.py:167 models.py:278
+#: forms.py:158 models.py:274
 msgid "Used for page title. Should be no longer than 150 chars."
 msgstr ""
 
-#: forms.py:167
+#: forms.py:158
 msgid "page title"
 msgstr ""
 
-#: forms.py:168 models.py:279
+#: forms.py:159 models.py:275
 msgid "Comma separated"
 msgstr ""
 
-#: forms.py:168 models.py:279
+#: forms.py:159 models.py:275
 msgid "keywords"
 msgstr ""
 
-#: forms.py:169
+#: forms.py:160
 msgid "description"
 msgstr ""
 
-#: forms.py:170
+#: forms.py:161
 msgid "page topic"
 msgstr ""
 
-#: forms.py:171
+#: forms.py:162
 msgid "content"
 msgstr ""
 
-#: forms.py:172
+#: forms.py:163
 msgid "content type"
 msgstr ""
 
-#: forms.py:173
+#: forms.py:164
 msgid "allow template tags"
 msgstr ""
 
-#: forms.py:174
+#: forms.py:165
 msgid "template (optional)"
 msgstr ""
 
-#: forms.py:177
+#: forms.py:168
 msgid "New page content"
 msgstr ""
 
-#: models.py:44
+#: forms.py:175 templates/cms/base.html:20
+msgid "search"
+msgstr ""
+
+#: models.py:40
 msgid "Please create at least one page."
 msgstr ""
 
-#: models.py:93
+#: models.py:83
 msgid "The title of the page."
 msgstr ""
 
-#: models.py:94
+#: models.py:84
 msgid ""
 "The name of the page that appears in the URL. A slug can contain letters, "
 "numbers, underscores or hyphens."
 msgstr ""
 
-#: models.py:100
+#: models.py:90
 msgid ""
 "Optional. Dotted path to a python function that receives two arguments "
 "(request, context) and can update the context."
 msgstr ""
 
-#: models.py:102
+#: models.py:92
 msgid "Whether or not the page is accessible from the web."
 msgstr ""
 
-#: models.py:107
+#: models.py:97
 msgid "Navigation"
 msgstr ""
 
-#: models.py:107
+#: models.py:97
 msgid "The page will be appended inside the chosen category."
 msgstr ""
 
-#: models.py:109
+#: models.py:99
 msgid "display in navigation"
 msgstr ""
 
-#: models.py:112
+#: models.py:102
 msgid "requires login"
 msgstr ""
 
-#: models.py:112
+#: models.py:102
 msgid "If checked, only logged-in users can view the page."
 msgstr ""
 
-#: models.py:129
+#: models.py:119
 msgid "pages"
 msgstr ""
 
-#: models.py:272
+#: models.py:253
+msgid "HTML"
+msgstr ""
+
+#: models.py:254
+msgid "Markdown"
+msgstr ""
+
+#: models.py:255
+msgid "Textile"
+msgstr ""
+
+#: models.py:256
+msgid "reStructuredText"
+msgstr ""
+
+#: models.py:257
+msgid "Plain text"
+msgstr ""
+
+#: models.py:268
 msgid "Only specify this if you want to override the page template."
 msgstr ""
 
-#: models.py:276
+#: models.py:272
 msgid "Used in navigation. Leave this empty to use the default title."
 msgstr ""
 
-#: models.py:280 models.py:281
+#: models.py:276 models.py:277
 msgid "Keep between 150 and 1000 characters long."
 msgstr ""
 
-#: models.py:316
+#: models.py:315
 msgid "published"
 msgstr ""
 
-#: models.py:316
+#: models.py:315
 msgid "unpublished"
 msgstr ""
 
-#: views.py:197
+#: views.py:166
 msgid "Please create at least one subpage or enable DISPLAY_ROOT."
 msgstr ""
 
-#: views.py:246
+#: views.py:217
 msgid "Please define LANGUAGES in your project's settings."
 msgstr ""
 
@@ -277,45 +289,45 @@ msgstr ""
 msgid "Received invalid data."
 msgstr ""
 
+#: templates/cms/base.html:16 templates/cms/search.html:5
+msgid "Search"
+msgstr ""
+
+#: templates/cms/base.html:23
+msgid "main menu"
+msgstr ""
+
+#: templates/cms/base.html:31
+msgid "sub pages"
+msgstr ""
+
 #: templates/cms/field.html:7
 msgid "Help"
 msgstr ""
 
-#: templates/cms/navigation.html:11
-msgid "Documentation"
-msgstr ""
-
-#: templates/cms/navigation.html:12
-msgid "Change password"
-msgstr ""
-
-#: templates/cms/navigation.html:13
-msgid "Log out"
-msgstr ""
-
-#: templates/cms/navigation.html:18 templates/cms/page_add.html:43
+#: templates/cms/navigation.html:12 templates/cms/page_add.html:43
 msgid "Home"
 msgstr ""
 
-#: templates/cms/navigation.html:25
+#: templates/cms/navigation.html:19
 msgid "Add page"
 msgstr ""
 
-#: templates/cms/navigation.html:28 templates/cms/page_add.html:65
+#: templates/cms/navigation.html:22 templates/cms/page_add.html:65
 msgid "Note"
 msgstr ""
 
-#: templates/cms/navigation.html:28
+#: templates/cms/navigation.html:22
 msgid ""
 "You will have to activate JavaScript in your browser's settings to be able "
 "to reorder the pages."
 msgstr ""
 
-#: templates/cms/navigation.html:31
+#: templates/cms/navigation.html:25
 msgid "Manage Pages"
 msgstr ""
 
-#: templates/cms/navigation.html:32
+#: templates/cms/navigation.html:26
 msgid ""
 "Here you can edit the pages of your site. Drag and drop the pages to change "
 "their order or hierarchy. Note that changing the hierarchy will affect the "
@@ -325,11 +337,11 @@ msgid ""
 "you don't reorder them."
 msgstr ""
 
-#: templates/cms/navigation.html:50 templates/cms/page_submit_row.html:4
+#: templates/cms/navigation.html:42 templates/cms/page_submit_row.html:4
 msgid "Add this page"
 msgstr ""
 
-#: templates/cms/navigation.html:50 templates/cms/page_submit_row.html:4
+#: templates/cms/navigation.html:42 templates/cms/page_submit_row.html:4
 msgid "Save all changes"
 msgstr ""
 
@@ -433,34 +445,30 @@ msgstr ""
 msgid "Delete this content"
 msgstr ""
 
-#: templates/cms/search.html:5
-msgid "Search"
-msgstr ""
-
-#: templates/cms/search.html:10
+#: templates/cms/search.html:11
 msgid "Search results"
 msgstr ""
 
-#: templates/cms/search.html:11
+#: templates/cms/search.html:12
 msgid "for"
 msgstr ""
 
-#: templates/cms/search.html:18
+#: templates/cms/search.html:19
 msgid "Articles found in other languages"
 msgstr ""
 
-#: templates/cms/search.html:26
+#: templates/cms/search.html:27
 msgid "Sorry, no articles were found."
 msgstr ""
 
-#: templatetags/cms_base.py:192
+#: templatetags/cms_base.py:195
 msgid "Unknown"
 msgstr ""
 
-#: templatetags/cms_base.py:194
+#: templatetags/cms_base.py:197
 msgid "Yes"
 msgstr ""
 
-#: templatetags/cms_base.py:196
+#: templatetags/cms_base.py:199
 msgid "No"
 msgstr ""
