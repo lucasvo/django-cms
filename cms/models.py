@@ -253,7 +253,7 @@ class PageContent(models.Model):
         ('html', _('HTML')),
         ('markdown', _('Markdown')),
         ('textile', _('Textile')),
-        ('restructuredtext', _('reStructuredText')),
+        ('rst', _('reStructuredText')),
         ('text', _('Plain text')),
     )
     page = models.ForeignKey(Page)
