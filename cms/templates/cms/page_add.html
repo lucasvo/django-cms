@@ -2,7 +2,7 @@
 {% load i18n adminmedia admin_modify cms_base cms_admin %}
 
 {% block extrahead %}{{ block.super }}
-<script src="/admin/jsi18n/" type="text/javascript"></script>
+<script src="{{ root_path }}jsi18n/" type="text/javascript"></script>
 <script src="{% admin_media_prefix %}js/calendar.js" type="text/javascript"></script>
 {{ media }}
 {% if use_tinymce %}
