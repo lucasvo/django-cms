@@ -199,3 +199,7 @@ class PageContentForm(dynamicforms.Form):
 
 class SearchForm(forms.Form):
     query = forms.CharField(label=_('search'))
+
+class NavigationForm(dynamicforms.Form):
+    in_navigation = forms.BooleanField(required=False)
+    is_published = forms.BooleanField(required=False)

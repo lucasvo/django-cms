@@ -8,17 +8,12 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django import forms
 
-from cms import dynamicforms
 from cms.util import set_values, get_values
 from cms.views import render_page
 from cms.models import Page, TextPageContent
-from cms.forms import PageForm, PageContentForm, PAGECONTENT_FIELDS
+from cms.forms import PageForm, PageContentForm, NavigationForm, PAGECONTENT_FIELDS
 from cms.decorators import json
 from cms.conf.global_settings import PAGE_ADDONS, USE_TINYMCE
-
-class NavigationForm(dynamicforms.Form):
-    in_navigation = forms.BooleanField(required=False)
-    is_published = forms.BooleanField(required=False)
 
 class PageAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
