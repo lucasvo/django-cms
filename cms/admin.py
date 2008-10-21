@@ -11,7 +11,7 @@ from django import forms
 from cms import dynamicforms
 from cms.util import set_values, get_values
 from cms.views import render_page
-from cms.models import Page, PageContent
+from cms.models import Page, TextPageContent
 from cms.forms import PageForm, PageContentForm, PAGECONTENT_FIELDS
 from cms.decorators import json
 from cms.conf.global_settings import PAGE_ADDONS, USE_TINYMCE
@@ -110,10 +110,12 @@ class PageAdmin(admin.ModelAdmin):
 
         else: # get
             if not add:
-                pagecontent_data = [PageContentForm(
+                pagecontent_data = []
+                for page_content in page_contents:
+                    content_form = PageContentForm(
                         initial=get_values(page_content, PAGECONTENT_FIELDS),
-                        id=page_content.id
-                    ).render_js('from_template') for page_content in page_contents]
+                        id=page_content.id)
+                    pagecontent_data.append(content_form.render_js('from_template'))
 
         media = self.media
         if USE_TINYMCE:

@@ -33,18 +33,23 @@ class BaseForm(forms.BaseForm):
         self.core = kwargs.pop('core', '') or getattr(self, 'CORE', [])
         self.id = kwargs.pop('id', '')
         super(BaseForm, self).__init__(*args, **kwargs)
+
     def add_prefix(self, field_name):
         prefixed = super(BaseForm, self).add_prefix(field_name)
         return self.postfix and ('%s.%s' % (prefixed, self.postfix)) or prefixed
+
     def header(self):
         return u'<input type="hidden" name="%s" value="%s" />' % (self.add_prefix('id'), self.id)
+
     def render(self, how):
         return u'%s%s' % (self.header(), getattr(self, how)())
+
     def render_js(self, how):
         data = addslashes(self.render(how))
         for replace_re in replace_res:
             data = re.sub(replace_re, '\\1 \\2\', FormId, \'\\3\\4', data)
         return mark_safe(u"['%s']" % data)
+
     def from_template(self, extra_context={}):
         template = loader.get_template(self.template)
         context = Context(dict([('form', self)]+extra_context.items()))
@@ -77,3 +82,4 @@ class BaseForm(forms.BaseForm):
 
 class Form(BaseForm):
     __metaclass__ = DeclarativeFieldsMetaclass
+

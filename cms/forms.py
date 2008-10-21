@@ -154,7 +154,7 @@ class PageForm(forms.ModelForm):
             instance.position = parent and parent.get_next_position() or 1
 
         # Set requires_login to the value of parent
-        if not instance.id:
+        if not instance.id and parent:
             if parent.requires_login and not new_requires_login:
                 instance.requires_login = parent.requires_login
 
