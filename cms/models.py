@@ -35,14 +35,14 @@ class RootPageDoesNotExist(Exception):
 class PageManager(models.Manager):
     def hierarchy(self, parent=None):
         if parent:
-            filter = self.filter(parent=parent)
+            pages = self.filter(parent=parent)
         else:
             try:
                 root = self.root()
             except RootPageDoesNotExist:
                 return []
             return [(root, self.hierarchy(root))]
-        return [(page, self.hierarchy(page)) for page in filter]
+        return [(page, self.hierarchy(page)) for page in pages]
 
     def root(self):
         try:
@@ -83,15 +83,15 @@ class PageManager(models.Manager):
             )
         return queryset.distinct()
 
-    def get_by_overridden_url(self, url, raise404=True): # TODO: what is this for??
-        qs = self.published()
+    def get_by_overridden_url(self, user, url, raise404=True): # TODO: what is this for??
+        queryset = self.published(user)
         try:
-            return qs.get(overridden_url=url, override_url=True)
+            return queryset.get(overridden_url=url, override_url=True)
         except AssertionError:
-            return qs.filter(overridden_url=url, override_url=True)[0]
+            return queryset.filter(overridden_url=url, override_url=True)[0]
         except Page.DoesNotExist:
             if raise404:
-                raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
+                raise Http404, unicode(_('Page does not exist. No page with overridden url "%s" was found.' % url))
 
 class PageSiteManager(PageManager, CurrentSiteManager):
     pass
@@ -117,7 +117,7 @@ class Page(models.Model):
     in_navigation = models.BooleanField(_('display in navigation'), default=True)
 
     # Access
-    requires_login = models.BooleanField(_('requires login'), help_text=_('If checked, only logged-in users can view the page.'))
+    requires_login = models.BooleanField(_('requires login'), help_text=_('If checked, only logged-in users can view the page. Automatically enabled if the parent page requires a login.'))
     
     #(not implemented yet)
     #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', null=True, blank=True)
@@ -201,8 +201,8 @@ class Page(models.Model):
             parent = parent.parent
         return PathList(reversed(path))
 
-    def on_path(self, super):
-        return super in self.get_path()
+    def on_path(self, path):
+        return path in self.get_path()
 
     def get_absolute_url(self, language=None):
         if self.redirect_to:
@@ -234,6 +234,15 @@ class Page(models.Model):
     def get_next_position(self):
         children = Page.objects.filter(parent=self).order_by('-position')
         return children and (children[0].position+1) or 1
+
+    def get_descendants(self):
+        children = set()
+        pages = Page.objects.filter(parent=self)
+        for page in pages:
+            children.add(page)
+            for subpage in page.get_children():
+                children.add(subpage)
+        return children
 
     def get_level(self):
         parent = self.parent

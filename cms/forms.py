@@ -109,9 +109,9 @@ class PageForm(forms.ModelForm):
     template = forms.ChoiceField(choices=TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
     start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
     end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
-#    not yet implemented
-#    change_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('change access level'), help_text=_('Select groups which are allowed to edit this page.'))
-#    view_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('view access level'), help_text=_('If groups are selected, only these groups are allowed to view this page and every page rooted under it.'))
+    # not yet implemented
+    # change_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('change access level'), help_text=_('Select groups which are allowed to edit this page.'))
+    # view_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('view access level'), help_text=_('If groups are selected, only these groups are allowed to view this page and every page rooted under it.'))
 
     class Meta:
         model = Page
@@ -134,7 +134,7 @@ class PageForm(forms.ModelForm):
             if (not self.instance.id or self.instance.parent) and not self.cleaned_data.get('parent'):
                 raise forms.ValidationError(_('Please choose in which category the page should belong.'))
         return self.cleaned_data.get('parent')
-    
+
     def clean_end_publish_date(self):
         end_publish_date = self.cleaned_data.get('end_publish_date')
         if end_publish_date and end_publish_date.hour == 0 and end_publish_date.minute == 0 and end_publish_date.second == 0:
@@ -144,14 +144,28 @@ class PageForm(forms.ModelForm):
 
     def save(self):
         old_parent = self.instance.parent
+        old_requires_login = self.instance.requires_login
+        new_requires_login = self.cleaned_data.get('requires_login')
+
         instance = super(PageForm, self).save(commit=False)
         parent = instance.parent
 
         if not instance.id or old_parent != parent:
             instance.position = parent and parent.get_next_position() or 1
 
+        # Set requires_login to the value of parent
+        if not instance.id:
+            if parent.requires_login and not new_requires_login:
+                instance.requires_login = parent.requires_login
+
         instance.save()
         self.save_m2m()
+
+        # Set requires_login of all children if changed
+        if instance.id and old_requires_login != new_requires_login:
+            for child in instance.get_descendants():
+                child.requires_login = new_requires_login
+                child.save()
         return instance
 
 class PageContentForm(dynamicforms.Form):
