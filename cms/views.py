@@ -8,11 +8,15 @@ from django.template import RequestContext, Template, loader, TemplateDoesNotExi
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import translation
 from django.utils.translation import ugettext as _
+from django.contrib.sites.models import Site, RequestSite
 
 from cms.forms import SearchForm
 from cms.models import Page, RootPageDoesNotExist
 from cms.util import PositionDict, language_list, resolve_dotted_path
-from cms.cms_global_settings import *
+from cms.conf.global_settings import SITE_TITLE, TEMPLATETAGS, POSITIONS, \
+                                     DEFAULT_TEMPLATE, LANGUAGE_DEFAULT, \
+                                     DISPLAY_ROOT, LANGUAGE_REDIRECT, \
+                                     REQUIRE_LOGIN
 
 def get_page_context(request, language, page, extra_context={}):
     context = RequestContext(request)
@@ -59,8 +63,7 @@ def render_page(request, language, page, template_name=None, preview=None, args=
     A template_name can be given to override the default page template.
     A PageContent object can be passed as a preview.
     """
-
-    if not Page.objects.root().published(request.user) or \
+    if not Page.on_site.root().published(request.user) or \
         not page.published(request.user) or \
         page.requires_login and \
         not request.user.is_authenticated():
@@ -150,18 +153,18 @@ def handle_page(request, language, url):
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overridden URL
-    pages = Page.objects.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
+    pages = Page.on_site.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
     if pages:
         return render_page(request, language, pages[0])
 
     # If not, go and look it up
     parts = url and url.split('/') or []
 
-    root = Page.objects.root()
+    root = Page.on_site.root()
 
     if not parts and not DISPLAY_ROOT:
         try:
-            return HttpResponseRedirect(Page.objects.filter(parent=root)[0].get_absolute_url(language))
+            return HttpResponseRedirect(Page.on_site.filter(parent=root)[0].get_absolute_url(language))
         except IndexError:
             raise RootPageDoesNotExist, unicode(_('Please create at least one subpage or enable DISPLAY_ROOT.'))
 
@@ -236,9 +239,6 @@ def handler(request):
 
     return handle_page(request, language, url[1:-1])
 
-if REQUIRE_LOGIN:
-    handler = staff_member_required(handler)
-
 def search(request, form_class=SearchForm, extra_context={}, 
         template_name="cms/search.html"):
     """
@@ -247,7 +247,7 @@ def search(request, form_class=SearchForm, extra_context={},
     """
 
     language = request.LANGUAGE_CODE[:2]
-    page = Page.objects.root()
+    page = Page.on_site.root()
     context = get_page_context(request, language, page)
 
     if request.GET.get('query', False):
@@ -258,9 +258,9 @@ def search(request, form_class=SearchForm, extra_context={},
             query = search_form.cleaned_data['query']
 
             # perform actual search
-            search_results = Page.objects.search(request.user, query, language)
+            search_results = Page.on_site.search(request.user, query, language)
             page_ids = [res['id'] for res in search_results.values('id')]
-            search_results_ml = Page.objects.search(request.user, query).exclude(id__in=page_ids)
+            search_results_ml = Page.on_site.search(request.user, query).exclude(id__in=page_ids)
 
             # update context to contain query and search results
             context.update({
@@ -276,3 +276,7 @@ def search(request, form_class=SearchForm, extra_context={},
     })
     return render_to_response(template_name, extra_context,
         context_instance=RequestContext(request, context))
+
+if REQUIRE_LOGIN:
+    handler = staff_member_required(handler)
+    search = staff_member_required(search)

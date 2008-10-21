@@ -1,16 +1,26 @@
 import datetime
 
 from django.conf import settings
+from django.db.models import get_app
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django import forms
 from django.forms.widgets import SelectMultiple
 from django.forms.fields import slug_re
+from django.core.exceptions import ImproperlyConfigured
 
-from cms import cms_global_settings
-from cms import dynamicforms, util
-from cms.cms_global_settings import *
+from cms import dynamicforms
+from cms.util import flatten
 from cms.models import Page, PageContent
+from cms.conf.global_settings import TEMPLATES, POSITIONS, USE_TINYMCE, SEO_FIELDS
+
+# Look if django-tagging is installed, use its TagField and fall back to
+# Django's CharField if unavailable.
+try:
+    tagging = get_app("tagging")
+    from tagging.forms import TagField
+except ImproperlyConfigured:
+    from django.forms import CharField as TagField
 
 DATETIME_FORMATS = (
     '%d.%m.%Y %H:%M:%S',     # '25.10.2006 14:30:59'
@@ -76,6 +86,7 @@ PAGE_FIELDS = (
     'requires_login', 
     'start_publish_date', 
     'end_publish_date',
+    'sites',
 )
 PAGECONTENT_FIELDS = (
     'language', 
@@ -95,7 +106,7 @@ PAGECONTENT_FIELDS = (
 
 class PageForm(forms.ModelForm):
     slug = SlugField()
-    template = forms.ChoiceField(choices=cms_global_settings.TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
+    template = forms.ChoiceField(choices=TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
     start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
     end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
 #    not yet implemented
@@ -109,10 +120,10 @@ class PageForm(forms.ModelForm):
     def __init__(self, request, instance=None):
         super(PageForm, self).__init__(request.method == 'POST' and request.POST or None, instance=instance)
         choices = [('', '--------')]
-        choices += [(p.id, smart_unicode(p.get_path())) for p in util.flatten(Page.objects.hierarchy()) if instance not in p.get_path()]
+        choices += [(p.id, smart_unicode(p.get_path())) for p in flatten(Page.objects.hierarchy()) if instance not in p.get_path()]
         self.fields['parent'].choices = choices
         choices = [('', '--------')]
-        choices += cms_global_settings.TEMPLATES
+        choices += TEMPLATES
         self.fields['template'].choices = choices
 
     def clean_parent(self):
@@ -140,6 +151,7 @@ class PageForm(forms.ModelForm):
             instance.position = parent and parent.get_next_position() or 1
 
         instance.save()
+        self.save_m2m()
         return instance
 
 class PageContentForm(dynamicforms.Form):
@@ -156,7 +168,7 @@ class PageContentForm(dynamicforms.Form):
     title = forms.CharField(max_length=200, required=False, help_text=_('Leave this empty to use the title of the page.'), label=_('title'))
     slug = SlugField(required=False, help_text=_('Only specify this if you want to give this page content a specific slug.'), label=_('slug'))
     page_title = forms.CharField(max_length=200, required=False, help_text=_('Used for page title. Should be no longer than 150 chars.'), label=_('page title'))
-    keywords = forms.CharField(max_length=200, required=False, help_text=_('Comma separated'), label=_('keywords'))
+    keywords = TagField(max_length=200, required=False, help_text=_('Comma separated'), label=_('keywords'))
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))
     page_topic = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 5, 'cols': 80}), label=_('page topic'))
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), label=_('content'))

@@ -14,8 +14,7 @@ from cms.views import render_page
 from cms.models import Page, PageContent
 from cms.forms import PageForm, PageContentForm, PAGECONTENT_FIELDS
 from cms.decorators import json
-from cms.cms_global_settings import *
-
+from cms.conf.global_settings import PAGE_ADDONS, USE_TINYMCE
 
 class NavigationForm(dynamicforms.Form):
     in_navigation = forms.BooleanField(required=False)
@@ -85,6 +84,7 @@ class PageAdmin(admin.ModelAdmin):
                 pagecontent_forms = PageContentForm.get_forms(request)
                 pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
             if form.is_valid() and (add or pagecontent_forms.are_valid()):
+                print form.cleaned_data
                 page = form.save()
 
                 if not add:
@@ -126,14 +126,13 @@ class PageAdmin(admin.ModelAdmin):
 
         return render_to_response('cms/page_add.html', {
                 'title': u'%s %s' % (add and _('Add') or _('Edit'), _('page')),
-                'page':page,
-                'form':form,
+                'page': page,
+                'form': form,
                 'add':add,
-                'page_contents':page_contents,
+                'page_contents': page_contents,
                 'page_addons': PAGE_ADDONS,
-                'use_tinymce': unicode(USE_TINYMCE),
-                'pagecontent_template':PageContentForm().render_js('from_template'),
-                'pagecontent_data':pagecontent_data,
+                'pagecontent_template': PageContentForm().render_js('from_template'),
+                'pagecontent_data': pagecontent_data,
                 'use_tinymce': USE_TINYMCE,
                 'root_path': self.admin_site.root_path,
                 'media': mark_safe(media),

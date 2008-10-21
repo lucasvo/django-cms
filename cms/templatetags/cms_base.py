@@ -4,7 +4,7 @@ from django.utils.html import escape
 from django.utils.translation import get_language
 
 from cms.models import Page
-from cms.cms_global_settings import *
+from cms.conf.global_settings import LANGUAGE_NAME_OVERRIDE
 
 register = template.Library()
 
@@ -21,13 +21,13 @@ class CmsSubpagesNode(template.Node):
         nav = template.resolve_variable(self.nav, context)
         try:
             if not isinstance(nav, Page):
-                page = Page.objects.get(pk=nav)
+                page = Page.on_site.get(pk=nav)
             else:
                 page = nav
         except Page.DoesNotExist:
             context[self.varname] = None
         else:
-            pages = Page.objects.filter(parent=page, in_navigation=True)
+            pages = Page.on_site.in_navigation().filter(parent=page)
             context[self.varname] = pages
         return ''
 
@@ -51,7 +51,7 @@ class CmsNavigationNode(template.Node):
         except template.VariableDoesNotExist:
             return ''
         if self.level >= 0 and self.level <= len(path):
-            pages = Page.objects.filter(in_navigation=True)
+            pages = Page.on_site.in_navigation()
             if self.level == 0:
                 pages = pages.filter(parent__isnull=True)
             else:
@@ -119,7 +119,7 @@ class CmsLinkNode(template.Node):
         language = self.language and template.resolve_variable('language', context) or get_language()
         if isinstance(page, int):
             try:
-                page = Page.objects.get(pk=page)
+                page = Page.on_site.get(pk=page)
             except Page.DoesNotExist:
                 return self.html and '<a href="#">(none)</a>' or '#'
 
@@ -169,9 +169,9 @@ class CmsIsSubpageNode(template.Node):
         page = template.resolve_variable(self.page, context)
 
         if isinstance(page, int):
-            page = Page.objects.get(pk=page)
+            page = Page.on_site.get(pk=page)
         if isinstance(sub_page, int):
-            sub_page = Page.objects.get(pk=sub_page)
+            sub_page = Page.on_site.get(pk=sub_page)
 
         while sub_page:
             if sub_page == page:

@@ -26,10 +26,11 @@
 <div class="form-row">{{ form.title.errors }}<label for="{{ form.title.auto_id }}">{{ form.title.label|capfirst }}</label>{{ form.title }}<p class="help">{{ form.title.help_text }}</p></div>
 <div class="form-row">{{ form.slug.errors }}<label for="{{ form.slug.auto_id }}">{{ form.slug.label|capfirst }}</label>{{ form.slug }}<p class="help">{{ form.slug.help_text }}</p></div>
 
-
 <div class="form-row">{{ form.content.errors }}<label for="{{ form.content.auto_id }}">{{ form.content.label|capfirst }}</label>{{ form.content }}</div>
-  <div class="form-row"><label>{% trans 'Actions' %}</label>
-  <!--<div><a class="preview" href="#" id="id_{{ form.prefix }}-preview.#">{% trans 'Preview this page' %}</a> <p class="help">{% trans 'Previews this page in a new window without saving it.' %}</div>-->
+<div class="form-row">{{ form.keywords.errors }}<label for="{{ form.keywords.auto_id }}">{{ form.keywords.label|capfirst }}</label>{{ form.keywords }}<p class="help">{{ form.keywords.help_text }}</p></div>
+
+<div class="form-row"><label>{% trans 'Actions' %}</label>
+<!--<div><a class="preview" href="#" id="id_{{ form.prefix }}-preview.#">{% trans 'Preview this page' %}</a> <p class="help">{% trans 'Previews this page in a new window without saving it.' %}</div>-->
 <div><ul class="object-tools"><li><a href="preview/" target="_blank" class="pagecontent-preview viewsitelink">{% trans 'Preview' %}</a></li></ul></div>
 <p class="help">{% trans '(in a new window without saving it)' %}</p>
 

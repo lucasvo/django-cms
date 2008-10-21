@@ -1,9 +1,7 @@
 from django import template
-#from django.contrib.admin.templatetags.admin_modify import TabularBoundRelatedObject
-#from django.contrib.admin.templatetags.admin_modify import StackedBoundRelatedObject
 from django.template import loader
 from django.conf import settings
-from cms import cms_global_settings as cms_settings
+from cms.conf.global_settings import PAGE_ADDONS
 
 register = template.Library()
 
@@ -24,7 +22,7 @@ class EditInlineNode(template.Node):
         from django.db import models
         relation = self.rel_var.resolve(context)
         add_on_name = u'%s.%s' % (relation.model.__module__, relation.model.__name__)
-        if add_on_name in cms_settings.PAGE_ADDONS:
+        if add_on_name in PAGE_ADDONS:
             context.push()
             """
             if relation.field.rel.edit_inline == models.TABULAR:

@@ -22,9 +22,11 @@ urlpatterns = patterns('',
     (r'', include('cms.urls')),
 )
 
-
 settings.py
 ===========
+
+Required
+--------
 
 Make sure LocaleMiddleware (either cms.middleware.locale.LocaleMiddleware or 
 django.middleware.locale.LocaleMiddleware) is in your MIDDLEWARE_CLASSES:
@@ -53,3 +55,17 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.load_template_source',
 )
 
+Optional
+--------
+
+For the reStructuredText markup formatter you may want to set some settings
+to make it more secure.
+
+Find more options for the rst formatter at http://docutils.sourceforge.net/docs/user/config.html
+
+RESTRUCTUREDTEXT_FILTER_SETTINGS = {
+    'cloak_email_addresses': True,
+    'file_insertion_enabled': False,
+    'raw_enabled': False,
+    'strip_comments': True,
+}

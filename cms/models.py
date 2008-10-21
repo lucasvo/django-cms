@@ -8,13 +8,24 @@ from django.utils.dateformat import DateFormat
 from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q, get_app
 from django.utils import translation
 from django.utils.html import linebreaks, escape
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.markup.templatetags.markup import markdown, textile, \
                                                       restructuredtext as rst
 from cms.util import language_list, MetaTag
-from cms.cms_global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
+from cms.conf.global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
+
+# Look if django-tagging is installed, use its TagField and fall back to
+# Django's CharField if unavailable.
+try:
+    tagging = get_app("tagging")
+    from tagging.fields import TagField
+except ImproperlyConfigured:
+    from django.models import CharField as TagField
 
 PROTOCOL_RE = re.compile('^\w+://')
 
@@ -49,6 +60,9 @@ class PageManager(models.Manager):
             Q(end_publish_date__gte=now) | Q(end_publish_date__isnull=True),
         )
 
+    def in_navigation(self):
+        return self.filter(in_navigation=True)
+
     def search(self, user, query, language=None):
         queryset = self.published(user)
         if language:
@@ -69,8 +83,8 @@ class PageManager(models.Manager):
             )
         return queryset.distinct()
 
-    def get_by_overridden_url(self, url, raise404=True):
-        qs = self.published() # TODO: what is this for??
+    def get_by_overridden_url(self, url, raise404=True): # TODO: what is this for??
+        qs = self.published()
         try:
             return qs.get(overridden_url=url, override_url=True)
         except AssertionError:
@@ -79,12 +93,16 @@ class PageManager(models.Manager):
             if raise404:
                 raise Http404, u'Page does not exist. No page with overridden url "%s" was found.' % url
 
+class PageSiteManager(PageManager, CurrentSiteManager):
+    pass
+
+
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'))
     slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
 
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
 
     template = models.CharField(max_length=200, null=True, blank=True)
     context = models.CharField(max_length=200, null=True, blank=True, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'))
@@ -100,9 +118,10 @@ class Page(models.Model):
 
     # Access
     requires_login = models.BooleanField(_('requires login'), help_text=_('If checked, only logged-in users can view the page.'))
+    
     #(not implemented yet)
-    #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
-    #view_access_level = models.ManyToManyField(Group, verbose_name=_('view access level'), related_name='view_page_set', filter_interface=models.VERTICAL, null=True, blank=True)
+    #change_access_level = models.ManyToManyField(Group, verbose_name=_('change access level'), related_name='change_page_set', null=True, blank=True)
+    #view_access_level = models.ManyToManyField(Group, verbose_name=_('view access level'), related_name='view_page_set', null=True, blank=True)
 
     # Override the page URL or redirect the page to another page.
     override_url = models.BooleanField(default=False)
@@ -111,7 +130,10 @@ class Page(models.Model):
 
     is_editable = models.BooleanField(default=True)
 
+    sites = models.ManyToManyField(Site, null=True, blank=True, default=[settings.SITE_ID], help_text=_('The site(s) the page is accessible at.'))
+
     objects = PageManager()
+    on_site = PageSiteManager('sites')
 
     class Meta:
         ordering = ('position', 'title',)
@@ -122,8 +144,6 @@ class Page(models.Model):
         return self.title
 
     def save(self):
-        if not self.id:
-            self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         self.overridden_url = self.overridden_url.strip('/ ')
         super(Page, self).save()
@@ -232,7 +252,7 @@ class Page(models.Model):
     smart_slug = property(smart_slug)
 
     def published(self, user):
-        return self in Page.objects.published(user)
+        return self in Page.on_site.published(user)
     published.boolean = True
     
     def get_meta_tags(self, language=None):
@@ -262,17 +282,17 @@ class PageContent(models.Model):
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'text')
     allow_template_tags = models.BooleanField(default=True)
 
-    created = models.DateTimeField(null=True, blank=True)
-    modified = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
 
     template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
 
-    position = models.CharField(max_length=32, null=True, blank=True, choices=POSITIONS)
+    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS])
 
     title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
     slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'))
     page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
-    keywords = models.CharField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
+    keywords = TagField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
     description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     page_topic = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     content = models.TextField()
@@ -289,7 +309,7 @@ class PageContent(models.Model):
             self.keywords = ''
         if not self.page_topic:
             self.page_topic = ''
-    
+
         # Convert the content to HTML
         if self.content_type == 'html':
             pass # Nothing to do
@@ -304,8 +324,6 @@ class PageContent(models.Model):
         return self
 
     def save(self):
-        if not self.id:
-            self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
         super(PageContent, self).save()
 

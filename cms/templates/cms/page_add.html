@@ -89,7 +89,7 @@ Window.onDomReady(function(){
                     {% render_field form.start_publish_date %}
                     {% render_field form.end_publish_date %}
                     {% render_field form.context %}
-                    {% render_field form.site %}
+                    {% render_field form.sites %}
                 </fieldset>
             </div>  
             {% if page_addons and not add %}
@@ -104,7 +104,7 @@ Window.onDomReady(function(){
             {% endif %}
         </div>
     </div>  
-        <div class="clearfix"></div>
+    <div class="clearfix"></div>
     {% include 'cms/page_submit_row.html' %}
 </form>
 {% endblock %}
