@@ -1,6 +1,11 @@
+import datetime
+
+from django.db import models
+from django.db.models import Q, get_app
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.sites.managers import CurrentSiteManager
+from django.utils.translation import ugettext as _
 
 class RootPageDoesNotExist(Exception):
     pass
@@ -34,7 +39,22 @@ class PageManager(models.Manager):
         )
 
     def in_navigation(self):
+        """
+        Returns a queryset representing Page objects that are in the
+        navigation.
+        """
         return self.filter(in_navigation=True)
+    
+    def overridden(self, url):
+        """
+        Returns a queryset representing Page objects that have an overridden
+        URL.
+        """
+        return self.filter(
+            override_url=True, 
+            overridden_url=url,
+            redirect_to__isnull=True
+        )
 
     def search(self, user, query, language=None):
         queryset = self.published(user)

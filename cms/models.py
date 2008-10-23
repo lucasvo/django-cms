@@ -10,11 +10,11 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q, get_app
-from django.utils import translation
-from django.utils.html import linebreaks, escape
+from django.utils import translation, html
 from django.contrib.sites.models import Site
-from django.contrib.markup.templatetags.markup import markdown, textile, \
-                                                      restructuredtext as rst
+from django.contrib.markup.templatetags import markup
+
+from cms import pagecontents
 from cms.util import language_list, MetaTag
 from cms.conf.global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 from cms.managers import PageManager, PageSiteManager
@@ -83,43 +83,48 @@ class Page(models.Model):
     def get_content(self, language=None, all=False, position=''):
         if not language:
             language = translation.get_language()
-        published_page_contents = self.pagecontent_set.filter(is_published=True, position=position)
+        
+        page_content_list = []
+        for model in pagecontents.models:
+            # get correct name for pagecontent releationmanager
+            pagecontent_set = getattr(self, '%(class)s_related' % {
+                'class': model.__name__.lower()
+            }, None)
+            if pagecontent_set is None:
+                continue
+            published_page_contents = pagecontent_set.filter(is_published=True, position=position)
 
-        page_content = None
+            page_content = None
 
-        # Determine the PageContent we want to render
-        page_contents = published_page_contents.filter(language=language)
-        if page_contents:
-            if all:
-                page_content = page_contents
+            # Determine the PageContent we want to render
+            page_contents = published_page_contents.filter(language=language)
+            if page_contents:
+                if all:
+                    page_content = page_contents
+                else:
+                    page_content = page_contents[0]
             else:
-                page_content = page_contents[0]
-        else:
-            # Use a PageContent in an alternative language
-            for alt_language in language_list():
-                if alt_language == language:
-                    continue
-                page_contents = published_page_contents.filter(language=alt_language)
-                if page_contents:
-                    if all:
-                        page_content = page_contents
-                    else:
-                        page_content = page_contents[0]
-                    break
+                # Use a PageContent in an alternative language
+                for alt_language in language_list():
+                    if alt_language == language:
+                        continue
+                    page_contents = published_page_contents.filter(language=alt_language)
+                    if page_contents:
+                        if all:
+                            page_content = page_contents
+                        else:
+                            page_content = page_contents[0]
+                        break
 
+            if not page_content:
+                continue
 
-        if not page_content:
-            # TODO: What's better?
-            # return None
-            page_content = PageContent(page=self)
-            if all:
-                page_content = [PageContent(page=self)]
-
-        if all and page_content:
-            for c in page_content:
-                c.prepare()
-            return page_content
-        return page_content.prepare()
+            if all and page_content:
+                for c in page_content:
+                    c.prepare()
+                page_content_list.append(page_content)
+            page_content_list.append(page_content.prepare())
+        return page_content_list
 
     def get_path(self):
         class PathList(list):
@@ -210,6 +215,22 @@ class Page(models.Model):
         return tags
 
 class PageContent(models.Model):
+    page = models.ForeignKey(Page, related_name="%(class)s_related")
+    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
+    is_published = models.BooleanField(default=True)
+    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS])
+    order = models.IntegerField()
+
+    class Meta:
+        abstract = True
+
+    def save(self):
+        self.modified = datetime.datetime.now()
+        super(PageContent, self).save()
+
+class TextPageContent(PageContent):
     CONTENT_TYPES = (
         ('html', _('HTML')),
         ('markdown', _('Markdown')),
@@ -217,18 +238,9 @@ class PageContent(models.Model):
         ('rst', _('reStructuredText')),
         ('text', _('Plain text')),
     )
-    page = models.ForeignKey(Page)
-    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
-    is_published = models.BooleanField(default=True)
     content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default=USE_TINYMCE and 'html' or 'text')
     allow_template_tags = models.BooleanField(default=True)
-
-    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
-    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
-
     template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
-
-    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS])
 
     title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
     slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'))
@@ -255,23 +267,18 @@ class PageContent(models.Model):
         if self.content_type == 'html':
             pass # Nothing to do
         elif self.content_type == 'markdown':
-            self.content = markdown(self.content)
+            self.content = markup.markdown(self.content)
         elif self.content_type == 'textile':
-            self.content = textile(self.content)
+            self.content = markup.textile(self.content)
         elif self.content_type == 'rst':
-            self.content = rst(self.content)
+            self.content = markup.restructuredtext(self.content)
         else:
-            self.content = mark_safe(linebreaks(escape(self.content)))
+            self.content = mark_safe(html.linebreaks(html.escape(self.content)))
         return self
-
-    def save(self):
-        self.modified = datetime.datetime.now()
-        super(PageContent, self).save()
 
     def __unicode__(self):
         created = self.created and (', created: %s' % DateFormat(self.created).format('jS F Y H:i')) or ''
         modified = self.modified and (', modified: %s' % DateFormat(self.modified).format('jS F Y H:i')) or ''
         return u'%s (%s%s%s%s%s)' % (self.title or self.page.title, self.get_language_display(), created, modified, created and ', ' or '', self.is_published and _('published') or _('unpublished'))
 
-    def language_bidi(self):
-        return self.language in settings.LANGUAGES_BIDI 
+pagecontents.register(TextPageContent)

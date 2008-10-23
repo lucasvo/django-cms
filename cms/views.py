@@ -9,9 +9,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site, RequestSite
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.utils.http import urlquote
 
 from cms.forms import SearchForm
-from cms.models import Page, RootPageDoesNotExist
+from cms.models import Page
+from cms.managers import RootPageDoesNotExist
 from cms.util import PositionDict, language_list, resolve_dotted_path
 from cms.conf.global_settings import SITE_TITLE, TEMPLATETAGS, POSITIONS, \
                                      DEFAULT_TEMPLATE, LANGUAGE_DEFAULT, \
@@ -56,18 +59,23 @@ def render_pagecontent(page_content, context):
     return page_content.title, content
 
 
-def render_page(request, language, page, template_name=None, preview=None, args=None):
+def render_page(request, language, page, template_name=None, preview=None, 
+        args=None, login_url=settings.LOGIN_URL, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Renders a page in the given language.
 
     A template_name can be given to override the default page template.
     A PageContent object can be passed as a preview.
     """
-    if not Page.on_site.root().published(request.user) or \
-        not page.published(request.user) or \
-        page.requires_login and \
-        not request.user.is_authenticated():
+    # if there is no published root page
+    if not Page.on_site.root().published(request.user) or not page.published(request.user):
         raise Http404
+
+    # if the given page requires login but the user is not authenticated
+    if page.requires_login and not request.user.is_authenticated():
+        path = urlquote(request.get_full_path())
+        redirect_args = login_url, redirect_field_name, path
+        return HttpResponseRedirect('%s?%s=%s' % redirect_args)
 
     # Make translations using Django's i18n work
     translation.activate(language)
@@ -77,6 +85,7 @@ def render_page(request, language, page, template_name=None, preview=None, args=
     content_dict = PositionDict(POSITIONS[0][0])
     title_dict = PositionDict(POSITIONS[0][0])
 
+    # Initialize default context.
     context = get_page_context(request, language, page)
 
     # Call a custom context function for this page, if it exists.
@@ -92,7 +101,6 @@ def render_page(request, language, page, template_name=None, preview=None, args=
         if response:
             return response
 
-
     for n, position in enumerate(POSITIONS):
         position = position[0]
 
@@ -101,14 +109,15 @@ def render_page(request, language, page, template_name=None, preview=None, args=
         else:
             page_content = page.get_content(language, position=position)
 
-        if n == 0:
-            # This is the main page content.
-            context.update({
-                'page_content':page_content,
-                'page_title': page_content.page_title or page_content.title,
-            })
-
-        title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
+        print page_content
+        for content in page_content:
+            if n == 0:
+                # This is the main page content.
+                context.update({
+                    'page_content': content,
+                    'page_title': content.page_title or content.title,
+                })
+            title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
 
     context.update({
         'content': content_dict,
@@ -153,7 +162,7 @@ def handle_page(request, language, url):
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
 
     # First take a look if there's a navigation object with an overridden URL
-    pages = Page.on_site.filter(override_url=True, overridden_url=url, redirect_to__isnull=True)
+    pages = Page.on_site.overridden(url=url)
     if pages:
         return render_page(request, language, pages[0])
 
@@ -173,7 +182,10 @@ def handle_page(request, language, url):
     args = []
 
     for part in parts:
-        pages = parent.page_set.filter(Q(slug=part) | Q(pagecontent__slug=part)) or parent.page_set.filter(slug='*')
+        pages = parent.page_set.filter(
+            Q(slug=part) |
+            Q(pagecontent__slug=part)
+        ) or parent.page_set.filter(slug='*')
         if not pages:
             raise Http404
         parent = pages[0]

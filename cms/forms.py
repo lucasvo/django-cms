@@ -11,7 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms import dynamicforms
 from cms.util import flatten
-from cms.models import Page, PageContent
+from cms.models import Page, PageContent, TextPageContent
 from cms.conf.global_settings import TEMPLATES, POSITIONS, USE_TINYMCE, SEO_FIELDS
 
 # Look if django-tagging is installed, use its TagField and fall back to
@@ -186,12 +186,12 @@ class PageContentForm(dynamicforms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 10, 'cols': 80}), label=_('description'))
     page_topic = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 5, 'cols': 80}), label=_('page topic'))
     content = forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 80}), label=_('content'))
-    content_type = forms.ChoiceField(choices=PageContent.CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'text', label=_('content type'))
+    content_type = forms.ChoiceField(choices=TextPageContent.CONTENT_TYPES, initial=USE_TINYMCE and 'html' or 'text', label=_('content type'))
     allow_template_tags = forms.BooleanField(required=False, initial=True, label=_('allow template tags'))
     template = forms.CharField(max_length=200, required=False, label=_('template (optional)'))
 
     def __unicode__(self):
-        return self.id and smart_unicode(PageContent.objects.get(pk=self.id)) or _('New page content')
+        return self.id and smart_unicode(TextPageContent.objects.get(pk=self.id)) or _('New page content')
 
     def from_template(self, extra_context={}):
         extra_context.update({'use_seo': SEO_FIELDS})

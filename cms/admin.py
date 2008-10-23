@@ -6,8 +6,9 @@ from django.contrib.admin.util import unquote
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django import forms
+from django.forms.models import modelform_factory
 
+from cms import dynamicforms
 from cms.util import set_values, get_values
 from cms.views import render_page
 from cms.models import Page, TextPageContent
@@ -70,11 +71,16 @@ class PageAdmin(admin.ModelAdmin):
             form = PageForm(request)
             add = True
 
-        page_contents = not add and page.pagecontent_set.all()
-
+        text_form = modelform_factory(TextPageContent, form=dynamicforms.DynamicModelForm)
+        print dir(page)
+        print 
+        page_contents = not add and page.textpagecontent_set.all()
+        
         pagecontent_data = None
 
         if request.method == 'POST':
+            print text_form.get_forms(request)
+            
             if not add:
                 pagecontent_forms = PageContentForm.get_forms(request)
                 pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
