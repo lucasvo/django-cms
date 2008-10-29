@@ -1,7 +1,5 @@
 {% load i18n %}
-<h2>{{ form }}</h2>
 <div class="pagecontent-content">
-
 <div class="form-row">{{ form.position.errors }}{{ form.language.errors }}{{ form.is_published.errors }}<label class="required">{% trans 'Properties' %}</label>
   <div class="inline"><label for="{{ form.language.auto_id }}" class="required">{{ form.language.label|capfirst }}:</label> {{ form.language }}</div>
   <div class="inline"><label for="{{ form.position.auto_id }}" class="required">{{ form.position.label|capfirst }}:</label> {{ form.position }}</div>

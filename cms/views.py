@@ -1,4 +1,5 @@
 import re
+import operator
 
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -12,6 +13,7 @@ from django.contrib.sites.models import Site, RequestSite
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.utils.http import urlquote
 
+from cms import pagecontents
 from cms.forms import SearchForm
 from cms.models import Page
 from cms.managers import RootPageDoesNotExist
@@ -55,38 +57,39 @@ def render_pagecontent(page_content, context):
         content = template.render(context)
     else:
         content = page_content.content
-
     return page_content.title, content
 
-
 def render_page(request, language, page, template_name=None, preview=None, 
-        args=None, login_url=settings.LOGIN_URL, redirect_field_name=REDIRECT_FIELD_NAME):
+                args=None, extra_context=None, login_url=settings.LOGIN_URL,
+                redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Renders a page in the given language.
 
     A template_name can be given to override the default page template.
     A PageContent object can be passed as a preview.
     """
-    # if there is no published root page
-    if not Page.on_site.root().published(request.user) or not page.published(request.user):
-        raise Http404
-
     # if the given page requires login but the user is not authenticated
     if page.requires_login and not request.user.is_authenticated():
-        path = urlquote(request.get_full_path())
-        redirect_args = login_url, redirect_field_name, path
-        return HttpResponseRedirect('%s?%s=%s' % redirect_args)
+        return redirect_to_login(next=page.get_absolute_url())
+
+    # if there is no published root page
+    if not Page.on_site.root().published(request.user) or \
+            not page.published(request.user):
+        raise Http404
 
     # Make translations using Django's i18n work
     translation.activate(language)
     request.LANGUAGE_CODE = translation.get_language()
 
     # Initialize content/title dicts.
-    content_dict = PositionDict(POSITIONS[0][0])
-    title_dict = PositionDict(POSITIONS[0][0])
+    default = POSITIONS[0][0]
+    content = PositionDict(default)
+    title = PositionDict(default)
 
     # Initialize default context.
-    context = get_page_context(request, language, page)
+    if extra_context is None:
+        extra_context = {}
+    context = get_page_context(request, language, page, extra_context)
 
     # Call a custom context function for this page, if it exists.
     if page.context:
@@ -109,20 +112,17 @@ def render_page(request, language, page, template_name=None, preview=None,
         else:
             page_content = page.get_content(language, position=position)
 
-        print page_content
-        for content in page_content:
+        for pcontent in page_content:
             if n == 0:
                 # This is the main page content.
-                context.update({
-                    'page_content': content,
-                    'page_title': content.page_title or content.title,
-                })
-            title_dict[position], content_dict[position] = render_pagecontent(page_content, context)
-
-    context.update({
-        'content': content_dict,
-        'title': title_dict,
-    })
+                context.update(dict(
+                    page_content=pcontent,
+                    page_title=content.page_title or content.title
+                ))
+            title[position], content[position] = render_pagecontent(page_content, context)
+    if not content:
+        content = u''
+    context.update(dict(content=content, title=title))
 
     # Third processing stage: Use the specified template
     # Templates are chosen in the following order:
@@ -142,21 +142,10 @@ def render_page(request, language, page, template_name=None, preview=None,
             template_path_preview = template_path[:template_path.rfind('.html')] + '_preview.html'
         else:
             template_path_preview += '_preview'
-        try:
-            template = loader.get_template(template_path_preview)
-        except TemplateDoesNotExist:
-            template = loader.get_template(template_path)
+        templates = (template_path_preview, template_path, DEFAULT_TEMPLATE)
     else:
-        try:
-            template = loader.get_template(template_path)
-        except TemplateDoesNotExist:
-            if settings.DEBUG:
-                raise
-            else:
-                template = loader.get_template(DEFAULT_TEMPLATE)
-
-    return HttpResponse(template.render(context))
-
+        templates = (template_path, DEFAULT_TEMPLATE)
+    return render_to_response(templates, context)
 
 def handle_page(request, language, url):
     # TODO: Objects with overridden URLs have two URLs now. This shouldn't be the case.
@@ -182,10 +171,12 @@ def handle_page(request, language, url):
     args = []
 
     for part in parts:
-        pages = parent.page_set.filter(
-            Q(slug=part) |
-            Q(pagecontent__slug=part)
-        ) or parent.page_set.filter(slug='*')
+        # Build OR queries for all related PageContent items
+        or_queries = [Q(slug=part)]
+        for name in pagecontents.get_related_names():
+            or_queries.append(Q(**{'%s__slug' % name: part}))
+
+        pages = parent.page_set.filter(reduce(operator.or_, or_queries)) or parent.page_set.filter(slug='*')
         if not pages:
             raise Http404
         parent = pages[0]

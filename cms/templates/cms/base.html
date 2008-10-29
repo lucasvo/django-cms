@@ -1,11 +1,10 @@
 {% load i18n cms_base %}<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
-<title>{{ site_title }} | {{ title }}</title>
+<title>{{ site_title }}</title>
 {% block extrahead %}{% endblock %}
 </head>
 <body>
-{% block body %}
 
 <!-- Example template -->
 <div class="breadcrumbs">
@@ -37,11 +36,10 @@
 <div id="content">
 {% block content %}
 {{ content }}
-{% endblock %}
+{% endblock content %}
 </div>
 
 <hr />
 <small>{% cms_language_links %}</small>
-{% endblock %}
 </body>
 </html>

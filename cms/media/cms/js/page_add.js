@@ -8,7 +8,7 @@ var PageContent = Form.extend({
         this.fieldset.innerHTML = this.html;
         $('page-contents').adopt(this.fieldset);
         if (typeof(use_tinymce) != 'undefined' && use_tinymce) {
-    		tinyMCE.execCommand('mceAddControl', false, "id_pagecontent-content." + this.id);
+            tinyMCE.execCommand('mceAddControl', false, "id_pagecontent-content." + this.id);
         }
 
         var that = this;
@@ -103,12 +103,6 @@ Window.onDomReady(function(){
                     } else { alert(obj['error']); }
                 }}).send({'action':'delete', 'id':id});
             }
-        }
-    });
-    $$('.page-content-add').addEvents({
-        'click':function(event) {
-            new PageContent();
-            new Event(event).preventDefault();
         }
     });
     var title = $('id_title');

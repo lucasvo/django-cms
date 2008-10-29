@@ -1,5 +1,6 @@
 import re
 import datetime
+import itertools
 
 from django.http import Http404
 from django.db import models
@@ -28,6 +29,9 @@ except ImproperlyConfigured:
     from django.models import CharField as TagField
 
 PROTOCOL_RE = re.compile('^\w+://')
+
+# if getattr(settings, 'CMS_PAGECONTENTS_AUTOREGISTER', False):
+#     pagecontents.autoregister()
 
 class Page(models.Model):
     title = models.CharField(_('title'), max_length=200, help_text=_('The title of the page.'))
@@ -80,50 +84,43 @@ class Page(models.Model):
         self.overridden_url = self.overridden_url.strip('/ ')
         super(Page, self).save()
 
-    def get_content(self, language=None, all=False, position=''):
-        if not language:
-            language = translation.get_language()
-        
-        page_content_list = []
-        for model in pagecontents.models:
+    def get_pagecontents(self, *args, **kwargs):
+        pagecontents_list = []
+        for related_name in pagecontents.get_related_names():
             # get correct name for pagecontent releationmanager
-            pagecontent_set = getattr(self, '%(class)s_related' % {
-                'class': model.__name__.lower()
-            }, None)
+            pagecontent_set = getattr(self, related_name, None)
             if pagecontent_set is None:
                 continue
-            published_page_contents = pagecontent_set.filter(is_published=True, position=position)
+            if kwargs:
+                pagecontents_list.append(pagecontent_set.filter(**kwargs))
+            else:
+                pagecontents_list.append(pagecontent_set.all())
+        return pagecontents_list
 
+    def get_content(self, language=None, position=''):
+        if not language:
+            language = translation.get_language()
+
+        page_content_list = []
+        for published_page_contents in itertools.chain(
+                *self.get_pagecontents(is_published=True, position=position)):
             page_content = None
 
             # Determine the PageContent we want to render
             page_contents = published_page_contents.filter(language=language)
-            if page_contents:
-                if all:
-                    page_content = page_contents
-                else:
-                    page_content = page_contents[0]
-            else:
+            if not page_contents:
                 # Use a PageContent in an alternative language
                 for alt_language in language_list():
                     if alt_language == language:
                         continue
                     page_contents = published_page_contents.filter(language=alt_language)
-                    if page_contents:
-                        if all:
-                            page_content = page_contents
-                        else:
-                            page_content = page_contents[0]
-                        break
 
             if not page_content:
                 continue
 
-            if all and page_content:
-                for c in page_content:
-                    c.prepare()
+            for page_content in page_contents:
+                page_content.prepare()
                 page_content_list.append(page_content)
-            page_content_list.append(page_content.prepare())
         return page_content_list
 
     def get_path(self):
@@ -162,7 +159,7 @@ class Page(models.Model):
                 language = translation.get_language()
             url += u'%s/' % language
 
-        url += u'/'.join([page.smart_slug for page in self.get_path() if page.parent])
+        url += u'/'.join([page.slug for page in self.get_path() if page.parent])
         if not url.endswith('/'):
             url += '/'
         return url
@@ -189,48 +186,62 @@ class Page(models.Model):
             parent = parent.parent
         return level
 
-    def smart_title(self):
-        return self.get_content().title
-    smart_title = property(smart_title)
-
-    def smart_slug(self):
-        return self.get_content().slug
-    smart_slug = property(smart_slug)
-
     def published(self, user):
         return self in Page.on_site.published(user)
     published.boolean = True
     
     def get_meta_tags(self, language=None):
-        if not language:
-            language = translation.get_language()
-        pagecontent_set = self.pagecontent_set.filter(is_published=True, language=language)
-        tags = []
-        tags += [MetaTag(page_content.keywords, 'keywords', lang=page_content.language) 
-            for page_content in pagecontent_set.filter(is_published=True) if page_content.keywords]
-        tags += [MetaTag(page_content.description, 'description', lang=page_content.language) 
-            for page_content in pagecontent_set if page_content.description]
-        tags += [MetaTag(page_content.page_topic, 'page_topic', lang=page_content.language) 
-            for page_content in pagecontent_set if page_content.page_topic]
-        return tags
+        return ""
+        # if not language:
+        #     language = translation.get_language()
+        # pagecontent_set = self.pagecontent_set.filter(is_published=True, language=language)
+        # tags = []
+        # tags += [MetaTag(page_content.keywords, 'keywords', lang=page_content.language) 
+        #     for page_content in pagecontent_set.filter(is_published=True) if page_content.keywords]
+        # tags += [MetaTag(page_content.description, 'description', lang=page_content.language) 
+        #     for page_content in pagecontent_set if page_content.description]
+        # tags += [MetaTag(page_content.page_topic, 'page_topic', lang=page_content.language) 
+        #     for page_content in pagecontent_set if page_content.page_topic]
+        # return tags
 
-class PageContent(models.Model):
-    page = models.ForeignKey(Page, related_name="%(class)s_related")
+class BasePageContent(models.Model):
+    page = models.ForeignKey(Page, related_name="%(class)s_related", null=True, blank=True)
+    
+    title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
+    slug = models.CharField(_('slug'), max_length=50, null=True, blank=True, help_text=_('Only specify this if you want to give this page content a specific slug.'))
+    page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
+    
     language = models.CharField(max_length=2, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
     is_published = models.BooleanField(default=True)
+    
     created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
     modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
-    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS])
-    order = models.IntegerField()
+    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS], default=POSITIONS[0][0])
+    order = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return u'%s (%s %s %s %s)' % (
+            self.title or self.page.title,
+            self.get_language_display(),
+            self.created,
+            self.modified,
+            self.is_published and _('published') or _('unpublished')
+        )
 
     class Meta:
         abstract = True
 
     def save(self):
         self.modified = datetime.datetime.now()
-        super(PageContent, self).save()
+        super(BasePageContent, self).save()
+    
+    def prepare(self):
+        """
+        Override in subclass to to do anything to prepare the pagecontent
+        """
+        raise NotImplemented
 
-class TextPageContent(PageContent):
+class TextPageContent(BasePageContent):
     CONTENT_TYPES = (
         ('html', _('HTML')),
         ('markdown', _('Markdown')),
@@ -242,43 +253,33 @@ class TextPageContent(PageContent):
     allow_template_tags = models.BooleanField(default=True)
     template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
 
-    title = models.CharField(max_length=200, null=True, blank=True, help_text=_('Used in navigation. Leave this empty to use the default title.'))
-    slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'))
-    page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
     keywords = TagField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
     description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     page_topic = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
-    content = models.TextField()
+
+    content = models.TextField(null=True, blank=True)
+    content_html = models.TextField(null=True, blank=True)
+
+    def save(self):
+        # Convert the content to HTML
+        if self.content_type == 'html':
+            self.content_html = self.content
+        elif self.content_type == 'markdown':
+            self.content_html = markup.markdown(self.content)
+        elif self.content_type == 'textile':
+            self.content_html = markup.textile(self.content)
+        elif self.content_type == 'rst':
+            self.content_html = markup.restructuredtext(self.content)
+        else:
+            self.content_html = mark_safe(html.linebreaks(html.escape(self.content)))
+        super(TextPageContent, self).save()
 
     def prepare(self):
-        # Set the template and title for the page content, if they are not set (but don't save them)
+        # Set the template and title for the page content
+        # if they are not set (but don't save them)
         self.title = self.title or self.page.title
         self.template = self.template or self.page.template
         self.slug = self.slug or self.page.slug
-
-        if not self.description:
-            self.description = ''
-        if not self.keywords:
-            self.keywords = ''
-        if not self.page_topic:
-            self.page_topic = ''
-
-        # Convert the content to HTML
-        if self.content_type == 'html':
-            pass # Nothing to do
-        elif self.content_type == 'markdown':
-            self.content = markup.markdown(self.content)
-        elif self.content_type == 'textile':
-            self.content = markup.textile(self.content)
-        elif self.content_type == 'rst':
-            self.content = markup.restructuredtext(self.content)
-        else:
-            self.content = mark_safe(html.linebreaks(html.escape(self.content)))
         return self
-
-    def __unicode__(self):
-        created = self.created and (', created: %s' % DateFormat(self.created).format('jS F Y H:i')) or ''
-        modified = self.modified and (', modified: %s' % DateFormat(self.modified).format('jS F Y H:i')) or ''
-        return u'%s (%s%s%s%s%s)' % (self.title or self.page.title, self.get_language_display(), created, modified, created and ', ' or '', self.is_published and _('published') or _('unpublished'))
 
 pagecontents.register(TextPageContent)

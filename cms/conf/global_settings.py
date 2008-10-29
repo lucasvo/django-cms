@@ -50,7 +50,7 @@ USE_TINYMCE = getattr(settings, 'CMS_USE_TINYMCE', False)
 # Specify multiple content positions here.
 # For example, you can have a separate page content for a sidebar.
 POSITIONS = getattr(settings, 'CMS_POSITIONS', (
-    ('', ugettext('Default')),
-#    ('left', _('Left column')),
-#    ('right', _('Right column')),
+    (u'',        ugettext('Default')),
+    (u'left',    ugettext('Left column')),
+    (u'right',   ugettext('Right column')),
 ))

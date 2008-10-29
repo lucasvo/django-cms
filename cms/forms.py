@@ -11,7 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from cms import dynamicforms
 from cms.util import flatten
-from cms.models import Page, PageContent, TextPageContent
+from cms.models import Page, BasePageContent, TextPageContent
 from cms.conf.global_settings import TEMPLATES, POSITIONS, USE_TINYMCE, SEO_FIELDS
 
 # Look if django-tagging is installed, use its TagField and fall back to

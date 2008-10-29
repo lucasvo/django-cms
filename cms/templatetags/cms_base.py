@@ -200,7 +200,10 @@ def yesno(value):
 cms_yesno = register.filter('cms_yesno', yesno)
 
 def content_title(page, language):
-    return page.get_content(language).title
+    content = page.get_content(language)
+    if content:
+        return content
+    return ''
 get_content_title = register.filter('cms_get_content_title', content_title)
 
 class CmsPaginationNode(template.Node):

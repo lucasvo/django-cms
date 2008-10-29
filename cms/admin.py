@@ -1,3 +1,5 @@
+import itertools
+
 from django.contrib import admin
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
@@ -6,9 +8,9 @@ from django.contrib.admin.util import unquote
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django.forms.models import modelform_factory
+from django.forms.models import modelform_factory, modelformset_factory
 
-from cms import dynamicforms
+from cms import dynamicforms, pagecontents
 from cms.util import set_values, get_values
 from cms.views import render_page
 from cms.models import Page, TextPageContent
@@ -58,6 +60,23 @@ class PageAdmin(admin.ModelAdmin):
         else:
             return super(PageAdmin, self).__call__(request, url)
 
+    def dynamic_modelform_factory(self, model, *args, **kwargs):
+        return modelform_factory(model=model,
+            form=dynamicforms.DynamicModelForm, *args, **kwargs)
+
+    def get_pagecontent_modelforms(self, *args, **kwargs):
+        for model in pagecontents.models:
+            yield model, self.dynamic_modelform_factory(model=model, *args, **kwargs)
+
+    def check_forms(self, pagecontent_forms):
+        for pagecontent_form in pagecontent_forms:
+            if not pagecontent_form.are_valid():
+                print "FUCK", dir(pagecontent_form[0])
+                print pagecontent_form[0].errors
+                print [myform.errors for myform in pagecontent_form]
+                return False
+        return True
+
     def page_add_edit(self, request, id=None):
         model = self.model
         opts = model._meta
@@ -71,33 +90,34 @@ class PageAdmin(admin.ModelAdmin):
             form = PageForm(request)
             add = True
 
-        text_form = modelform_factory(TextPageContent, form=dynamicforms.DynamicModelForm)
-        print dir(page)
-        print 
-        page_contents = not add and page.textpagecontent_set.all()
-        
-        pagecontent_data = None
+        page_contents = not add and page.get_pagecontents()
+        pagecontent_data = []
+        pagecontent_forms = []
+        all_pagecontent_forms = []
 
         if request.method == 'POST':
-            print text_form.get_forms(request)
-            
             if not add:
-                pagecontent_forms = PageContentForm.get_forms(request)
-                pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
-            if form.is_valid() and (add or pagecontent_forms.are_valid()):
-                page = form.save()
+                for model, modelform in self.get_pagecontent_modelforms():
+                    modelform_collection = modelform.get_forms(request)
+                    for f in modelform_collection:
+                        pagecontent_data.append(f.render_js('from_template'))
+                        pagecontent_forms.append(modelform_collection)
+                        all_pagecontent_forms.append(f)
 
+            if form.is_valid() and (add or self.check_forms(pagecontent_forms)):
                 if not add:
                     # Save the PageContents
-                    for pagecontent_form in pagecontent_forms:
+                    for pagecontent_form in all_pagecontent_forms:
+                        print dir(pagecontent_form)
                         if pagecontent_form.id:
+                            model = pagecontent_form._meta.model
                             try:
-                                page_content = PageContent.objects.get(pk=pagecontent_form.id)
-                            except PageContent.DoesNotExist:
-                                page_content = PageContent() # Is this ok?
+                                page_content = model.objects.get(pk=pagecontent_form.id)
+                            except model.DoesNotExist:
+                                page_content = model() # Is this ok?
                         else:
-                            page_content = PageContent()
-                        set_values(page_content, PAGECONTENT_FIELDS, pagecontent_form.cleaned_data)
+                            page_content = model()
+                        set_values(page_content, pagecontent_form.fields, pagecontent_form.cleaned_data)
                         page_content.page = page
                         page_content.save()
 
@@ -111,12 +131,12 @@ class PageAdmin(admin.ModelAdmin):
 
         else: # get
             if not add:
-                pagecontent_data = []
-                for page_content in page_contents:
-                    content_form = PageContentForm(
-                        initial=get_values(page_content, PAGECONTENT_FIELDS),
-                        id=page_content.id)
-                    pagecontent_data.append(content_form.render_js('from_template'))
+                for page_content in itertools.chain(*page_contents):
+                    modelform = self.dynamic_modelform_factory(model=page_content.__class__)
+                    pagecontent_data.append(modelform(
+                        id=page_content.id,
+                        instance=page_content,
+                    ).render_js('from_template'))
 
         media = self.media
         if USE_TINYMCE:
@@ -125,20 +145,35 @@ class PageAdmin(admin.ModelAdmin):
             "cms/js/dynamicforms.js",
             "cms/js/page_add.js",
         ))
+        
+        pagecontent_templates = []
+        modelformsets = []
+        for model, modelform in self.get_pagecontent_modelforms():
+            m = modelformset_factory(model, form=dynamicforms.DynamicModelForm, extra=1)()
+            print dir(m.forms[0])
+            modelformsets.append(m)
+            # for field in model._meta.fields:
+            #     if hasattr(field.formfield(), 'required'):
+            #         print field.formfield().required
+            pagecontent_templates.append(
+                (model.__name__, m.forms[0].render_js('from_template'))
+            )
+        print modelformsets
 
         return render_to_response('cms/page_add.html', {
                 'title': u'%s %s' % (add and _('Add') or _('Edit'), _('page')),
                 'page': page,
                 'form': form,
-                'add':add,
+                'add': add,
                 'page_contents': page_contents,
-                'page_addons': PAGE_ADDONS,
-                'pagecontent_template': PageContentForm().render_js('from_template'),
+                'pagecontent_templates': pagecontent_templates,
                 'pagecontent_data': pagecontent_data,
-                'use_tinymce': USE_TINYMCE,
                 'root_path': self.admin_site.root_path,
                 'media': mark_safe(media),
                 'opts': opts,
+                'page_addons': PAGE_ADDONS,
+                'use_tinymce': USE_TINYMCE,
+                'modelformsets': modelformsets,
             }, context_instance=RequestContext(request))
 
     def navigation(self, request):

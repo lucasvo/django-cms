@@ -1,9 +1,10 @@
 import re
 
+from django.template.loader import render_to_string
 from django.template import Context, loader
 from django import forms
 from django.forms.forms import DeclarativeFieldsMetaclass
-from django.forms.models import ModelFormMetaclass, ModelForm
+from django.forms.models import ModelFormMetaclass, ModelForm, BaseModelForm
 from django.utils.safestring import mark_safe
 
 replace_res = [re.compile('(<[^>]+) (%s=\\\\"[a-zA-Z0-9-_]+\.)#(\\\\")([^<]*>)' % s) for s in ('id', 'for', 'name')]
@@ -52,9 +53,9 @@ class BaseForm(forms.BaseForm):
         return mark_safe(u"['%s']" % data)
 
     def from_template(self, extra_context={}):
-        template = loader.get_template(self.template)
-        context = Context(dict([('form', self)]+extra_context.items()))
-        return template.render(context)
+        return render_to_string(self.template, {
+            'form': self,
+        }, context_instance=Context(extra_context))
 
     @classmethod
     def get_forms(cls, request, kwargs={}):
@@ -84,11 +85,19 @@ class BaseForm(forms.BaseForm):
 class DynamicModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.postfix = kwargs.pop('postfix', '#')
-        kwargs['prefix'] = kwargs.get('prefix', '') or getattr(self, 'PREFIX', '')
-        self.template = kwargs.pop('template', '') or getattr(self, 'TEMPLATE', '')
-        self.core = kwargs.pop('core', '') or getattr(self, 'CORE', [])
+        self.model_name = self._meta.model.__name__.lower()
+        kwargs['prefix'] = kwargs.get('prefix', self.model_name)
+        self.template = kwargs.pop('template', (
+            'cms/pagecontents/%s.html' % self.model_name,
+            'cms/pagecontents/default.html',
+        ))
         self.id = kwargs.pop('id', '')
         super(DynamicModelForm, self).__init__(*args, **kwargs)
+        self.core = dict([(name, field) for name, field in self.fields.items() if field.required])
+
+    def save(self, *args, **kwargs):
+        print "saved:", self
+        super(DynamicModelForm, self).save(*args, **kwargs)
 
     def add_prefix(self, field_name):
         prefixed = super(DynamicModelForm, self).add_prefix(field_name)
@@ -107,9 +116,9 @@ class DynamicModelForm(ModelForm):
         return mark_safe(u"['%s']" % data)
 
     def from_template(self, extra_context={}):
-        template = loader.get_template(self.template)
-        context = Context(dict([('form', self)]+extra_context.items()))
-        return template.render(context)
+        return render_to_string(self.template, {
+            'form': self,
+        }, context_instance=Context(extra_context))
 
     @classmethod
     def get_forms(cls, request, kwargs={}):
