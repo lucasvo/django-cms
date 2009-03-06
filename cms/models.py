@@ -1,7 +1,6 @@
 import re
 import datetime
 
-from django.http import Http404
 from django.db import models
 from django.conf import settings
 from django.utils.dateformat import DateFormat
@@ -193,7 +192,7 @@ class Page(models.Model):
     smart_slug = property(smart_slug)
 
     def published(self, user):
-        return self in Page.on_site.published(user)
+        return self in Page.objects.published(user)
     published.boolean = True
     
     def get_meta_tags(self, language=None):

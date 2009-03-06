@@ -10,7 +10,7 @@ from django import forms
 
 from cms.util import set_values, get_values
 from cms.views import render_page
-from cms.models import Page, TextPageContent
+from cms.models import Page, PageContent
 from cms.forms import PageForm, PageContentForm, NavigationForm, PAGECONTENT_FIELDS
 from cms.decorators import json
 from cms.conf.global_settings import PAGE_ADDONS, USE_TINYMCE
