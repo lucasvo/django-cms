@@ -24,7 +24,7 @@ try:
     tagging = get_app("tagging")
     from tagging.fields import TagField
 except ImproperlyConfigured:
-    from django.models import CharField as TagField
+    from django.db.models import CharField as TagField
 
 PROTOCOL_RE = re.compile('^\w+://')
 
