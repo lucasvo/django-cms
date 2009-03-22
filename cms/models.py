@@ -24,7 +24,7 @@ try:
     tagging = get_app("tagging")
     from tagging.fields import TagField
 except ImproperlyConfigured:
-    from django.models import CharField as TagField
+    from django.db.models import CharField as TagField
 
 PROTOCOL_RE = re.compile('^\w+://')
 
@@ -135,7 +135,7 @@ class Page(models.Model):
     def on_path(self, path):
         return path in self.get_path()
 
-    def get_absolute_url(self, language=None):
+    def get_absolute_url(self, language=None, nolang=False):
         if self.redirect_to:
             return self.redirect_to.get_absolute_url()
 
@@ -151,7 +151,7 @@ class Page(models.Model):
             else:
                 return url
 
-        if LANGUAGE_REDIRECT:
+        if LANGUAGE_REDIRECT and not nolang:
             if not language:
                 language = translation.get_language()
             url += u'%s/' % language
@@ -161,6 +161,9 @@ class Page(models.Model):
             url += '/'
         return url
     absolute_url = get_absolute_url
+
+    def get_absolute_url_nolang(self):
+        return self.get_absolute_url(None, True)
 
     def get_next_position(self):
         children = Page.objects.filter(parent=self).order_by('-position')
