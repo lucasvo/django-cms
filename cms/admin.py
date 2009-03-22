@@ -21,7 +21,7 @@ class PageAdmin(admin.ModelAdmin):
     search_fields = ('title', 'slug',)
     prepopulated_fields = {'title': ['slug',] }
     tinymce_js = (
-        'js/getElementsBySelector.js',
+        'admin/js/getElementsBySelector.js',
         'filebrowser/js/AddFileBrowser.js'
     )
     
