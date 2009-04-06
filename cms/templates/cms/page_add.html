@@ -51,7 +51,7 @@ Window.onDomReady(function(){
 
 {% block content %}
 <p id="errors"></p>
-<form id="page-form" action="" method="post">
+<form id="page-form" action="" method="post" enctype="multipart/form-data">
     <div id="content-main">
         <div id="content-cms">
             <div id="itemdetails">
@@ -61,6 +61,10 @@ Window.onDomReady(function(){
                     {% render_field form.slug %}
                     {% render_field form.parent %}
                 </fieldset>
+                {# {% addons_render "top" opts %} #}
+{% for addon in addon_list %}
+{{ addon.render }}
+{% endfor %}
             </div>
             <div id="page-contents" class="clearfix"></div>
             {% if not add %}

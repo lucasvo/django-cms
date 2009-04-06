@@ -15,6 +15,8 @@ from cms.forms import PageForm, PageContentForm, NavigationForm, PAGECONTENT_FIE
 from cms.decorators import json
 from cms.conf.global_settings import PAGE_ADDONS, USE_TINYMCE
 
+from addons import AddOnList
+
 class PageAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'is_published', 'created', 'modified', 'parent', 'position', 'in_navigation')
     list_filter = ('is_published',)
@@ -70,6 +72,8 @@ class PageAdmin(admin.ModelAdmin):
             form = PageForm(request)
             add = True
 
+        addon_list = AddOnList(request, page)
+
         page_contents = not add and page.pagecontent_set.all()
 
         pagecontent_data = None
@@ -78,8 +82,12 @@ class PageAdmin(admin.ModelAdmin):
             if not add:
                 pagecontent_forms = PageContentForm.get_forms(request)
                 pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
-            if form.is_valid() and (add or pagecontent_forms.are_valid()):
+
+            addons_valid = addon_list.is_valid()
+
+            if form.is_valid() and (add or pagecontent_forms.are_valid()) and addons_valid:
                 page = form.save()
+                addon_list.save()
 
                 if not add:
                     # Save the PageContents
@@ -133,6 +141,7 @@ class PageAdmin(admin.ModelAdmin):
                 'root_path': self.admin_site.root_path,
                 'media': mark_safe(media),
                 'opts': opts,
+                'addon_list': addon_list,
             }, context_instance=RequestContext(request))
 
     def navigation(self, request):
