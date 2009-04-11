@@ -29,7 +29,7 @@ LANGUAGE_NAME_OVERRIDE = getattr(settings, 'CMS_LANGUAGE_NAME_OVERRIDE', (
 SEO_FIELDS = getattr(settings, 'CMS_SEO_FIELDS', False)
 
 # Whether the whole page should be password protected
-REQUIRE_LOGIN = getattr(settings, 'CMS_REQUIRE_LOGING', False)
+REQUIRE_LOGIN = getattr(settings, 'CMS_REQUIRE_LOGIN', False)
 
 # Additional templatetags for the page content, e.g. ['yourapp.extras']
 # will load yourapp/templatetags/extras.py (yourapp must be in INSTALLED_APPS)
