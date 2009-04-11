@@ -78,7 +78,9 @@ class PageAdmin(admin.ModelAdmin):
             if not add:
                 pagecontent_forms = PageContentForm.get_forms(request)
                 pagecontent_data = [pagecontent_form.render_js('from_template') for pagecontent_form in pagecontent_forms]
-            if form.is_valid() and (add or pagecontent_forms.are_valid()):
+
+
+            if form.is_valid():
                 page = form.save()
 
                 if not add:
