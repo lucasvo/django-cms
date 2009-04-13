@@ -23,7 +23,7 @@ default = dict(
     SHOW_STYLES_MENU = True,
     # (X)HTML
     FORCED_ROOT_BLOCK = 'p',
-    EXTENDED_VALID_ELEMENTS = 'a[class|name|href|title|onclick],img[class|src|alt=image|title|onmouseover|onmouseout],p[id|style|dir|class],span[class|style]',
+    EXTENDED_VALID_ELEMENTS = 'a[class|name|target|href|title|onclick],img[class|src|alt=image|title|onmouseover|onmouseout],p[id|style|dir|class],span[class|style]',
     INVALID_ELEMENTS = "", # example: "font,strike,u"    
 )
 
