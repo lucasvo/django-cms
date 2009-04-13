@@ -1,9 +1,7 @@
 CMS settings
 =============
 
-1. cd cms && cp cms_settings.py.dist cms_settings.py
-2. Edit cms_settings.py
-
+You can customize the cms settings by adding them to your settings.py. A list of available options is available in cms/conf/global_settings.py
 
 Setup media files and templates
 ===============================
