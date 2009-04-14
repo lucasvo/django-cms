@@ -76,7 +76,7 @@ class Page(models.Model):
 
     def save(self):
         self.modified = datetime.datetime.now()
-        self.overridden_url = self.overridden_url.strip('/ ')
+        self.overridden_url = self.overridden_url and self.overridden_url.strip('/ ')
         super(Page, self).save()
 
     def get_content(self, language=None, all=False, position=''):
