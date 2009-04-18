@@ -9,7 +9,9 @@ from django.forms.widgets import SelectMultiple
 from django.forms.fields import slug_re
 from django.core.exceptions import ImproperlyConfigured
 
-from cms.models import Page, PageContent
+from mptt.forms import TreeNodeChoiceField
+from cms.models import Page, PageTranslation, PageContent
+
 
 DATETIME_FORMATS = (
     '%d.%m.%Y %H:%M:%S',     # '25.10.2006 14:30:59'
@@ -40,13 +42,20 @@ class SlugField(forms.RegexField):
     def __init__(self, max_length=50, min_length=None, *args, **kwargs):
         error_message = _("This value must contain only letters, numbers, underscores or hyphens.")
         super(SlugField, self).__init__(slug_re, max_length, min_length, error_message, *args, **kwargs)
-    
+        
+class PageTranslationForm(forms.ModelForm):
+    class Meta:
+        model = PageTranslation
+        exclude = ('language', 'model')
+        
+        
 class PageForm(forms.ModelForm):
-    # parent = forms.ChoiceField(label=_('category'), choices=[('', '--------')], required=False)
+    parent = TreeNodeChoiceField(label=_('Navigation'), queryset=Page.objects.all(), required=True, help_text=_("The page will be positioned after the element you select. A more convenient way to move pages is the page overview."))
     
-    #publish_start = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
-    #publish_end = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
-    
+    def __init__(self, data=None, instance=None):
+        super(PageForm, self).__init__(data, instance)
+        self.fields['publish_start'].input_formats = self.fields['publish_end'].input_formats = DATETIME_FORMATS
+        
     class Meta:
         model = Page
         exclude = ('parent', 'created', 'modified', 'position', 'is_editable')
@@ -60,9 +69,7 @@ class PageForm(forms.ModelForm):
         choices = [('', '--------')]
         choices += TEMPLATES
         self.fields['template'].choices = choices
-        
-        self.fields['publish_start'].input_formats=DATETIME_FORMATS
-        self.fields['publish_end'].input_formats=DATETIME_FORMATS
+
 
     def clean_parent(self):
         num_pages = Page.objects.count()

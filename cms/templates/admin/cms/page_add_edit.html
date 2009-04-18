@@ -3,7 +3,6 @@
 
 {% block extrahead %}{{ block.super }}
 <script src="{{ root_path }}jsi18n/" type="text/javascript"></script>
-<script src="{% admin_media_prefix %}js/calendar.js" type="text/javascript"></script>
 {{ media }}
 {% if use_tinymce %}
 <script type="text/javascript">var use_tinymce = {{ use_tinymce|lower }};</script>
@@ -11,9 +10,12 @@
 <script src="/tinymce/init/tiny_mce_init.js" type="text/javascript"></script>
 <script src="/media/admin/filebrowser/js/TinyMCEAdmin.js"></script>
 {% endif %}
+
 <script type="text/javascript">
 //<![CDATA[
+prepare_page_add_edit();
 
+{% comment %}
 Window.onDomReady(function(){
     PageContent.template = {{ pagecontent_template }};
 
@@ -32,7 +34,7 @@ Window.onDomReady(function(){
         className: 'custom',
         showDelay: 600
     });
-});
+});{% endcomment %}
 //]]>
 </script>
 {% endblock %}
@@ -45,18 +47,63 @@ Window.onDomReady(function(){
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../../">{{ opts.app_label|capfirst|escape }}</a> &rsaquo; 
      <a href="../">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ page|truncatewords:"18" }}{% endif %}
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ page.menu_title|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
 
 {% block content %}
-<p id="errors"></p>
 <form id="page-form" action="" method="post" enctype="multipart/form-data">
-<table>
-{{ form }}
-</table>
-<input type="submit" name="submit">
-{% comment %}
+<div id="content-main">
+            {% for language in languages %}
+                <input type="button" class="language_button button" id="{{ language.0 }}button" name="{{ language.0}}" value="{{ language.1 }}" /> 
+            {% endfor %}
+    <div id="content-cms">
+        {% for lang in page_translation_forms %}
+        <div id="lang-{{ lang.0.0 }}" class="content-cms_container translated_form_container" {% if not forloop.first %}style="display:none;"{% endif %}><fieldset class="module aligned">
+            <h2>{% trans "Page" %} ({{ lang.0.1 }})</h2>
+            {% for field in lang.1 %}
+                <div class="form-row{% if field.errors %} error{% endif %}">
+                    {{ field.errors }}
+                    <label for="id_{{ lang.1.prefix }}-{{ field.name }}"{% if field.field.required %} class="required"{% endif %}>{{ field.label|capfirst }}</label>
+                    <fieldset class="aligned" style="border: medium none ;">
+                        {{ field }}
+                        {% if field.help_text %}<a href="#" onclick="return false;" class="HelpTip" title="{{ field.label|capfirst }} :: {{ field.help_text }}"><span>{% trans "Help" %}</span></a>{% endif %}
+                    </fieldset>
+                {% if field.info_text %}<p class="help">{{ field.info_text }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            
+            
+        </fieldset></div>
+        {% endfor %}
+    </div>
+    <div id="right">
+        <div id="publishinginfo">
+            <fieldset class="module aligned">
+                <h2>{% trans "Page Settings" %}</h2>
+                {% for field in page_form %}
+                    <div class="form-row{% if field.errors %} error{% endif %}">
+                        {{ field.errors }}
+                        <label for="id_{{ field.name }}"{% if field.field.required %} class="required"{% endif %}>{{ field.label|capfirst }}</label>
+                            <fieldset class="aligned" style="border: medium none ;">
+                                {{ field }}
+                            {% if field.help_text %}<a href="#" onclick="return false;" class="HelpTip" title="{{ field.label|capfirst }} :: {{ field.help_text }}"><span>{% trans "Help" %}</span></a>{% endif %}
+                            </fieldset>
+                        {% if field.info_text %}<p class="help">{{ field.info_text }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="submit-row">
+{% if not add %}<p class="float-left"><a href="delete/" class="deletelink">{% trans 'Delete' %}</a></p>{% endif %}
+<input type="submit" id="page_add_edit_submit" value="{% if add %}{% trans 'Add this page' %}{% else %}{% trans 'Save all changes' %}{% endif %}" class="default" />
+</div>
+</div>
+
+
+<!-- {% comment %}
     <div id="content-main">
         <div id="content-cms">
             <div id="itemdetails">
@@ -111,6 +158,6 @@ Window.onDomReady(function(){
     </div>  
     <div class="clearfix"></div>
     {% include 'cms/page_submit_row.html' %}
-{% endcomment %}
+{% endcomment %}-->
 </form>
 {% endblock %}

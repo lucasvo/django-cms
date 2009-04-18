@@ -9,6 +9,8 @@
 		
 		//events are written here
 		$(this).find("li").mousedown(function(e){
+            if (!$(e.target).hasClass('movespan'))
+                return;
 			if ($("#jTreeHelper").is(":not(:animated)") && e.button !=2) {
 				// append jTreePlacement to body and hides
 				$("body").append(str);
@@ -32,6 +34,7 @@
 					color: opts.hColor,
 					background: opts.hBg,
 				});
+                $("#jTreeHelper").attr("class", "navigation");
 				// start binding events to use
 				// prevent text selection
 				$(document).bind("selectstart", doNothing);
@@ -110,7 +113,7 @@
 				top: e.pageY + 5,
 				left: e.pageX + 5
 			});
-			
+		   	
 			$(".jTreePlacement").remove();
 		};
 		

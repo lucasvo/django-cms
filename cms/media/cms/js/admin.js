@@ -59,6 +59,7 @@ function serialize (el) {
     });
     return serializedData
 }
+
 function prepare_page_tree() {
 $(document).ready(function () {
     $('#navigation').jTree({
@@ -74,7 +75,6 @@ $(document).ready(function () {
         childOff: 40,
         onChange: function (el) { serialize(el); },
         moveHandler: "li div .movespan",
-
     });
     $("#submit_tree").click(function () {
         data = serialize($('#navigation'));
@@ -87,8 +87,33 @@ $(document).ready(function () {
             if (textStatus == "success") {
                     return true;
                 } else {
+                    // TODO: i18n!
                     alert("There was an error saving your changes. Please try again");
                 }
+        });
+        
+        return false;
+    });
+});
+}
+
+
+
+function prepare_page_add_edit() {
+$(document).ready(function () {
+    $('.language_button').click(function () {
+        div_name = "#lang-"+$(this).attr("name");
+        $('.translated_form_container').hide();
+        $(div_name).show();
+        // TODO: Save Changes if changed?
+        return false;
+    });
+
+    $('#page_add_edit_submit').click(function () {
+        post_data = $("#page-form").serialize();
+        console.log(post_data);
+        $.post(".", post_data, function (data) { 
+        //console.log(data); 
         });
         return false;
     });

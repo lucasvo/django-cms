@@ -1,5 +1,137 @@
-/* Import divio cms styles */
-@import url('cmslayout.css');
+
+
+/* Page Layout
+--------------------------------------------------------------------------------------- */
+
+#itemdetails, #publishinginfo, #content-cms {
+}
+
+/* Content CMS
+--------------------------------------------------------------------------------------- */
+#content-cms {
+	float: left;
+	margin-right: -335px;
+	width: 100%;
+	zoom:1;
+	z-index: 50;
+	
+}
+
+
+#content-cms .content-cms_container {
+	margin-right: 335px;
+}
+
+/* Right
+--------------------------------------------------------------------------------------- */
+#right {
+	float: right;
+	width: 330px;
+}
+
+
+/* Publishing Info
+--------------------------------------------------------------------------------------- */
+#publishinginfo {
+	position: relative;
+}
+
+/* Modules
+--------------------------------------------------------------------------------------- */
+.modules {
+	position: relative;
+}
+
+
+/* Content Pages
+--------------------------------------------------------------------------------------- */
+#content-pages {
+	float: left;
+	margin-right: -335px;
+	width: 100%;
+	zoom:1;
+	z-index: 50;
+	
+}
+
+
+
+/* Page Contents
+--------------------------------------------------------------------------------------- */
+#managepageslist {
+	margin-right: 255px;
+}
+
+/* Publishing Info
+--------------------------------------------------------------------------------------- */
+
+#managepagesinfo p {
+    padding-left: 10px;
+    margin-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+
+/* Source: http://www.positioniseverything.net/easyclearing.html */
+.clearfix:after {
+content: "."; 
+display: block; 
+height: 0; 
+clear: both; 
+visibility: hidden;
+}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE-mac \*/
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+
+
+/* Help Tooltip
+--------------------------------------------------------------------------------------- */ 
+.custom-tip {
+	color: #000;
+	width: 300px;
+	z-index: 13000;
+	border: 1px solid #ccc;
+}
+ 
+.custom-title {
+	font-weight: bold;
+	font-size: 11px;
+	margin: 0;
+	color: #fff;
+	padding: 4px 8px 4px;
+	background:white url(../img/default-bg.gif) bottom repeat-x;
+
+}
+ 
+.custom-text {
+	font-size: 11px;
+	padding: 3px 8px 8px;
+	background: #fff;
+}
+
+a.HelpTip {
+	height: 10px;
+	width: 10px;
+	background:url(../img/icon-unknown.gif) center bottom no-repeat;
+}
+
+a.HelpTip span {
+    visibility: hidden;
+}
+
+.datebreak {
+    display: block;
+}
+
+
+/* Navigation Styling
+--------------------------------------------------------------------------------------- */
 
 #navigation-form .submit-row input.default { float:none; }
 #page-form .submit-row input.default { float:none; }
@@ -27,38 +159,38 @@ div.inline label { float:none !important; width:auto !important; display:inline 
 .form-row a.toggle-advanced { text-decoration:underline; }
 
 /*.form-row { padding:0.4em 1em; }*/
-#navigation ul { padding-left:40px; }
-#navigation ul li {}
-#navigation li { margin: 0.1em 0 0.1em 0em; list-style: none; }
-#navigation { padding-top:0.5em; padding-bottom:0.5em; padding-left: 0px;}
-#navigation li { clear:both; }
-#navigation li span { cursor:pointer; color:#999; }
-#navigation li a span { color:#5B80B2; font-weight: bold }
-#navigation li a:hover span { color:#036; text-decoration:none;}
-/*#navigation li span:hover, #navigation li span:focus { text-decoration:underline; }
-#navigation li span:hover span, #navigation li span:focus span { text-decoration:none; }*/
-/*#navigation li.drag span { background-color:#eee; }*/
-#navigation li.changed .border { background-color:#ffc !important; }
-#navigation .toolbox { float:right; margin-right:1em; }
-#navigation .toolbox a, #navigation .toolbox label { margin:0 0.5em; }
-#navigation .toolbox label { margin-left:0; }
-/*#navigation { width:700px; }*/
+.navigation ul { padding-left:40px; }
+.navigation ul li {}
+.navigation li { margin: 0.1em 0 0.1em 0em; list-style: none; }
+.navigation { padding-top:0.5em; padding-bottom:0.5em; padding-left: 0px;}
+.navigation li { clear:both; }
+.navigation li span { cursor:pointer; color:#999; }
+.navigation li a span { color:#5B80B2; font-weight: bold }
+.navigation li a:hover span { color:#036; text-decoration:none;}
+/*.navigation li span:hover, .navigation li span:focus { text-decoration:underline; }
+.navigation li span:hover span, .navigation li span:focus span { text-decoration:none; }*/
+/*.navigation li.drag span { background-color:#eee; }*/
+.navigation li.changed .border { background-color:#ffc !important; }
+.navigation .toolbox { float:right; margin-right:1em; }
+.navigation .toolbox a, .navigation .toolbox label { margin:0 0.5em; }
+.navigation .toolbox label { margin-left:0; }
+/*.navigation { width:700px; }*/
 .toolbox { display:none; } /* don't display in drag shadow */
-#navigation .toolbox { display:block; }
-#navigation .toolbox label { font-size:1em; }
-#navigation .toolbox label.left { margin-left:0.5em; }
-#navigation .toolbox img { margin-right:1em; }
-#navigation div.border:hover { background-color:#eee;}
-#navigation div.border { border-bottom: 1px solid #ddd; padding: 5px 5px 5px 10px; background-color:#f1f6ff; /*margin-right: 350px*/}
-/*#navigation div.border .toolbox { display:none; }
-#navigation div.border:hover .toolbox { display:block; }*/
-#navigation .path { width:10em; display:block; float:left; overflow:hidden; text-align:left; }
-#navigation .path a { font-weight:normal; color:#666; font-size:0.9em; overflow:hidden;}
-#navigation .movespan { font-weight:normal; margin-right: 10px; color:#999; font-size:0.9em; padding-left:15px; background:url(../img/icon_move.gif) 0 0 no-repeat; cursor: move;}
-#navigation .movespan:link { text-decoration: none; color: #036;}
-#navigation .movespan:hover { text-decoration: none; color: #036;}
-#navigation .view { font-weight:normal; margin-right: 0px; color:#999; padding-left:15px; background:url(../img/selector-addall.gif) 0 0.1em no-repeat; }
-#navigation .link_id { cursor:default; font-weight:normal; padding-left:1em; color:#999; font-size:0.9em; }
+.navigation .toolbox { display:block; }
+.navigation .toolbox label { font-size:1em; }
+.navigation .toolbox label.left { margin-left:0.5em; }
+.navigation .toolbox img { margin-right:1em; }
+.navigation div.border:hover { background-color:#eee;}
+.navigation div.border { border-bottom: 1px solid #ddd; padding: 5px 5px 5px 10px; background-color:#f1f6ff; /*margin-right: 350px*/}
+/*.navigation div.border .toolbox { display:none; }
+.navigation div.border:hover .toolbox { display:block; }*/
+.navigation .path { width:10em; display:block; float:left; overflow:hidden; text-align:left; }
+.navigation .path a { font-weight:normal; color:#666; font-size:0.9em; overflow:hidden;}
+.navigation .movespan { font-weight:normal; margin-right: 10px; color:#999; font-size:0.9em; padding-left:15px; background:url(../img/icon_move.gif) 0 0 no-repeat; cursor: move;}
+.navigation .movespan:link { text-decoration: none; color: #036;}
+.navigation .movespan:hover { text-decoration: none; color: #036;}
+.navigation .view { font-weight:normal; margin-right: 0px; color:#999; padding-left:15px; background:url(../img/selector-addall.gif) 0 0.1em no-repeat; }
+.navigation .link_id { cursor:default; font-weight:normal; padding-left:1em; color:#999; font-size:0.9em; }
 
 fieldset .small { 
     color:#999; 
@@ -70,6 +202,8 @@ fieldset .small b {
 }
 .hideme { display: none; }
 
-/* NAVVIGATION TOOLS */
+
+
+
 
 
