@@ -9,18 +9,7 @@ from django.forms.widgets import SelectMultiple
 from django.forms.fields import slug_re
 from django.core.exceptions import ImproperlyConfigured
 
-from cms import dynamicforms
-from cms.util import flatten
 from cms.models import Page, PageContent
-from cms.conf.global_settings import TEMPLATES, POSITIONS, USE_TINYMCE, SEO_FIELDS
-
-# Look if django-tagging is installed, use its TagField and fall back to
-# Django's CharField if unavailable.
-try:
-    tagging = get_app("tagging")
-    from tagging.forms import TagField
-except ImproperlyConfigured:
-    from django.forms import CharField as TagField
 
 DATETIME_FORMATS = (
     '%d.%m.%Y %H:%M:%S',     # '25.10.2006 14:30:59'
@@ -47,76 +36,22 @@ DATE_FORMATS = (
     '%m/%d/%y',              # '10/25/06'
 )
 
-class DateTimeWidget(forms.widgets.SplitDateTimeWidget):
-    def render(self, name, value, attrs=None):
-        attrs.update({'class': 'vDateField'})
-        return super(DateTimeWidget, self).render(name, value, attrs)
-
-class DateWidget(forms.widgets.Input):
-    input_type = 'text' # Subclasses must define this.
-
-    def render(self, name, value, attrs=None):
-        attrs.update({'class': 'vDateField'})
-        return super(DateWidget, self).render(name, value, attrs)
-
-class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):
-    "A MultipleChoiceField with default help_text."
-    def __init__(self, queryset, cache_choices=False, required=True,
-            widget=SelectMultiple, label=None, initial=None, help_text=None):
-        if not help_text:
-            help_text = _(u'Hold down "Control", or "Command" on a Mac, to select more than one.')
-        super(ModelMultipleChoiceField, self).__init__(queryset, cache_choices,
-            required, widget, label, initial, help_text)
-
 class SlugField(forms.RegexField):
     def __init__(self, max_length=50, min_length=None, *args, **kwargs):
         error_message = _("This value must contain only letters, numbers, underscores or hyphens.")
         super(SlugField, self).__init__(slug_re, max_length, min_length, error_message, *args, **kwargs)
     
-PAGE_FIELDS = (
-    'title',
-    'slug', 
-    'template',
-    'context',
-    'is_published', 
-    'in_navigation', 
-    'override_url', 
-    'overridden_url', 
-    'redirect_to', 
-    'requires_login', 
-    'start_publish_date', 
-    'end_publish_date',
-    'sites',
-)
-PAGECONTENT_FIELDS = (
-    'language', 
-    'position',
-    'is_published', 
-    'content_type', 
-    'title', 
-    'slug',
-    'page_title',
-    'keywords',
-    'description', 
-    'page_topic',
-    'content', 
-    'allow_template_tags', 
-    'template',
-)
-
 class PageForm(forms.ModelForm):
-    slug = SlugField()
-    template = forms.ChoiceField(choices=TEMPLATES, help_text=_('The template that will be used to render the page. Choose nothing if you don\'t need a custom template.'), required=False)
-    start_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
-    end_publish_date = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
-    # not yet implemented
-    # change_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('change access level'), help_text=_('Select groups which are allowed to edit this page.'))
-    # view_access_level = ModelMultipleChoiceField(required=False, queryset=Group.objects.all(), label=_('view access level'), help_text=_('If groups are selected, only these groups are allowed to view this page and every page rooted under it.'))
-
+    # parent = forms.ChoiceField(label=_('category'), choices=[('', '--------')], required=False)
+    
+    #publish_start = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('start publishing'), help_text=_('Enter a date (and time) on which you want to start publishing this page.'))
+    #publish_end = forms.DateTimeField(widget=DateWidget, input_formats=DATETIME_FORMATS, required=False, label=_('finish publishing'), help_text=_('Enter a date after which you want to stop publishing this page.'))
+    
     class Meta:
         model = Page
-        exclude = ('created', 'modified', 'position', 'is_editable')
+        exclude = ('parent', 'created', 'modified', 'position', 'is_editable')
 
+'''
     def __init__(self, request, instance=None):
         super(PageForm, self).__init__(request.method == 'POST' and request.POST or None, instance=instance)
         choices = [('', '--------')]
@@ -125,6 +60,9 @@ class PageForm(forms.ModelForm):
         choices = [('', '--------')]
         choices += TEMPLATES
         self.fields['template'].choices = choices
+        
+        self.fields['publish_start'].input_formats=DATETIME_FORMATS
+        self.fields['publish_end'].input_formats=DATETIME_FORMATS
 
     def clean_parent(self):
         num_pages = Page.objects.count()
@@ -203,3 +141,4 @@ class SearchForm(forms.Form):
 class NavigationForm(dynamicforms.Form):
     in_navigation = forms.BooleanField(required=False)
     is_published = forms.BooleanField(required=False)
+'''

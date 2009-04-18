@@ -1,3 +1,106 @@
+import datetime
+
+from django.conf import settings
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from cms.managers import PageManager
+
+#from cms.conf.global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
+POSITIONS = []
+
+from multiling import MultilingualModel
+
+import mptt
+
+
+class PageTranslation(models.Model):
+    model = models.ForeignKey('Page')
+    language = models.CharField(max_length=5, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
+
+    page_title = models.CharField(_('page title'), max_length=200, help_text=_('The title of the page.'))
+    menu_title = models.CharField(_('menu title'), max_length=200, help_text=_('The title displayed in the menu.'))
+    slug = models.SlugField(_('slug'), help_text=_('The name of the page that appears in the URL. A slug can contain letters, numbers, underscores or hyphens.'))
+
+    keywords = models.CharField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
+    description = models.TextField(help_text=_('keep between 150 and 1000 characters long.'), null=True, blank=True)
+
+    def __unicode__(self):
+        return self.menu_title
+
+
+class Page(MultilingualModel):
+
+    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+
+    in_navigation = models.BooleanField(_('display in navigation'), default=True)
+
+    is_published = models.BooleanField(_('is published'), default=True, help_text=_('Whether or not the page is accessible from the web.'))
+    publish_start = models.DateTimeField(_('start publishing'), null=True, blank=True)
+    publish_end = models.DateTimeField(_('finish publishing'), null=True, blank=True)
+
+    requires_login = models.BooleanField(_('requires login'), help_text=_('If checked, only logged-in users can view the page. Automatically enabled if the parent page requires a login.'))
+
+    redirect_to = models.ForeignKey('self', null=True, blank=True, related_name='redirected_pages')
+
+    context = models.CharField(max_length=200, null=True, blank=True, help_text=_('Optional. Dotted path to a python function that receives two arguments (request, context) and can update the context.'))
+
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+
+    def __unicode__(self):
+        if self.get_translated_or_none('menu_title'):
+            return self.get_translated_or_none('menu_title')
+        else:
+            return 'Page object'
+
+    '''def render_as_tree_item(self):
+        parent, children = obj
+        template = loader.get_template('admin/cms/tree_item.html')
+        content = template.render(Context({'page': parent}))
+        return '<li id="navigation-%s">%s%s</li>' % (parent.id, content, children and '<ul>%s</ul>'%''.join([render(child) for child in children]) or '')
+    '''
+    class Meta:
+        translation = PageTranslation
+        multilingual = ['page_title', 'menu_title', 'slug', 'keywords', 'description']
+
+    objects = PageManager()
+
+mptt.register(Page)
+
+
+
+class PageContent(models.Model):
+    CONTENT_TYPES = (
+        ('html', _('HTML')),
+        # ('markdown', _('Markdown')),
+        # ('textile', _('Textile')),
+        # ('rst', _('reStructuredText')),
+        ('text', _('Plain text')),
+    )
+
+    page = models.ForeignKey(Page)
+    language = models.CharField(max_length=5, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE[:2])
+
+    is_published = models.BooleanField(_('is published'), default=True, help_text=_('Whether or not the page is accessible from the web.'))
+    publish_start = models.DateTimeField(_('start publishing'), null=True, blank=True)
+    publish_end = models.DateTimeField(_('finish publishing'), null=True, blank=True)
+
+    created = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+    modified = models.DateTimeField(null=True, blank=True, default=datetime.datetime.now)
+
+    content_type = models.CharField(max_length=10, choices=CONTENT_TYPES, default='html')
+    allow_template_tags = models.BooleanField(default=True)
+
+    template = models.CharField(max_length=200, null=True, blank=True, help_text=_('Only specify this if you want to override the page template.'))
+
+    position = models.CharField(max_length=32, null=True, blank=True, choices=[(pos[0], _(pos[1])) for pos in POSITIONS])
+
+    content = models.TextField(null=True, blank=True)
+    
+    
+
+'''
 import re
 import datetime
 
@@ -18,13 +121,6 @@ from cms.util import language_list, MetaTag
 from cms.conf.global_settings import LANGUAGE_REDIRECT, USE_TINYMCE, POSITIONS
 from cms.managers import PageManager, PageSiteManager
 
-# Look if django-tagging is installed, use its TagField and fall back to
-# Django's CharField if unavailable.
-try:
-    tagging = get_app("tagging")
-    from tagging.fields import TagField
-except ImproperlyConfigured:
-    from django.db.models import CharField as TagField
 
 PROTOCOL_RE = re.compile('^\w+://')
 
@@ -236,7 +332,7 @@ class PageContent(models.Model):
     slug = models.CharField(_('slug'), max_length=50, help_text=_('Only specify this if you want to give this page content a specific slug.'))
     page_title = models.CharField(max_length=250, null=True, blank=True, help_text=_('Used for page title. Should be no longer than 150 chars.'))
     keywords = TagField(_('keywords'), max_length=250, help_text=_('Comma separated'), null=True, blank=True)
-    description = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
+    description = models.textfield(help_text=_('keep between 150 and 1000 characters long.'), null=true, blank=true)
     page_topic = models.TextField(help_text=_('Keep between 150 and 1000 characters long.'), null=True, blank=True)
     content = models.TextField()
 
@@ -277,3 +373,4 @@ class PageContent(models.Model):
 
     def language_bidi(self):
         return self.language in settings.LANGUAGES_BIDI 
+'''
