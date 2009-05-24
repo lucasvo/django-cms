@@ -91,7 +91,6 @@ $(document).ready(function () {
                     alert("There was an error saving your changes. Please try again");
                 }
         });
-        
         return false;
     });
 });
@@ -105,6 +104,8 @@ $(document).ready(function () {
         div_name = "#lang-"+$(this).attr("name");
         $('.translated_form_container').hide();
         $(div_name).show();
+        $('.language_button').removeClass('selected');
+        $(this).addClass('selected');
         // TODO: Save Changes if changed?
         return false;
     });
@@ -113,8 +114,16 @@ $(document).ready(function () {
         post_data = $("#page-form").serialize();
         console.log(post_data);
         $.post(".", post_data, function (data) { 
-        //console.log(data); 
-        });
+            // Clean up:
+            $('.form-row').removeClass('error');
+            $('ul.errorlist').remove();
+            for (x in data) {
+                div = $('#div_'+data[x][0]);
+                div.addClass('error');
+                div.prepend(data[x][1]);
+            }
+            
+        }, "json");
         return false;
     });
 });

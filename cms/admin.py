@@ -6,14 +6,14 @@ from django.views.generic.simple import direct_to_template
 from django.shortcuts import render_to_response, get_object_or_404
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.template import RequestContext, Context, loader
 from django.core import serializers
 
 import simplejson as json
 
-from cms.models import Page, PageTranslation
+from cms.models import Page, PageTranslation, Position, Template
 from cms.forms import PageForm, PageTranslationForm
 
 
@@ -42,35 +42,58 @@ class PageAdmin(admin.ModelAdmin):
     def page_add_edit(self, request, page_id=None):
         model = self.model
         opts = model._meta
+        
         media = self.media
         media.add_css({
             'all':(settings.ADMIN_MEDIA_PREFIX+'css/forms.css',)
-            })                  
+            })           
         
         if page_id:
             page = get_object_or_404(Page, pk=page_id)
             page_form = PageForm(request.method == 'POST' and request.POST or None, instance=page)
             add = False
+            print request.method
+            print page_form.errors
+            
             page_translation_forms = []
             for language in settings.LANGUAGES:
                 p_t = PageTranslation.objects.filter(language=language[0], model=page)
                 if len(p_t) == 1:
-                    p_t_form = PageTranslationForm(prefix=language[0], instance=p_t)
+                    p_t_form = PageTranslationForm(request.method == 'POST' and request.POST or None, prefix=language[0], instance=p_t[0])
                 else:
-                    p_t_form = PageTranslationForm(prefix=language[0])
+                    p_t_form = PageTranslationForm(request.method == 'POST' and request.POST or None, prefix=language[0])
                 page_translation_forms.append((language, p_t_form))
-
         else:
             page_form = PageForm(request.method == 'POST' and request.POST or None)
             page = None
             add = True 
+            
 
+        errors = []
         if request.method == 'POST':
-            print request.POST
-            #if form.is_valid():
-            #    album = form.save()
-            #    return HttpResponseRedirect('../%d/' % page.id)
-                        
+            if page_form.is_valid():
+                page_form.save()
+                page_form_valid = True
+            else:
+                for field in page_form:
+                    if field.errors:
+                        errors.append((field.name, str(field.errors)))
+
+            for p in page_translation_forms:
+                form = p[1]
+                lang = p[0][0]
+                if form.is_valid():
+                    p_t = form.save(commit=False)
+                    p_t.model = page
+                    p_t.language = lang
+                    p_t.save()
+                else:
+                    for field in form:
+                        if field.errors:
+                            errors.append((lang+'-'+field.name, str(field.errors)))
+
+            return HttpResponse(json.dumps(errors))
+                
         return direct_to_template(request, 'admin/cms/page_add_edit.html', {
                 'title':(add and _('Add %s') % _('page') or _('Edit %s') % _('page')),
                 'page':page,
@@ -145,3 +168,6 @@ class PageAdmin(admin.ModelAdmin):
 
 admin.site.register(Page, PageAdmin)
 admin.site.register(PageTranslation)
+#admin.site.register(PageContent)
+admin.site.register(Template)
+admin.site.register(Position)

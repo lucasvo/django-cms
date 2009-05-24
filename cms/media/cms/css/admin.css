@@ -130,6 +130,19 @@ a.HelpTip span {
 }
 
 
+.language_button { 
+    font-weight:bold;
+    margin-bottom:-1px; 
+    border-color:#DDDDDD #AAAAAA #CCCCCC #DDDDDD !important; 
+    border:1px;  
+    background:white url(/media/admin/img/admin/nav-bg.gif) repeat-x scroll center bottom !important;
+    }
+.language_button.selected { 
+    margin-bottom:-2px;
+    border-bottom:0px !important;
+    color:#fff;
+    background:#bcd2e9 !important;
+    }
 /* Navigation Styling
 --------------------------------------------------------------------------------------- */
 

@@ -50,7 +50,7 @@ class PageTranslationForm(forms.ModelForm):
         
         
 class PageForm(forms.ModelForm):
-    parent = TreeNodeChoiceField(label=_('Navigation'), queryset=Page.objects.all(), required=True, help_text=_("The page will be positioned after the element you select. A more convenient way to move pages is the page overview."))
+    #parent = TreeNodeChoiceField(label=_('Navigation'), queryset=Page.objects.all(), required=True, help_text=_("The page will be positioned after the element you select. A more convenient way to move pages is the page overview."))
     
     def __init__(self, data=None, instance=None):
         super(PageForm, self).__init__(data, instance)
